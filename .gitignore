@@ -1,0 +1,34 @@
+# OS / tooling
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.log
+__pycache__/
+*.pyc
+
+# Python envs / vendors
+env/
+venv/
+.venv/
+Lib/
+Scripts/
+
+# Selenium / Chrome profiles (local state; do not publish)
+chrome_profile_plus/
+hailuo_chrome_profile/
+sora2_chrome_profile/
+
+# Runtime outputs
+downloads/
+logs/
+
+# App state files (local progress)
+hailuo_state_*.json
+sora_state_*.json
+
+# Optional: personal prompts (uncomment if you prefer not to publish prompts)
+#prompts.txt
+#prompts_set*.txt
+#hailuo_prompts*.txt
+
