@@ -8,6 +8,9 @@ cd /d "%~dp0"
 
 set MSG=%*
 if "%MSG%"=="" (
+  set /p MSG=커밋 메시지를 적어주세요 (엔터=자동문구): 
+)
+if "%MSG%"=="" (
   for /f "tokens=1-5 delims=/:. " %%a in ("%date% %time%") do set MSG=auto commit %%a-%%b-%%c_%%d%%e
 )
 
@@ -26,4 +29,3 @@ git push
 echo.
 echo 완료! 창을 닫아도 됩니다.
 pause
-
