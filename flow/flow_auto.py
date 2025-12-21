@@ -1120,19 +1120,23 @@ class FlowApp:
         candidates: list[Path] = []
         if override:
             candidates.append(Path(override))
+        
+        # Windows 크롬 기본 경로 총망라
         candidates += [
             Path("C:/Program Files/Google/Chrome/Application/chrome.exe"),
             Path("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"),
+            Path(os.environ.get("LOCALAPPDATA", "")) / "Google/Chrome/Application/chrome.exe",
             Path(os.environ.get("PROGRAMFILES", "")) / "Google/Chrome/Application/chrome.exe",
             Path(os.environ.get("PROGRAMFILES(X86)", "")) / "Google/Chrome/Application/chrome.exe",
-            Path.home() / "AppData/Local/Google/Chrome/Application/chrome.exe",
         ]
+        
         for p in candidates:
             if p and p.exists():
                 return str(p)
-        raise FileNotFoundError(
-            "Chrome 실행 파일을 찾지 못했습니다. flow_config.json 의 chrome_executable 값을 확인해 주세요."
-        )
+                
+        # 못 찾으면 에러 메시지 띄움
+        messagebox.showerror("오류", "크롬 브라우저를 찾을 수 없습니다.\n구글 크롬이 설치되어 있는지 확인해주세요.")
+        raise FileNotFoundError("Chrome 실행 파일을 찾지 못했습니다.")
 
     def _is_debug_port_alive(self, port: int) -> bool:
         import urllib.error
@@ -1173,19 +1177,23 @@ class FlowApp:
         
         try:
             self.log("Chrome 실행 시도 (스텔스 모드)...")
-            subprocess.Popen(flags, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            # 에러 확인을 위해 stderr는 파이프로 연결하지 않음
+            subprocess.Popen(flags)
         except Exception as e:
             self.log(f"Chrome 실행 실패: {e}")
+            messagebox.showerror("실패", f"크롬 실행 중 오류가 발생했습니다:\n{e}")
             return False
             
-        # 포트가 열릴 때까지 대기
-        for _ in range(30):
+        # 포트가 열릴 때까지 대기 (최대 30초)
+        self.log("크롬이 켜지기를 기다리는 중...")
+        for i in range(30):
             if self._is_debug_port_alive(port):
-                self.log("Chrome 준비 완료!")
+                self.log(f"Chrome 준비 완료! ({i+1}초 소요)")
                 return True
             time.sleep(1)
             
         self.log("Chrome 실행 대기 시간 초과")
+        messagebox.showwarning("시간 초과", "크롬이 실행되었지만 연결되지 않았습니다.\n이미 실행된 크롬이 있다면 닫고 다시 시도해보세요.")
         return False
 
     def _get_driver(self):
@@ -1576,40 +1584,56 @@ class FlowApp:
 
     def _fill_via_keys(self, d: webdriver.Chrome, el, text: str) -> bool:
         """
-        [물리적 입력 모드]
-        Selenium으로 클릭하여 포커스를 잡고, PyAutoGUI(가상 키보드)로 실제 신호를 보냅니다.
-        이 방식은 OS 레벨의 입력이므로 브라우저가 봇을 감지하기 매우 어렵습니다.
+        [물리적 입력 모드 - 정밀 타격 버전]
+        요소의 화면상 절대 좌표를 계산하여 마우스를 직접 이동시켜 클릭한 후 입력합니다.
         """
         text = self._sanitize_bmp(text)
         
         try:
-            self.log("🖱️ 입력창 포커싱 (Selenium)...")
-            # 1. Selenium으로 클릭해서 입력창 활성화 (가장 정확함)
-            self._human_click(d, el)
+            self.log("🖱️ 좌표 계산 및 이동 중...")
+            
+            # 1. 요소의 화면상 절대 좌표 계산 (JS 이용)
+            # window.screenX: 브라우저 창의 모니터 내 X 좌표
+            # element.getBoundingClientRect(): 뷰포트 내 요소 좌표
+            # window.outerHeight - window.innerHeight: 상단 UI(주소창 등) 높이 대략적 계산
+            
+            metrics = d.execute_script("""
+                const rect = arguments[0].getBoundingClientRect();
+                const uiHeight = window.outerHeight - window.innerHeight;
+                return {
+                    x: window.screenX + rect.left + rect.width / 2,
+                    y: window.screenY + rect.top + rect.height / 2 + (uiHeight * 0.7) // 상단 바 보정
+                };
+            """, el)
+            
+            target_x = int(metrics['x'])
+            target_y = int(metrics['y'])
+            
+            # 2. 마우스 이동 및 클릭
+            pyautogui.moveTo(target_x, target_y, duration=0.5) # 0.5초 동안 부드럽게 이동
+            pyautogui.click()
             time.sleep(0.5)
             
-            # 2. PyAutoGUI로 물리적 키 입력 (유령 모드)
-            self.log("👻 유령 키보드 작동 중... (마우스 건드리지 마세요!)")
+            # 3. 입력 시작
+            self.log("👻 유령 키보드 입력 시작")
             
-            # 기존 내용 지우기 (Ctrl+A -> Backspace)
+            # 기존 내용 지우기
             pyautogui.hotkey('ctrl', 'a')
             time.sleep(0.1)
             pyautogui.press('backspace')
             time.sleep(0.2)
             
-            # 클립보드 복사 후 붙여넣기 (한글 깨짐 방지 및 속도 최적화)
-            # 봇 탐지 회피를 위해 클립보드 사용 후 미세한 움직임 추가
+            # 붙여넣기
             pyperclip.copy(text)
             time.sleep(0.1)
             pyautogui.hotkey('ctrl', 'v')
-            time.sleep(0.3)
+            time.sleep(0.5)
             
-            # 봇 아님을 증명하기 위한 '인간적인 틱' (의미 없는 키 입력 후 삭제)
-            # 마치 오타 났다가 지우는 것처럼 연기
-            if random.random() < 0.3: # 30% 확률로 연기
-                pyautogui.press('space')
+            # 연기 (오타 수정 척)
+            if random.random() < 0.3:
+                pyautogui.press('left')
                 time.sleep(0.1)
-                pyautogui.press('backspace')
+                pyautogui.press('right')
             
             self.log("✅ 물리적 입력 완료")
             return True
