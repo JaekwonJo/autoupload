@@ -519,7 +519,8 @@ class FlowApp:
         )
 
         self.auto_next_var = tk.BooleanVar(value=True)
-        self.auto_dl_var = tk.BooleanVar(value=bool(self.cfg.get("auto_download_enabled", False)))
+        # 자동 다운로드 기본값 해제 (사용자 요청: 생성과 다운로드 분리)
+        self.auto_dl_var = tk.BooleanVar(value=False)
 
         ttk.Checkbutton(
             run_frame,
@@ -1850,12 +1851,8 @@ class FlowApp:
             self.log("입력창을 찾지 못했습니다.")
             return False
         
-        # 다운로드 기능이 켜져 있다면, 제출 전 버튼 개수를 미리 셉니다.
-        pre_count = 0
-        do_download = bool(self.cfg.get("auto_download_enabled", False))
-        if do_download:
-            pre_count = self._count_download_buttons(d)
-
+        # [수정] 자동 다운로드 로직 완전 삭제! (제출만 집중)
+        
         cur_no = self.index + 1
         total = len(self.prompts)
         prefix = f"[프롬프트 {cur_no}/{total}]"
@@ -1875,7 +1872,7 @@ class FlowApp:
                 self.session_fail += 1
             return False
             
-        # 2. 스타일 선택 (실패 원인 유력 후보)
+        # 2. 스타일 선택 (필수)
         time.sleep(0.5)
         self._select_style_heuristic(d)
         
@@ -1891,13 +1888,7 @@ class FlowApp:
             else:
                 self.session_fail += 1
 
-        # Auto-download if enabled
-        if ok_submit and do_download:
-            try:
-                # 제출 전 개수(pre_count)보다 버튼이 많아질 때까지 기다립니다.
-                self._wait_and_download(pre_count)
-            except Exception as exc:
-                self.log(f"{prefix} 자동 다운로드 중 오류: {exc}")
+        # [수정] 제출 후 다운로드 시도하던 코드 삭제됨.
         return ok_submit
 
     # ------------------- selector capture -------------------
