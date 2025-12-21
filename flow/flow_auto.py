@@ -1159,11 +1159,6 @@ class FlowApp:
         options = ChromeOptions()
         options.add_experimental_option("debuggerAddress", f"127.0.0.1:{port}")
         
-        # 봇 탐지 우회 설정 강화
-        options.add_argument("--disable-blink-features=AutomationControlled")
-        options.add_experimental_option("excludeSwitches", ["enable-automation"])
-        options.add_experimental_option('useAutomationExtension', False)
-        
         service = ChromeService(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=options)
         self.driver.implicitly_wait(2)
