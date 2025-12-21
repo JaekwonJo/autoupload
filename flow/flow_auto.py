@@ -138,37 +138,32 @@ class FlowVisionApp:
         style.map("TButton", background=[('active', '#5E5E7E')])
         style.configure("Accent.TButton", background="#FF79C6", foreground="black", font=("Malgun Gothic", 10, "bold"))
         
-        # 상단: 타이틀 & 설명
-        top = tk.Frame(self.root, bg="#1E1E2E")
-        top.pack(fill="x", padx=20, pady=15)
-        tk.Label(top, text="🌙 Flow 비전 봇 (탐지 불가)", font=("Malgun Gothic", 16, "bold"), fg="#BD93F9", bg="#1E1E2E").pack(anchor="w")
-        tk.Label(top, text="Selenium을 쓰지 않고, 순수 마우스/키보드 제어로 구글을 속입니다.", font=("Malgun Gothic", 9), fg="#6272A4", bg="#1E1E2E").pack(anchor="w")
+        # 메인 컨테이너
+        main = tk.Frame(self.root, bg="#1E1E2E")
+        main.pack(fill="both", expand=True)
 
-        # 좌표 설정 영역
-        coord_frame = tk.LabelFrame(self.root, text=" 1. 좌표 설정 (필수!) ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=10)
-        coord_frame.pack(fill="x", padx=20, pady=5)
+        # 1. 상단: 타이틀
+        top = tk.Frame(main, bg="#1E1E2E")
+        top.pack(fill="x", padx=20, pady=10)
+        tk.Label(top, text="🌙 Flow 비전 봇 (Smart Edition)", font=("Malgun Gothic", 14, "bold"), fg="#BD93F9", bg="#1E1E2E").pack(side="left")
         
-        tk.Label(coord_frame, text="버튼을 누르고 5초 안에 마우스를 해당 위치로 옮기세요!", bg="#1E1E2E", fg="#FFB86C").pack(pady=(0,5))
+        # 2. 좌표 설정
+        coord_frame = tk.LabelFrame(main, text=" 1. 좌표 설정 (필수) ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=5)
+        coord_frame.pack(fill="x", padx=20, pady=5)
         
         btn_box = tk.Frame(coord_frame, bg="#1E1E2E")
         btn_box.pack(fill="x")
-        
-        self.btn_set_input = ttk.Button(btn_box, text="📍 입력창 위치 잡기 (5초 대기)", command=lambda: self.start_capture("input"))
-        self.btn_set_input.pack(side="left", expand=True, fill="x", padx=2)
-        
-        self.btn_set_submit = ttk.Button(btn_box, text="📍 생성 버튼 위치 잡기 (5초 대기)", command=lambda: self.start_capture("submit"))
-        self.btn_set_submit.pack(side="left", expand=True, fill="x", padx=2)
-        
+        ttk.Button(btn_box, text="📍 입력창 위치 (5초)", command=lambda: self.start_capture("input")).pack(side="left", expand=True, fill="x", padx=2)
+        ttk.Button(btn_box, text="📍 생성 버튼 위치 (5초)", command=lambda: self.start_capture("submit")).pack(side="left", expand=True, fill="x", padx=2)
         self.lbl_coords = tk.Label(coord_frame, text=self._get_coord_text(), bg="#1E1E2E", fg="#8BE9FD")
-        self.lbl_coords.pack(pady=5)
+        self.lbl_coords.pack(pady=2)
 
-        # 실행 제어 영역
-        run_frame = tk.LabelFrame(self.root, text=" 2. 실행 제어 ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=10)
-        run_frame.pack(fill="x", padx=20, pady=10)
+        # 3. 실행 제어
+        run_frame = tk.LabelFrame(main, text=" 2. 실행 제어 ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=5)
+        run_frame.pack(fill="x", padx=20, pady=5)
         
         ctrl_box = tk.Frame(run_frame, bg="#1E1E2E")
         ctrl_box.pack(fill="x")
-        
         tk.Label(ctrl_box, text="간격(초):", bg="#1E1E2E", fg="white").pack(side="left")
         self.entry_interval = tk.Entry(ctrl_box, width=5)
         self.entry_interval.insert(0, str(self.cfg.get("interval_seconds", 60)))
@@ -176,17 +171,54 @@ class FlowVisionApp:
         
         self.btn_start = ttk.Button(ctrl_box, text="🌙 조용히 시작", style="Accent.TButton", command=self.on_start)
         self.btn_start.pack(side="left", padx=10, fill="x", expand=True)
-        
         self.btn_stop = ttk.Button(ctrl_box, text="🛑 멈추기", command=self.on_stop, state="disabled")
         self.btn_stop.pack(side="left", fill="x", expand=True)
+        
+        self.lbl_status = tk.Label(run_frame, text="대기 중...", bg="#1E1E2E", fg="#50FA7B")
+        self.lbl_status.pack(pady=2)
 
-        self.lbl_status = tk.Label(run_frame, text="대기 중...", bg="#1E1E2E", fg="#50FA7B", font=("Malgun Gothic", 10))
-        self.lbl_status.pack(pady=5)
+        # 4. 프롬프트 관리
+        prompt_frame = tk.LabelFrame(main, text=" 3. 프롬프트 관리 ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=5)
+        prompt_frame.pack(fill="both", expand=True, padx=20, pady=10)
+        
+        toolbar = tk.Frame(prompt_frame, bg="#1E1E2E")
+        toolbar.pack(fill="x", pady=(0, 5))
+        
+        self.slot_var = tk.StringVar()
+        slots = [s["name"] for s in self.cfg["prompt_slots"]]
+        self.combo_slots = ttk.Combobox(toolbar, textvariable=self.slot_var, values=slots, state="readonly", width=15)
+        self.combo_slots.pack(side="left", padx=2)
+        self.combo_slots.bind("<<ComboboxSelected>>", self.on_slot_change)
+        
+        current_idx = self.cfg.get("active_prompt_slot", 0)
+        if 0 <= current_idx < len(slots):
+            self.combo_slots.current(current_idx)
+        
+        ttk.Button(toolbar, text="💾 저장", command=self.on_save_prompts).pack(side="right", padx=2)
+        ttk.Button(toolbar, text="🔄 새로고침", command=self.on_reload).pack(side="right", padx=2)
 
-        # 프롬프트 표시 영역
-        tk.Label(self.root, text="현재 프롬프트 미리보기:", bg="#1E1E2E", fg="white").pack(anchor="w", padx=20)
-        self.text_preview = ScrolledText(self.root, height=10, bg="#282A36", fg="#F8F8F2", insertbackground="white")
-        self.text_preview.pack(fill="both", expand=True, padx=20, pady=(0, 20))
+        # 에디터 (수정 가능)
+        self.text_preview = ScrolledText(prompt_frame, height=10, bg="#282A36", fg="#F8F8F2", insertbackground="white", font=("Consolas", 10))
+        self.text_preview.pack(fill="both", expand=True)
+
+    def on_slot_change(self, event=None):
+        idx = self.combo_slots.current()
+        if idx >= 0:
+            self.cfg["active_prompt_slot"] = idx
+            slot = self.cfg["prompt_slots"][idx]
+            self.cfg["prompts_file"] = slot["file"]
+            self.save_config()
+            self.on_reload()
+
+    def on_save_prompts(self):
+        try:
+            content = self.text_preview.get("1.0", "end-1c")
+            path = self.base / self.cfg["prompts_file"]
+            path.write_text(content, encoding="utf-8")
+            self.on_reload()
+            messagebox.showinfo("저장 완료", "프롬프트 파일이 저장되었습니다!")
+        except Exception as e:
+            messagebox.showerror("오류", f"저장 실패: {e}")
 
     def _get_coord_text(self):
         ix = self.cfg.get('input_coords', {}).get('x', 0)
