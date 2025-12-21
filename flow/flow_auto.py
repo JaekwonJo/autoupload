@@ -10,15 +10,15 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from tkinter.scrolledtext import ScrolledText
 
-# [투명 망토 모듈 장착]
-import undetected_chromedriver as uc
+# [Selenium 복구]
 from selenium import webdriver
+from selenium.webdriver.chrome.options import Options as ChromeOptions
+from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.common.exceptions import WebDriverException
-# ChromeOptions 등은 uc에서 내부적으로 처리하거나 호환됨
-from selenium.webdriver.chrome.options import Options as ChromeOptions
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 APP_NAME = "Flow Veo3.1 Auto – Moonlight Studio"
@@ -1113,57 +1113,72 @@ class FlowApp:
             return False
 
     def _ensure_chrome_ready(self, port: int) -> bool:
-        # Undetected-Chromedriver는 직접 프로세스를 관리하므로 
-        # 별도의 수동 실행 과정이 필요 없습니다.
-        return True
+        if self._is_debug_port_alive(port):
+            self.log(f"Chrome 디버그 포트 {port} 감지됨 (이미 실행 중)")
+            return True
+            
+        chrome = self._resolve_chrome_path()
+        # 깨끗한 프로필 사용
+        profile = self.base / self.cfg.get("chrome_profile_dir", "flow_human_profile")
+        profile.mkdir(parents=True, exist_ok=True)
+        
+        # [강력 스텔스 실행 플래그]
+        flags = [
+            chrome,
+            f"--remote-debugging-port={port}",
+            f"--user-data-dir={profile}",
+            "--profile-directory=Default",
+            "--no-first-run",
+            "--disable-popup-blocking",
+            "--disable-features=TranslateUI",
+            "--disable-blink-features=AutomationControlled", # 봇 탐지 방지
+            "--disable-infobars",
+            "--start-maximized",
+            "--no-sandbox",
+            "--disable-dev-shm-usage",
+            "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+        ]
+        
+        try:
+            self.log("Chrome 실행 시도 (스텔스 모드)...")
+            subprocess.Popen(flags, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        except Exception as e:
+            self.log(f"Chrome 실행 실패: {e}")
+            return False
+            
+        # 포트가 열릴 때까지 대기
+        for _ in range(30):
+            if self._is_debug_port_alive(port):
+                self.log("Chrome 준비 완료!")
+                return True
+            time.sleep(1)
+            
+        self.log("Chrome 실행 대기 시간 초과")
+        return False
 
     def _get_driver(self):
         if self.driver:
             try:
-                # 브라우저가 살아있는지 확인
                 _ = self.driver.current_url
                 return self.driver
             except Exception:
                 self.driver = None
                 self.driver_ready = False
 
-        # 투명 크롬 설정
-        profile = self.base / self.cfg.get("chrome_profile_dir", "flow_human_profile")
-        profile.mkdir(parents=True, exist_ok=True)
+        port = self._get_devtools_port()
+        if not self._ensure_chrome_ready(port):
+            raise RuntimeError("Chrome을 실행할 수 없습니다.")
+
+        # 이미 실행된 크롬에 연결
+        options = ChromeOptions()
+        options.add_experimental_option("debuggerAddress", f"127.0.0.1:{port}")
         
-        options = uc.ChromeOptions()
-        options.add_argument("--disable-popup-blocking")
-        options.add_argument("--start-maximized")
-        options.add_argument("--disable-features=TranslateUI")
+        service = ChromeService(ChromeDriverManager().install())
+        self.driver = webdriver.Chrome(service=service, options=options)
+        self.driver.implicitly_wait(3)
+        self.driver_ready = True
         
-        self.log("🛡️ 투명 망토 크롬(Undetected) 시동 중... (잠시만 기다려주세요)")
-        try:
-            self.driver = uc.Chrome(
-                options=options,
-                user_data_dir=str(profile),
-                use_subprocess=True, # 중요: 독립 프로세스로 실행
-                version_main=131 # 윈도우 크롬 버전에 맞춰주면 좋음 (자동 감지도 됨)
-            )
-            self.driver.implicitly_wait(3)
-            self.driver_ready = True
-            self.log("✅ 투명 크롬 연결 성공! (구글이 못 알아봅니다)")
-        except Exception as e:
-            self.log(f"❌ 투명 크롬 시작 실패: {e}")
-            self.log("팁: '4_긴급수리.bat'을 실행해서 부품을 설치했는지 확인하세요.")
-            # 혹시 버전 문제가 생기면 version_main을 지워서 자동 감지 시도
-            try:
-                self.log("자동 버전 감지로 재시도합니다...")
-                self.driver = uc.Chrome(
-                    options=options,
-                    user_data_dir=str(profile),
-                    use_subprocess=True
-                )
-                self.driver_ready = True
-                self.log("✅ 재시도 성공!")
-            except Exception as e2:
-                self.log(f"❌ 재시도 실패: {e2}")
-                raise e2
-            
+        self.log("Chrome 세션 연결 성공")
         return self.driver
 
 
