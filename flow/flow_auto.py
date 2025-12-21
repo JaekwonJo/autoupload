@@ -7,7 +7,7 @@ from pathlib import Path
 from datetime import datetime
 
 import tkinter as tk
-from tkinter import filedialog, messagebox, ttk
+from tkinter import filedialog, messagebox, simpledialog, ttk
 from tkinter.scrolledtext import ScrolledText
 
 # [비전 봇 핵심 모듈]
@@ -195,6 +195,9 @@ class FlowVisionApp:
         self.combo_slots.pack(side="left", padx=2)
         self.combo_slots.bind("<<ComboboxSelected>>", self.on_slot_change)
         
+        # [이름 변경 버튼 추가]
+        ttk.Button(toolbar1, text="✏️ 이름", width=6, command=self.on_rename_slot).pack(side="left", padx=2)
+        
         current_idx = self.cfg.get("active_prompt_slot", 0)
         if 0 <= current_idx < len(slots):
             self.combo_slots.current(current_idx)
@@ -245,6 +248,26 @@ class FlowVisionApp:
             messagebox.showinfo("성공", f"좌표 저장 완료!\n({x}, {y})")
             
         threading.Thread(target=countdown, daemon=True).start()
+
+    def on_rename_slot(self):
+        idx = self.combo_slots.current()
+        if idx < 0:
+            return
+        
+        current_name = self.cfg["prompt_slots"][idx]["name"]
+        new_name = simpledialog.askstring("이름 변경", "새 슬롯 이름을 입력하세요:", initialvalue=current_name)
+        
+        if new_name:
+            self.cfg["prompt_slots"][idx]["name"] = new_name
+            self.save_config()
+            
+            # 콤보박스 목록 갱신
+            slots = [s["name"] for s in self.cfg["prompt_slots"]]
+            self.combo_slots["values"] = slots
+            self.combo_slots.current(idx)
+            self.slot_var.set(new_name)
+            
+            messagebox.showinfo("성공", f"'{new_name}'(으)로 변경 완료!")
 
     def on_slot_change(self, event=None):
         idx = self.combo_slots.current()
