@@ -73,11 +73,11 @@
   "download_selector_main": "button[type=\"button\"]",
   "download_selector_quality": "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr",
   "input_coords": {
-    "x": 1280,
-    "y": 1263
+    "x": 1005,
+    "y": 1267
   },
   "submit_coords": {
-    "x": 1552,
-    "y": 1307
+    "x": 1564,
+    "y": 1315
   }
 }

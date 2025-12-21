@@ -118,11 +118,23 @@ class CaptureOverlay:
     def close(self, event=None):
         self.root.destroy()
 
+def load_config_from_file(path):
+    if not path.exists():
+        return DEFAULT_CONFIG.copy()
+    try:
+        data = json.loads(path.read_text(encoding='utf-8'))
+        for k, v in DEFAULT_CONFIG.items():
+            if k not in data:
+                data[k] = v
+        return data
+    except:
+        return DEFAULT_CONFIG.copy()
+
 class FlowVisionApp:
     def __init__(self):
         self.base = Path(__file__).resolve().parent
         self.cfg_path = self.base / CONFIG_FILE
-        self.cfg = self.load_config()
+        self.cfg = load_config_from_file(self.cfg_path)
         
         self.running = False
         self.prompts = []
@@ -148,6 +160,18 @@ class FlowVisionApp:
         self.on_reload()
         
         self.root.after(1000, self._tick)
+
+    def save_config(self):
+        try:
+            self.cfg_path.write_text(json.dumps(self.cfg, indent=4, ensure_ascii=False), encoding='utf-8')
+        except Exception as e:
+            print(f"Config save failed: {e}")
+
+    def _ensure_prompt_slots(self):
+        if "prompt_slots" not in self.cfg or not self.cfg["prompt_slots"]:
+            self.cfg["prompt_slots"] = [{"name": "기본 슬롯", "file": "flow_prompts.txt"}]
+            self.cfg["active_prompt_slot"] = 0
+            self.save_config()
 
     def _prevent_sleep(self):
         """윈도우가 절전 모드로 들어가는 것을 방지합니다."""
@@ -195,6 +219,19 @@ class FlowVisionApp:
         if self.alert_window:
             self.alert_window.close()
             self.alert_window = None
+
+    def _build_ui(self):
+        main = self.root
+
+        # 1. 상태 바 (Header)
+        header_frame = tk.Frame(main, bg="#282A36", height=40)
+        header_frame.pack(fill="x")
+        
+        self.lbl_status = tk.Label(header_frame, text="준비됨", font=("Malgun Gothic", 12, "bold"), bg="#282A36", fg="#F8F8F2")
+        self.lbl_status.pack(side="left", padx=10, pady=5)
+        
+        self.lbl_eta = tk.Label(header_frame, text="-", font=("Malgun Gothic", 10), bg="#282A36", fg="#6272A4")
+        self.lbl_eta.pack(side="right", padx=10, pady=5)
 
         # 2. 좌표 설정
         coord_frame = tk.LabelFrame(main, text=" 1. 좌표 설정 ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=5)
