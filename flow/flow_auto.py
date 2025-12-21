@@ -1,8 +1,40 @@
-import json
 import os
+import sys
+
+# [Critical Fix] Python 3.12+ distutils 삭제 대응 패치
+# undetected_chromedriver가 distutils.version.LooseVersion을 찾을 때 속여서 넘깁니다.
+try:
+    import distutils.version
+except ImportError:
+    import types
+    # 1. 가짜 distutils 모듈 생성
+    distutils = types.ModuleType("distutils")
+    distutils.version = types.ModuleType("distutils.version")
+    sys.modules["distutils"] = distutils
+    sys.modules["distutils.version"] = distutils.version
+    
+    # 2. LooseVersion 구현 (packaging 라이브러리 활용)
+    try:
+        from packaging.version import Version as LooseVersion
+    except ImportError:
+        class LooseVersion:
+            def __init__(self, vstring):
+                self.vstring = str(vstring)
+            def __ge__(self, other):
+                return self.vstring >= str(other)
+            def __str__(self):
+                return self.vstring
+            
+    distutils.version.LooseVersion = LooseVersion
+
+import json
 import subprocess
 import time
 import random
+# [물리적 입력 도구]
+import pyautogui
+import pyperclip
+
 from datetime import datetime
 from pathlib import Path
 
@@ -1543,64 +1575,48 @@ class FlowApp:
         return try_click_buttons(all_buttons)
 
     def _fill_via_keys(self, d: webdriver.Chrome, el, text: str) -> bool:
-        # 봇 탐지 우회를 위한 '인간 타이핑 모드' (1순위)
+        """
+        [물리적 입력 모드]
+        Selenium으로 클릭하여 포커스를 잡고, PyAutoGUI(가상 키보드)로 실제 신호를 보냅니다.
+        이 방식은 OS 레벨의 입력이므로 브라우저가 봇을 감지하기 매우 어렵습니다.
+        """
         text = self._sanitize_bmp(text)
         
         try:
+            self.log("🖱️ 입력창 포커싱 (Selenium)...")
+            # 1. Selenium으로 클릭해서 입력창 활성화 (가장 정확함)
             self._human_click(d, el)
-            # 기존 내용 지우기
-            el.send_keys(Keys.CONTROL, "a")
-            time.sleep(0.05)
-            el.send_keys(Keys.BACKSPACE)
-            time.sleep(0.1)
+            time.sleep(0.5)
             
-            # 한 글자씩 타이핑 (핵심: 불규칙한 딜레이 & 줄바꿈 처리)
-            for char in text:
-                if char == '\n':
-                    # 줄바꿈 시 그냥 Enter를 치면 제출되어버릴 수 있으므로 Shift+Enter 사용
-                    el.send_keys(Keys.SHIFT, Keys.ENTER)
-                else:
-                    el.send_keys(char)
-                
-                # 0.005 ~ 0.03초 사이의 미세한 랜덤 딜레이
-                time.sleep(random.uniform(0.005, 0.03))
-                
-            # 입력 확인
+            # 2. PyAutoGUI로 물리적 키 입력 (유령 모드)
+            self.log("👻 유령 키보드 작동 중... (마우스 건드리지 마세요!)")
+            
+            # 기존 내용 지우기 (Ctrl+A -> Backspace)
+            pyautogui.hotkey('ctrl', 'a')
+            time.sleep(0.1)
+            pyautogui.press('backspace')
             time.sleep(0.2)
-            snapshot = self._read_element_text(d, el).strip()
-            # 길이가 0이 아니면 성공으로 간주
-            if len(snapshot) > 0 or len(text) == 0:
-                self.log(f"인간 타이핑 완료 (길이: {len(snapshot)})")
-                return True
-        except Exception as e:
-            self.log(f"인간 타이핑 실패: {e} -> 클립보드 방식 시도")
-
-        # 2차 시도: 클립보드 붙여넣기 (Fallback)
-        try:
-            self._human_click(d, el)
-            self._copy_to_clipboard(text)
-            el.send_keys(Keys.CONTROL, "a")
-            time.sleep(0.05)
-            el.send_keys(Keys.BACKSPACE)
-            time.sleep(0.05)
-            el.send_keys(Keys.CONTROL, "v")
-            time.sleep(0.05)
+            
+            # 클립보드 복사 후 붙여넣기 (한글 깨짐 방지 및 속도 최적화)
+            # 봇 탐지 회피를 위해 클립보드 사용 후 미세한 움직임 추가
+            pyperclip.copy(text)
+            time.sleep(0.1)
+            pyautogui.hotkey('ctrl', 'v')
+            time.sleep(0.3)
+            
+            # 봇 아님을 증명하기 위한 '인간적인 틱' (의미 없는 키 입력 후 삭제)
+            # 마치 오타 났다가 지우는 것처럼 연기
+            if random.random() < 0.3: # 30% 확률로 연기
+                pyautogui.press('space')
+                time.sleep(0.1)
+                pyautogui.press('backspace')
+            
+            self.log("✅ 물리적 입력 완료")
             return True
-        except Exception:
-            pass
-
-        # 3차 시도: DevTools Input.insertText 사용
-        try:
-            self._human_click(d, el)
-            if self._insert_text_cdp(d, text):
-                snapshot = self._read_element_text(d, el).strip()
-                self.log(f"입력 후 텍스트 길이(CDP 경로): {len(snapshot)}")
-                if snapshot:
-                    return True
-        except Exception:
-            self.log("CDP 기반 입력 경로에서도 예외 발생")
-
-        return False
+            
+        except Exception as e:
+            self.log(f"❌ 물리 입력 실패: {e}")
+            return False
 
     def _snapshot_files(self, d: Path) -> set[str]:
         try:
