@@ -1116,29 +1116,25 @@ class FlowApp:
             self.log(f"Chrome 디버그 포트 {port} 감지됨")
             return True
         chrome = self._resolve_chrome_path()
-        # [수정] 차단 해결을 위해 새로운 프로필 폴더 사용
-        profile = self.base / self.cfg.get("chrome_profile_dir", "flow_chrome_profile_new")
+        # [수정] 무조건 새 폴더, 새 유저로! 'flow_human_profile' 사용
+        profile = self.base / self.cfg.get("chrome_profile_dir", "flow_human_profile")
         profile.mkdir(parents=True, exist_ok=True)
+        
         flags = [
             chrome,
             f"--remote-debugging-port={port}",
             f"--user-data-dir={profile}",
-            "--profile-directory=FlowVeo",
+            "--profile-directory=Default", # 일반적인 'Default' 사용
             "--no-first-run",
             "--disable-popup-blocking",
             "--disable-features=TranslateUI",
             "--disable-blink-features=AutomationControlled", 
             "--disable-infobars",
             "--start-maximized",
-            "--no-sandbox",
-            "--disable-dev-shm-usage",
-            "--disable-background-timer-throttling",
-            "--disable-backgrounding-occluded-windows",
-            "--disable-renderer-backgrounding",
             "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
         ]
         try:
-            self.log("Chrome 실행 시도 (강력한 스텔스 모드)")
+            self.log("Chrome 실행 시도 (완벽한 인간 위장 모드 🎭)")
             subprocess.Popen(flags, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except Exception:
             self.log("Chrome 실행 실패")
@@ -1171,15 +1167,22 @@ class FlowApp:
         self.driver = webdriver.Chrome(service=service, options=options)
         self.driver.implicitly_wait(2)
         self.driver_ready = True
-        # 새 문서에서 navigator.webdriver 숨기기
+        
+        # [특급 기밀] navigator.webdriver 및 기타 봇 흔적 완벽 은폐 스크립트
+        stealth_js = """
+        Object.defineProperty(navigator, 'webdriver', {get: () => undefined});
+        window.chrome = { runtime: {} };
+        Object.defineProperty(navigator, 'languages', {get: () => ['ko-KR', 'ko', 'en-US', 'en']});
+        Object.defineProperty(navigator, 'plugins', {get: () => [1, 2, 3, 4, 5]});
+        """
         try:
             self.driver.execute_cdp_cmd(
                 "Page.addScriptToEvaluateOnNewDocument",
-                {"source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"},
+                {"source": stealth_js},
             )
         except Exception:
             pass
-        # 다운로드 디렉터리 지정
+        
         try:
             dl_dir = self._get_download_dir()
             self.driver.execute_cdp_cmd(

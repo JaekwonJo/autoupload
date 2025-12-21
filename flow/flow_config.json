@@ -4,7 +4,7 @@
   "check_interval_seconds": 120,
   "flow_base_url": "https://labs.google/fx/ko/tools/flow",
   "flow_project_url": "https://labs.google/fx/ko/tools/flow",
-  "chrome_profile_dir": "flow_chrome_profile_new",
+  "chrome_profile_dir": "flow_human_profile",
   "chrome_devtools_port": 9555,
   "chrome_executable": "",
   "input_selectors": [
