@@ -1560,10 +1560,15 @@ class FlowApp:
             el.send_keys(Keys.BACKSPACE)
             time.sleep(0.1)
             
-            # 한 글자씩 타이핑 (핵심: 불규칙한 딜레이)
+            # 한 글자씩 타이핑 (핵심: 불규칙한 딜레이 & 줄바꿈 처리)
             for char in text:
-                el.send_keys(char)
-                # 0.005 ~ 0.03초 사이의 미세한 랜덤 딜레이 (사람의 빠른 타자 속도 모방)
+                if char == '\n':
+                    # 줄바꿈 시 그냥 Enter를 치면 제출되어버릴 수 있으므로 Shift+Enter 사용
+                    el.send_keys(Keys.SHIFT, Keys.ENTER)
+                else:
+                    el.send_keys(char)
+                
+                # 0.005 ~ 0.03초 사이의 미세한 랜덤 딜레이
                 time.sleep(random.uniform(0.005, 0.03))
                 
             # 입력 확인
