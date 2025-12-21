@@ -1116,7 +1116,8 @@ class FlowApp:
             self.log(f"Chrome 디버그 포트 {port} 감지됨")
             return True
         chrome = self._resolve_chrome_path()
-        profile = self.base / self.cfg.get("chrome_profile_dir", "flow_chrome_profile")
+        # [수정] 차단 해결을 위해 새로운 프로필 폴더 사용
+        profile = self.base / self.cfg.get("chrome_profile_dir", "flow_chrome_profile_new")
         profile.mkdir(parents=True, exist_ok=True)
         flags = [
             chrome,
