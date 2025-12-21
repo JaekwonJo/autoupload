@@ -1593,23 +1593,7 @@ class FlowApp:
             time.sleep(0.05)
             return True
         except Exception:
-            return False
-                    el.send_keys(line)
-                    time.sleep(0.01)
-            if not lines:
-                el.send_keys(" ")
-                time.sleep(0.02)
-            try:
-                el.send_keys(" ")
-                el.send_keys(Keys.BACKSPACE)
-            except Exception:
-                pass
-            snapshot = self._read_element_text(d, el).strip()
-            self.log(f"입력 후 텍스트 길이(키보드 경로): {len(snapshot)}")
-            if snapshot:
-                return True
-        except Exception:
-            self.log("키보드 입력 경로에서 예외 발생 – CDP 경로 시도")
+            pass
 
         # 3차 시도: DevTools Input.insertText 사용
         try:
