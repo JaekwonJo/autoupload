@@ -27,6 +27,39 @@ DEFAULT_CONFIG = {
     "active_prompt_slot": 0
 }
 
+# [좌표 캡처 오버레이 클래스]
+class CaptureOverlay:
+    def __init__(self, master, on_capture, kind_text):
+        self.on_capture = on_capture
+        self.root = tk.Toplevel(master)
+        self.root.attributes("-fullscreen", True)
+        self.root.attributes("-alpha", 0.3) # 반투명 배경
+        self.root.attributes("-topmost", True)
+        self.root.configure(bg="black", cursor="crosshair")
+        
+        # 안내 라벨 (마우스 따라다님)
+        self.label = tk.Label(self.root, text=f"{kind_text} 위치에서 [클릭] 또는 [Enter]", 
+                              bg="#FF79C6", fg="black", font=("Malgun Gothic", 12, "bold"))
+        self.label.place(x=0, y=0)
+        
+        # 이벤트 바인딩
+        self.root.bind("<Motion>", self.on_move)
+        self.root.bind("<Button-1>", self.on_click) # 클릭으로 저장
+        self.root.bind("<Return>", self.on_click)   # 엔터로 저장
+        self.root.bind("<Escape>", self.close)      # ESC 취소
+
+    def on_move(self, event):
+        self.label.place(x=event.x + 20, y=event.y + 20)
+        self.label.config(text=f"X:{event.x}, Y:{event.y}\n(클릭하여 저장)")
+
+    def on_click(self, event):
+        x, y = event.x, event.y
+        self.root.destroy()
+        self.on_capture(x, y)
+
+    def close(self, event=None):
+        self.root.destroy()
+
 # [알림창 클래스]
 class CountdownAlert:
     def __init__(self, master, seconds=30):
@@ -231,13 +264,9 @@ class FlowVisionApp:
         return f"현재 설정: 입력창({ix}, {iy}) / 버튼({sx}, {sy})"
 
     def start_capture(self, kind):
-        def countdown():
-            for i in range(5, 0, -1):
-                self.lbl_coords.config(text=f"⏳ {i}초 뒤 좌표를 저장합니다! 마우스를 위치시키세요!", fg="#FF5555")
-                self.root.update()
-                time.sleep(1)
-            
-            x, y = pyautogui.position()
+        kind_text = "입력창" if kind == "input" else "생성 버튼"
+        
+        def on_captured(x, y):
             if kind == "input":
                 self.cfg["input_coords"] = {"x": x, "y": y}
             else:
@@ -245,9 +274,10 @@ class FlowVisionApp:
             
             self.save_config()
             self.lbl_coords.config(text=self._get_coord_text(), fg="#8BE9FD")
-            messagebox.showinfo("성공", f"좌표 저장 완료!\n({x}, {y})")
-            
-        threading.Thread(target=countdown, daemon=True).start()
+            messagebox.showinfo("성공", f"{kind_text} 좌표 저장 완료!\n({x}, {y})")
+
+        # 오버레이 실행 (화면 전체를 덮는 투명 레이어)
+        CaptureOverlay(self.root, on_captured, kind_text)
 
     def on_rename_slot(self):
         idx = self.combo_slots.current()
