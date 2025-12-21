@@ -1125,10 +1125,12 @@ class FlowApp:
             "--no-first-run",
             "--disable-popup-blocking",
             "--disable-features=TranslateUI",
+            "--disable-blink-features=AutomationControlled", # 봇 탐지 우회 핵심
+            "--disable-infobars",
             "--start-maximized",
         ]
         try:
-            self.log("Chrome 실행 시도")
+            self.log("Chrome 실행 시도 (봇 탐지 우회 모드)")
             subprocess.Popen(flags, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except Exception:
             self.log("Chrome 실행 실패")
@@ -1156,7 +1158,12 @@ class FlowApp:
             raise RuntimeError("Chrome 디버그 세션을 시작하지 못했습니다.")
         options = ChromeOptions()
         options.add_experimental_option("debuggerAddress", f"127.0.0.1:{port}")
+        
+        # 봇 탐지 우회 설정 강화
         options.add_argument("--disable-blink-features=AutomationControlled")
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option('useAutomationExtension', False)
+        
         service = ChromeService(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=options)
         self.driver.implicitly_wait(2)
@@ -1547,10 +1554,34 @@ class FlowApp:
         return try_click_buttons(all_buttons)
 
     def _fill_via_keys(self, d: webdriver.Chrome, el, text: str) -> bool:
-        # Prefer clipboard + Ctrl+V paste to mimic human copy/paste,
-        # falling back to per-character typing or CDP insertion.
+        # 봇 탐지 우회를 위한 '인간 타이핑 모드' (1순위)
         text = self._sanitize_bmp(text)
-        # 1차 시도: 클립보드 붙여넣기
+        
+        try:
+            self._human_click(d, el)
+            # 기존 내용 지우기
+            el.send_keys(Keys.CONTROL, "a")
+            time.sleep(0.05)
+            el.send_keys(Keys.BACKSPACE)
+            time.sleep(0.1)
+            
+            # 한 글자씩 타이핑 (핵심: 불규칙한 딜레이)
+            for char in text:
+                el.send_keys(char)
+                # 0.005 ~ 0.03초 사이의 미세한 랜덤 딜레이 (사람의 빠른 타자 속도 모방)
+                time.sleep(random.uniform(0.005, 0.03))
+                
+            # 입력 확인
+            time.sleep(0.2)
+            snapshot = self._read_element_text(d, el).strip()
+            # 길이가 0이 아니면 성공으로 간주
+            if len(snapshot) > 0 or len(text) == 0:
+                self.log(f"인간 타이핑 완료 (길이: {len(snapshot)})")
+                return True
+        except Exception as e:
+            self.log(f"인간 타이핑 실패: {e} -> 클립보드 방식 시도")
+
+        # 2차 시도: 클립보드 붙여넣기 (Fallback)
         try:
             self._human_click(d, el)
             self._copy_to_clipboard(text)
@@ -1560,34 +1591,9 @@ class FlowApp:
             time.sleep(0.05)
             el.send_keys(Keys.CONTROL, "v")
             time.sleep(0.05)
-            try:
-                el.send_keys(" ")
-                el.send_keys(Keys.BACKSPACE)
-            except Exception:
-                pass
-            snapshot = self._read_element_text(d, el).strip()
-            self.log(f"입력 후 텍스트 길이(클립보드 경로): {len(snapshot)}")
-            if snapshot:
-                return True
+            return True
         except Exception:
-            self.log("클립보드 붙여넣기 경로에서 예외 발생 – 다른 방식 시도")
-
-        # 2차 시도: 키보드로 한 글자씩 입력
-        try:
-            self._human_click(d, el)
-            lines = text.splitlines()
-            el.send_keys(Keys.CONTROL, "a")
-            time.sleep(0.05)
-            el.send_keys(Keys.BACKSPACE)
-            time.sleep(0.05)
-            for idx, line in enumerate(lines):
-                if idx > 0:
-                    try:
-                        el.send_keys(Keys.SHIFT, Keys.ENTER)
-                    except Exception:
-                        el.send_keys(Keys.ENTER)
-                    time.sleep(0.02)
-                if line:
+            return False
                     el.send_keys(line)
                     time.sleep(0.01)
             if not lines:
