@@ -40,6 +40,8 @@ DEFAULT_CONFIG = {
     "download_wait_seconds": 300,
     "download_index": 1,
     "download_selectors": [],
+    "download_selector_main": "",
+    "download_selector_quality": "",
     # 프롬프트 슬롯/저장 관련
     "prompt_slots": [],
     "active_prompt_slot": 0,
@@ -79,9 +81,16 @@ class FlowApp:
         self.base = Path(__file__).resolve().parent
         self.cfg_path = self.base / "flow_config.json"
         self.cfg = load_or_create_config(self.cfg_path)
+        
+        # 다운로드 기록 로드 (중복 방지용)
+        self.history_path = self.base / "flow_history.json"
+        self.history = self.load_history()
 
         # 프롬프트 슬롯 초기화
         self._ensure_prompt_slots()
+
+        # 다운로드 설정 정리(1단계/2단계 버튼 분리)
+        self._normalize_download_config()
 
         # 현재 활성 슬롯의 파일을 실제 사용 파일로 반영
         self._apply_active_slot_to_prompts_file()
@@ -152,6 +161,47 @@ class FlowApp:
         self._show()
         self._tick()
 
+    # ------------------- history helpers -------------------
+    def load_history(self) -> set[str]:
+        if not self.history_path.exists():
+            return set()
+        try:
+            data = json.loads(self.history_path.read_text(encoding="utf-8"))
+            return set(data)
+        except Exception:
+            return set()
+
+    def save_history(self):
+        try:
+            self.history_path.write_text(json.dumps(list(self.history), indent=2), encoding="utf-8")
+        except Exception:
+            pass
+
+    def _get_unique_id(self, driver: webdriver.Chrome, button_el) -> str | None:
+        """
+        다운로드 버튼 주변의 고유한 정보(이미지 주소 등)를 찾아서 ID로 반환합니다.
+        못 찾으면 None을 반환합니다 (이 경우 중복 체크 불가).
+        """
+        try:
+            # 버튼의 조상(컨테이너)을 타고 올라가며 img 태그 탐색
+            # 보통 3~4단계 위에 카드 컨테이너가 있음
+            parent = button_el
+            for _ in range(5):
+                parent = parent.find_element(By.XPATH, "..")
+                try:
+                    # 컨테이너 안의 이미지 태그 찾기
+                    imgs = parent.find_elements(By.TAG_NAME, "img")
+                    for img in imgs:
+                        src = img.get_attribute("src")
+                        if src and "http" in src:
+                            # 썸네일 주소가 보통 고유함 (URL 파라미터 제외하고 저장해도 되지만, 전체가 안전)
+                            return src
+                except Exception:
+                    pass
+        except Exception:
+            pass
+        return None
+
     # ------------------- config helpers -------------------
     def _ensure_prompt_slots(self):
         slots = self.cfg.get("prompt_slots")
@@ -197,6 +247,24 @@ class FlowApp:
             self.cfg["prompts_file"] = rel
             self.cfg["prompt_slots"][idx] = slot
             save_config(self.cfg_path, self.cfg)
+
+    def _normalize_download_config(self):
+        sels = list(self.cfg.get("download_selectors", []) or [])
+        main = str(self.cfg.get("download_selector_main") or "").strip()
+        quality = str(self.cfg.get("download_selector_quality") or "").strip()
+
+        # 예전 설정을 그대로 가져오는 경우: 리스트의 앞 2개를 1/2단계로 사용
+        if not main and sels:
+            main = sels[0]
+        if not quality and len(sels) > 1:
+            quality = sels[1]
+
+        self.cfg["download_selector_main"] = main
+        self.cfg["download_selector_quality"] = quality
+        # 리스트는 1단계 → 2단계 순으로 재구성
+        new_list = [s for s in (main, quality) if s]
+        self.cfg["download_selectors"] = new_list
+        save_config(self.cfg_path, self.cfg)
 
     # ------------------- UI -------------------
     def _apply_styles(self):
@@ -453,18 +521,36 @@ class FlowApp:
             command=self.on_toggle_auto_download,
         ).grid(row=0, column=0, padx=(0, 6), pady=2, sticky="w")
 
-        ttk.Button(dl_frame, text="💾 지금 다운로드", command=self.on_download_now).grid(
+        ttk.Button(dl_frame, text="💾 지금 다운로드(1개)", command=self.on_download_now).grid(
             row=0, column=1, padx=6, pady=2, sticky="w"
         )
         ttk.Button(dl_frame, text="📁 다운로드 폴더", command=self.on_pick_download_dir).grid(
             row=0, column=2, padx=6, pady=2, sticky="w"
         )
-        ttk.Button(dl_frame, text="🎯 다운로드 버튼 지정", command=self.on_capture_download).grid(
-            row=0, column=3, padx=6, pady=2, sticky="w"
-        )
+        
+        # 일괄 다운로드 버튼 추가
+        ttk.Button(
+            dl_frame, 
+            text="📥 기존 영상 싹쓸이 다운로드", 
+            style="Accent.TButton",
+            command=self.on_start_bulk_download
+        ).grid(row=0, column=3, padx=6, pady=2, sticky="w")
+
+        ttk.Button(
+            dl_frame,
+            text="🎯 1단계 버튼 지정",
+            style="Ghost.TButton",
+            command=self.on_capture_download_step1,
+        ).grid(row=1, column=0, columnspan=2, padx=6, pady=2, sticky="ew")
+        ttk.Button(
+            dl_frame,
+            text="🎯 2단계 버튼 지정",
+            style="Ghost.TButton",
+            command=self.on_capture_download_step2,
+        ).grid(row=1, column=2, columnspan=2, padx=6, pady=2, sticky="ew")
 
         for col in range(4):
-            run_frame.grid_columnconfigure(col, weight=1)
+            dl_frame.grid_columnconfigure(col, weight=1)
 
         # Info row
         info = tk.Frame(body, bg="#050816")
@@ -1526,72 +1612,136 @@ class FlowApp:
         return None
 
     def _finalize_download(self, p: Path) -> Path:
-        try:
-            idx = int(self.cfg.get("download_index", 1))
-            self.cfg["download_index"] = idx + 1
-            save_config(self.cfg_path, self.cfg)
-            ext = p.suffix or ".bin"
-            target = p.with_name(f"{idx}{ext}")
-            try:
-                if target.exists():
-                    target.unlink()
-            except Exception:
-                pass
-            p.rename(target)
-            return target
-        except Exception:
-            return p
+        # Flow 가 내려준 원래 파일 이름을 그대로 사용합니다.
+        # (이전에는 1.mp4, 2.mp4 처럼 번호로 다시 이름을 붙였음)
+        return p
 
-    def _attempt_download(self) -> bool:
+    def _count_download_buttons(self, d: webdriver.Chrome) -> int:
+        sels = list(self.cfg.get("download_selectors", []))
+        if not sels:
+            return 0
+        main_sel = sels[0]
+        try:
+            elements = d.find_elements(By.CSS_SELECTOR, main_sel)
+            # 화면에 보이고 활성화된 것만 카운트
+            return len([el for el in elements if el.is_displayed() and el.is_enabled()])
+        except Exception:
+            return 0
+
+    def _wait_and_download(self, pre_count: int = 0) -> bool:
+        """
+        영상 생성이 완료될 때까지 기다렸다가(최대 download_wait_seconds),
+        다운로드 버튼이 나타나면 순서대로 클릭합니다.
+        가장 최근(화면 하단)에 있는 버튼을 우선적으로 찾습니다.
+        pre_count: 이전에 존재하던 버튼 개수. 이 개수보다 많아져야 '새 버튼'으로 인식합니다.
+        """
         sels = list(self.cfg.get("download_selectors", []))
         if not sels:
             self.log("다운로드 셀렉터가 설정되어 있지 않습니다.")
             return False
+
         try:
             d = self._get_driver()
         except Exception as exc:
             self.log(f"Chrome 연결 실패(다운로드): {exc}")
             return False
 
-        dl_dir = self._get_download_dir()
-        snap = self._snapshot_files(dl_dir)
-        any_clicked = False
-        # 여러 단계를 순서대로 클릭할 수 있도록,
-        # download_selectors 에 들어 있는 셀렉터들을 앞에서부터 차례대로 적용합니다.
-        for sel in sels:
-            step_clicked = False
+        # 설정된 대기 시간 (기본 300초)
+        max_wait = int(self.cfg.get("download_wait_seconds", 300))
+        start_time = time.time()
+
+        self.log(f"영상 생성 대기 시작 (최대 {max_wait}초, 이전 버튼 {pre_count}개)...")
+
+        # 1단계 버튼(메인)을 찾을 때까지 루프
+        main_sel = sels[0]
+        found_main = None
+
+        while time.time() - start_time < max_wait:
+            # 남은 시간 UI 표시
+            elapsed = int(time.time() - start_time)
+            self.status_var.set(f"영상 생성 기다리는 중... ({elapsed}초 경과)")
+            self.root.update()
+
             try:
-                for b in d.find_elements(By.CSS_SELECTOR, sel):
-                    if b.is_displayed() and b.is_enabled():
-                        try:
-                            b.click()
-                            step_clicked = True
-                            break
-                        except Exception:
-                            try:
-                                d.execute_script("arguments[0].click();", b)
-                                step_clicked = True
-                                break
-                            except Exception:
-                                pass
+                # 모든 매칭되는 버튼을 찾아서
+                elements = d.find_elements(By.CSS_SELECTOR, main_sel)
+                # 화면에 보이고 활성화된 것만 필터링
+                valid_elements = [el for el in elements if el.is_displayed() and el.is_enabled()]
+                
+                # 조건: 버튼이 존재하고, 이전 개수보다 많아야 함 (새로운 버튼 등장)
+                # 단, pre_count가 0이고 valid가 있으면(첫 생성) 통과
+                if valid_elements and len(valid_elements) > pre_count:
+                    # 가장 마지막(최신) 요소를 타겟으로 함
+                    found_main = valid_elements[-1]
+                    break
             except Exception:
-                step_clicked = False
-            if step_clicked:
-                any_clicked = True
-                self.log(f"다운로드 단계 클릭: {sel}")
-                time.sleep(0.6)
+                pass
 
-        if not any_clicked:
-            self.log("다운로드용으로 클릭할 버튼을 찾지 못했습니다.")
+            time.sleep(1)
+
+        if not found_main:
+            self.log(f"시간 초과: {max_wait}초 동안 새 다운로드 버튼을 찾지 못했습니다.")
             return False
 
-        wait = max(5, int(self.cfg.get("download_wait_seconds", 300)))
-        newf = self._wait_new_file(dl_dir, snap, wait)
-        if not newf:
-            self.log("다운로드 파일을 감지하지 못했습니다.")
+        # 1단계 클릭
+        try:
+            self.log("다운로드 1단계(메인) 버튼 클릭")
+            self._human_click(d, found_main)
+        except Exception as exc:
+            self.log(f"1단계 클릭 중 오류: {exc}")
             return False
-        final = self._finalize_download(newf)
-        self.log(f"다운로드 완료: {final.name}")
+
+        # 만약 2단계(화질 선택 등)가 있다면
+        if len(sels) > 1:
+            quality_sel = sels[1]
+            self.log("다운로드 2단계(옵션) 버튼 찾는 중...")
+            
+            # 팝업이 뜨기를 잠시 기다림 (최대 10초)
+            step2_start = time.time()
+            found_quality = None
+            
+            # 우선순위 키워드 (사용자가 720p를 언급했으므로 이를 우선)
+            priority_keywords = ["720", "mp4", "download", "저장"]
+
+            while time.time() - step2_start < 10:
+                self.root.update()
+                try:
+                    elements = d.find_elements(By.CSS_SELECTOR, quality_sel)
+                    valid_elements = [el for el in elements if el.is_displayed() and el.is_enabled()]
+                    
+                    if valid_elements:
+                        # 1. 키워드 매칭 시도
+                        for el in valid_elements:
+                            txt = (self._read_element_text(d, el) or "").lower()
+                            # aria-label도 확인
+                            aria = (el.get_attribute("aria-label") or "").lower()
+                            combined = txt + " " + aria
+                            
+                            if any(k in combined for k in priority_keywords):
+                                found_quality = el
+                                self.log(f"2단계 버튼 키워드 매칭 성공: {txt or aria}")
+                                break
+                        
+                        # 2. 매칭된 게 없으면 마지막 요소 선택
+                        if not found_quality:
+                            found_quality = valid_elements[-1]
+                            self.log("2단계 버튼: 마지막 요소 선택")
+                        
+                        break
+                except Exception:
+                    pass
+                time.sleep(0.5)
+
+            if found_quality:
+                try:
+                    self.log("다운로드 2단계(옵션) 버튼 클릭")
+                    self._human_click(d, found_quality)
+                except Exception as exc:
+                    self.log(f"2단계 클릭 중 오류: {exc}")
+            else:
+                self.log("2단계 버튼을 찾지 못했습니다(1단계만 클릭됨).")
+
+        self.log("다운로드 동작 완료 – 파일 저장을 확인해 주세요.")
         return True
 
     def _press_reset(self, d: webdriver.Chrome, el) -> bool:
@@ -1665,6 +1815,13 @@ class FlowApp:
             self.status_var.set("입력창을 찾지 못했어요.")
             self.log("입력창을 찾지 못했습니다.")
             return False
+        
+        # 다운로드 기능이 켜져 있다면, 제출 전 버튼 개수를 미리 셉니다.
+        pre_count = 0
+        do_download = bool(self.cfg.get("auto_download_enabled", False))
+        if do_download:
+            pre_count = self._count_download_buttons(d)
+
         cur_no = self.index + 1
         total = len(self.prompts)
         prefix = f"[프롬프트 {cur_no}/{total}]"
@@ -1694,10 +1851,10 @@ class FlowApp:
                 self.session_fail += 1
 
         # Auto-download if enabled
-        if ok_submit and bool(self.cfg.get("auto_download_enabled", False)):
+        if ok_submit and do_download:
             try:
-                self.log(f"{prefix} 자동 다운로드 시도")
-                self._attempt_download()
+                # 제출 전 개수(pre_count)보다 버튼이 많아질 때까지 기다립니다.
+                self._wait_and_download(pre_count)
             except Exception as exc:
                 self.log(f"{prefix} 자동 다운로드 중 오류: {exc}")
         return ok_submit
@@ -1713,6 +1870,7 @@ class FlowApp:
         self._navigate(d)
         js = """
         (function(){
+          var KIND = "%s";
           if (window.__cap && window.__cap.active) return;
           function cssEscape(s){ return (window.CSS&&CSS.escape)?CSS.escape(s):s.replace(/([#.;,:+*~'>"\\[\\]\\(\\) ])/g,'\\\\$1'); }
           function uniqueSelector(el){
@@ -1722,7 +1880,14 @@ class FlowApp:
               try{
                 const v=el.getAttribute(a);
                 if(v){
-                  if(a==='id') return '#'+cssEscape(v);
+                  // 다운로드 버튼(download1/download2)을 지정할 때는
+                  // Flow 가 매번 바꾸는 일회용 id(radix-:...:) 는 무시합니다.
+                  if(a==='id'){
+                    if(KIND.indexOf('download')!==0){
+                      return '#'+cssEscape(v);
+                    }
+                    continue;
+                  }
                   return el.tagName.toLowerCase()+'['+a+'="'+String(v).replace(/"/g,'\\"')+'"]';
                 }
               }catch(e){}
@@ -1731,7 +1896,8 @@ class FlowApp:
             let n=el, depth=0;
             while(n&&n.nodeType===1&&n!==document.body&&depth<6){
               let p=n.tagName.toLowerCase();
-              const cls=(n.className||'').trim().split(/\\s+/).filter(Boolean);
+              const rawClass = (n.className||'').trim();
+              const cls = rawClass ? rawClass.split(/\\s+/).filter(c => c && !c.startsWith('__cap')) : [];
               if(cls.length&&cls.join('').length<40){
                 p+='.'+cls.map(cssEscape).join('.');
               }else{
@@ -1742,7 +1908,9 @@ class FlowApp:
                 p+=':nth-of-type('+i+')';
               }
               parts.unshift(p);
-              if(n.id){
+              // 다운로드 버튼(download1/download2)을 지정할 때는
+              // Flow 의 일회용 id(radix-:...:) 를 피하기 위해 id 를 무시합니다.
+              if(n.id && KIND.indexOf('download')!==0){
                 parts.unshift('#'+cssEscape(n.id));
                 break;
               }
@@ -1780,21 +1948,31 @@ class FlowApp:
               }
               if(e.key==='Enter' || e.key.toLowerCase()==='s'){
                 e.preventDefault(); e.stopPropagation();
+                // Enter 로 지정하는 모드는 2단계 다운로드 + 기타(입력칸/생성 버튼)에 사용
                 const t=state.prev;
                 state.sel=uniqueSelector(t);
                 state.done=true; state.cleanup(); window.__cap=state; return;
               }
               return;
             }
-            if(e.type==='click' || e.type==='mousedown' || e.type==='mouseup' || e.type==='pointerdown' || e.type==='pointerup'){
-              e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+            if(e.type==='click' && KIND==='download1'){
+              // 1단계(메인) 다운로드 버튼은 '클릭'으로 지정합니다.
+              // 클릭 동작은 그대로 Flow 쪽으로도 전달됩니다.
+              try{ state.prev = e.target; }catch(err){}
+              try{
+                const t = state.prev;
+                state.sel = uniqueSelector(t);
+                state.done = true;
+                state.cleanup();
+                window.__cap = state;
+              }catch(err){}
               return;
             }
           }
           ['mouseover','mouseout','click','mousedown','mouseup','pointerdown','pointerup','keydown'].forEach(ev=>document.addEventListener(ev,handler,true));
           window.__cap=state;
         })();
-        """
+        """ % kind
         try:
             d.execute_script(js)
         except Exception as exc:
@@ -1805,8 +1983,16 @@ class FlowApp:
             self.status_var.set("입력칸 위로 마우스를 올린 뒤 Enter 를 눌러주세요. (Esc 취소)")
         elif kind == "submit":
             self.status_var.set("생성 버튼 위로 마우스를 올린 뒤 Enter 를 눌러주세요. (Esc 취소)")
+        elif kind == "download1":
+            self.status_var.set("1단계 다운로드 버튼(팝업을 여는 버튼)을 클릭해 주세요.")
+        elif kind == "download2":
+            self.status_var.set(
+                "2단계 다운로드 버튼(720p/1080p 등)을 지정합니다.\n"
+                "1) 먼저 1단계 버튼을 눌러 팝업을 띄운 뒤\n"
+                "2) 원하는 품질 버튼 위에 마우스를 올리고 Enter 를 눌러주세요. (Esc 취소)"
+            )
         else:
-            self.status_var.set("다운로드 버튼 위로 마우스를 올린 뒤 Enter 를 눌러주세요. (Esc 취소)")
+            self.status_var.set("다운로드 버튼을 클릭해서 지정해 주세요. (Esc 취소)")
 
         start = time.time()
         picked = None
@@ -1833,16 +2019,38 @@ class FlowApp:
             key = "input_selectors"
         elif kind == "submit":
             key = "submit_selectors"
+        elif kind == "download1":
+            key = "download_selector_main"
+        elif kind == "download2":
+            key = "download_selector_quality"
         else:
             key = "download_selectors"
 
-        cur = list(self.cfg.get(key, []))
-        self.cfg[key] = [picked] + [s for s in cur if s != picked]
+        if key in ("download_selector_main", "download_selector_quality"):
+            # 1단계/2단계 다운로드 버튼은 각각 하나의 셀렉터만 사용
+            self.cfg[key] = picked
+            # 리스트는 1단계 → 2단계 순으로 재구성
+            main = str(self.cfg.get("download_selector_main") or "").strip()
+            quality = str(self.cfg.get("download_selector_quality") or "").strip()
+            lst = [s for s in (main, quality) if s]
+            self.cfg["download_selectors"] = lst
+        else:
+            cur = list(self.cfg.get(key, []))
+            # 다운로드 버튼은 여러 단계를 순서대로 클릭해야 하므로,
+            # 새로 지정한 셀렉터를 "맨 뒤"에 붙여서 앞에서부터 차례로 실행되게 합니다.
+            if key == "download_selectors":
+                new_list = [s for s in cur if s != picked] + [picked]
+            else:
+                # 나머지는 최근 지정한 것을 우선 사용
+                new_list = [picked] + [s for s in cur if s != picked]
+            self.cfg[key] = new_list
         save_config(self.cfg_path, self.cfg)
         label_map = {
             "input_selectors": "입력칸",
             "submit_selectors": "생성 버튼",
             "download_selectors": "다운로드 버튼",
+            "download_selector_main": "다운로드 1단계 버튼",
+            "download_selector_quality": "다운로드 2단계 버튼",
         }
         label = label_map.get(key, key)
         self.status_var.set(f"{label} 지정 완료: {picked}")
@@ -1856,6 +2064,14 @@ class FlowApp:
 
     def on_capture_download(self):
         self._capture_button(kind="download")
+
+    def on_capture_download_step1(self):
+        # 1단계: 메인 다운로드 버튼 (팝업을 여는 버튼)
+        self._capture_button(kind="download1")
+
+    def on_capture_download_step2(self):
+        # 2단계: 720p/1080p 등 품질 선택 버튼
+        self._capture_button(kind="download2")
 
     # ------------------- download UI callbacks -------------------
     def on_pick_download_dir(self):
@@ -1884,6 +2100,142 @@ class FlowApp:
         ok = self._attempt_download()
         self.status_var.set("다운로드 완료" if ok else "다운로드 실패")
         self.log("수동 다운로드 완료" if ok else "수동 다운로드 실패")
+
+    def on_start_bulk_download(self):
+        if self.running:
+            self.on_stop()
+            time.sleep(0.5)
+        
+        if not messagebox.askyesno(
+            APP_NAME,
+            "📥 기존 영상 일괄 다운로드를 시작할까요?\n\n"
+            "1. Flow 화면을 맨 위(또는 다운로드를 시작할 위치)로 스크롤해 주세요.\n"
+            "2. '예'를 누르면 화면에 보이는 영상부터 순서대로 다운로드하고, 자동으로 스크롤을 내립니다.\n"
+            "3. [스마트 중복 방지] 이미 다운로드한 영상(썸네일 기준)은 건너뜁니다.\n"
+            "4. 멈추려면 '🛑 멈추기' 버튼을 누르세요."
+        ):
+            return
+
+        self.running = True
+        self.status_var.set("일괄 다운로드 시작...")
+        self.log(f"일괄 다운로드 모드 시작 (현재 기록된 영상: {len(self.history)}개)")
+        # 별도 스레드 대신 after로 루프 처리
+        self.root.after(100, self._run_bulk_download_loop)
+
+    def _run_bulk_download_loop(self):
+        if not self.running:
+            return
+
+        try:
+            d = self._get_driver()
+        except Exception as exc:
+            self.log(f"Chrome 연결 실패: {exc}")
+            self.running = False
+            return
+
+        sels = list(self.cfg.get("download_selectors", []))
+        if not sels:
+            self.status_var.set("다운로드 버튼이 지정되지 않았어요.")
+            self.running = False
+            return
+
+        main_sel = sels[0]
+        quality_sel = sels[1] if len(sels) > 1 else None
+
+        # 현재 화면에서 버튼들 찾기
+        try:
+            all_buttons = d.find_elements(By.CSS_SELECTOR, main_sel)
+            # 화면에 보이는 것만
+            visible_buttons = [b for b in all_buttons if b.is_displayed() and b.is_enabled()]
+        except Exception:
+            visible_buttons = []
+
+        if not visible_buttons:
+            self.log("화면에 다운로드 버튼이 안 보여요. 스크롤을 시도합니다.")
+            d.execute_script("window.scrollBy(0, 500);")
+            self.root.after(2000, self._run_bulk_download_loop)
+            return
+
+        self.status_var.set(f"화면에서 {len(visible_buttons)}개 발견. 처리 시작...")
+        
+        count_processed = 0
+        for i, btn in enumerate(visible_buttons):
+            if not self.running:
+                break
+            
+            # [중복 방지] 고유 ID(썸네일 주소) 확인
+            uid = self._get_unique_id(d, btn)
+            if uid and uid in self.history:
+                self.log(f"영상 {i+1}: 이미 다운로드한 영상입니다 (Skip)")
+                continue
+
+            # 스크롤해서 버튼이 잘 보이게 함
+            try:
+                self._human_click(d, btn) # 1단계 클릭 (메인)
+                time.sleep(0.5)
+                
+                # 2단계(화질) 처리
+                downloaded_ok = False
+                if quality_sel:
+                    # 팝업 대기
+                    found_quality = None
+                    # 우선순위 키워드
+                    priority_keywords = ["720", "mp4", "download", "저장"]
+                    
+                    for _ in range(5): # 최대 2.5초 대기
+                        try:
+                            q_elements = d.find_elements(By.CSS_SELECTOR, quality_sel)
+                            q_valid = [qe for qe in q_elements if qe.is_displayed()]
+                            if q_valid:
+                                # 키워드 검색
+                                for qe in q_valid:
+                                    txt = (self._read_element_text(d, qe) or "").lower()
+                                    aria = (qe.get_attribute("aria-label") or "").lower()
+                                    combined = txt + " " + aria
+                                    if any(k in combined for k in priority_keywords):
+                                        found_quality = qe
+                                        break
+                                
+                                if not found_quality:
+                                    found_quality = q_valid[-1] # 없으면 마지막
+                                break
+                        except Exception:
+                            pass
+                        time.sleep(0.5)
+                        self.root.update()
+
+                    if found_quality:
+                        self._human_click(d, found_quality)
+                        self.log(f"영상 {i+1} 다운로드 클릭 완료")
+                        downloaded_ok = True
+                        count_processed += 1
+                        time.sleep(1.0) # 다운로드 시작 대기
+                    else:
+                        self.log(f"영상 {i+1}: 2단계 버튼을 못 찾았습니다.")
+                        # 팝업 닫기 위해 다른 곳 클릭하거나 ESC
+                        try:
+                            webdriver.ActionChains(d).send_keys(Keys.ESCAPE).perform()
+                        except:
+                            pass
+                else:
+                    # 1단계만 있는 경우 (바로 다운로드라고 가정)
+                    downloaded_ok = True
+                    count_processed += 1
+                
+                # 성공 시 기록 저장
+                if downloaded_ok and uid:
+                    self.history.add(uid)
+                    self.save_history()
+
+            except Exception as e:
+                self.log(f"버튼 처리 중 오류 (무시하고 계속): {e}")
+
+        if self.running:
+            # 한 화면 처리가 끝났으므로 스크롤 다운
+            self.log("현재 화면 처리 완료. 아래로 스크롤합니다.")
+            d.execute_script("window.scrollBy(0, window.innerHeight * 0.8);")
+            # 로딩 대기 후 재귀 호출
+            self.root.after(3000, self._run_bulk_download_loop)
 
 
 if __name__ == "__main__":

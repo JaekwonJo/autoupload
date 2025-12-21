@@ -28,6 +28,7 @@ DEFAULT_CONFIG = {
     "hailuo_url": "https://hailuoai.video/create/text-to-video",
     "chrome_profile_dir": "hailuo_chrome_profile",
     "chrome_executable": "",
+    "input_selectors": [],
     "submit_selectors": [],
     "reset_selectors": [],
     "auto_download_enabled": False,
@@ -75,10 +76,35 @@ class App:
         self.running = False
         self.t_next: float | None = None
 
-        self.root = tk.Tk()
-        self.root.title(APP_NAME)
-        self.root.geometry("880x600")
-        self.root.configure(bg="#14121F")
+        # logging first so crashes before UI are captured
+        self.log_dir = self.base / "logs"
+        self.log_dir.mkdir(parents=True, exist_ok=True)
+        self.log_path = self.log_dir / f"hailuo_run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+        try:
+            self.log_file = open(self.log_path, "a", encoding="utf-8")
+        except Exception:
+            # last resort: use stdout only
+            self.log_file = None  # type: ignore
+
+        try:
+            self.root = tk.Tk()
+            self.root.title(APP_NAME)
+            self.root.geometry("880x600")
+            self.root.configure(bg="#14121F")
+        except Exception as exc:
+            # Try to show a Windows message box; otherwise print and exit
+            try:
+                import ctypes
+                ctypes.windll.user32.MessageBoxW(0, f"Tk 초기화 오류:\n{exc}", APP_NAME, 0x10)
+            except Exception:
+                print(f"[FATAL] Tk 초기화 오류: {exc}")
+            # Also persist crash info for support
+            try:
+                crash = self.log_dir / f"hailuo_crash_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+                crash.write_text(f"Tk 초기화 오류: {exc}\n", encoding="utf-8")
+            except Exception:
+                pass
+            raise
 
         self.interval_var = tk.IntVar(value=max(30, min(3600, int(self.cfg.get("check_interval_seconds", 1200)))))
         self.status_var = tk.StringVar(value="대기 중…")
@@ -86,12 +112,6 @@ class App:
         # selenium state
         self.driver = None
         self.driver_ready = False
-
-        # logging
-        self.log_dir = self.base / "logs"
-        self.log_dir.mkdir(parents=True, exist_ok=True)
-        self.log_path = self.log_dir / f"hailuo_run_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
-        self.log_file = open(self.log_path, "a", encoding="utf-8")
 
         self._build_ui()
         self.log(f"{APP_NAME} 시작 – 로그 파일: {self.log_path}")
@@ -107,12 +127,13 @@ class App:
         ttk.Button(top, text="⏭ 다음", command=self.on_next).grid(row=0, column=3, padx=6)
         ttk.Button(top, text="🌐 Hailuo 열기", command=self.on_open_site).grid(row=0, column=4, padx=(18,6))
 
-        ttk.Button(top, text="🎯 제출 버튼 지정", command=self.on_capture_submit).grid(row=0, column=5, padx=6)
-        ttk.Button(top, text="🧹 초기화 버튼 지정", command=self.on_capture_reset).grid(row=0, column=6, padx=6)
+        ttk.Button(top, text="🖊️ 입력칸 지정", command=self.on_capture_input).grid(row=0, column=5, padx=6)
+        ttk.Button(top, text="🎯 제출 버튼 지정", command=self.on_capture_submit).grid(row=0, column=6, padx=6)
+        ttk.Button(top, text="🧹 초기화 버튼 지정", command=self.on_capture_reset).grid(row=0, column=7, padx=6)
 
-        tk.Label(top, text="⏱ 간격(초)", fg="#E7E3FF", bg="#14121F").grid(row=0, column=7, padx=(18,6))
+        tk.Label(top, text="⏱ 간격(초)", fg="#E7E3FF", bg="#14121F").grid(row=0, column=8, padx=(18,6))
         sp = ttk.Spinbox(top, from_=30, to=3600, increment=30, textvariable=self.interval_var, width=8, justify="center", command=self._on_interval)
-        sp.grid(row=0, column=8, padx=6)
+        sp.grid(row=0, column=9, padx=6)
         sp.bind("<Return>", lambda e: self._on_interval())
 
         # Bottom controls (moves big buttons here)
@@ -372,11 +393,27 @@ class App:
             raise RuntimeError("Chrome 디버그 세션을 시작하지 못했습니다.")
         options = ChromeOptions()
         options.add_experimental_option("debuggerAddress", f"127.0.0.1:{port}")
+        # Reduce obvious automation fingerprints
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
+        options.add_experimental_option("useAutomationExtension", False)
         options.add_argument("--disable-blink-features=AutomationControlled")
         service = ChromeService(ChromeDriverManager().install())
         self.driver = webdriver.Chrome(service=service, options=options)
         self.driver.implicitly_wait(2)
         self.driver_ready = True
+        # Hide navigator.webdriver on new documents
+        try:
+            self.driver.execute_cdp_cmd(
+                "Page.addScriptToEvaluateOnNewDocument",
+                {"source": "Object.defineProperty(navigator, 'webdriver', {get: () => undefined});"},
+            )
+        except Exception:
+            pass
+        # Bring to front to ensure proper focus
+        try:
+            self.driver.execute_cdp_cmd("Page.bringToFront", {})
+        except Exception:
+            pass
         self.log("Chrome 세션 연결 완료")
         return self.driver
 
@@ -387,8 +424,31 @@ class App:
                 d.get(url)
         except Exception:
             d.get(url)
+        # If Hailuo shows a generic React error page, try to self-heal
+        try:
+            self._heal_error_overlay(d)
+        except Exception:
+            pass
+
+    def _find_input_by_config(self, d):
+        sels = list(self.cfg.get("input_selectors", []))
+        for s in sels:
+            try:
+                for el in d.find_elements(By.CSS_SELECTOR, s):
+                    try:
+                        if el.is_displayed() and el.size.get("height", 0) >= 30:
+                            return el
+                    except Exception:
+                        continue
+            except Exception:
+                continue
+        return None
 
     def _wait_input(self, d, timeout=60):
+        # Prefer user-captured selector first
+        el = self._find_input_by_config(d)
+        if el is not None:
+            return el
         sels = ["textarea", "div[contenteditable='true']", "div[role='textbox']"]
         def finder(_d):
             for s in sels:
@@ -401,9 +461,78 @@ class App:
                         continue
             return False
         try:
-            return WebDriverWait(d, timeout, poll_frequency=1).until(finder)
+            el = WebDriverWait(d, timeout, poll_frequency=1).until(finder)
+            return el
         except Exception:
-            return None
+            # Try one healing pass if we failed to find input
+            try:
+                self._heal_error_overlay(d)
+                return WebDriverWait(d, 15, poll_frequency=1).until(finder)
+            except Exception:
+                return None
+
+    # ---------------- Error recovery helpers ----------------
+    def _heal_error_overlay(self, d):
+        """Detect Hailuo's generic error screen and attempt recovery.
+        Looks for text like 'Sorry, Hailuo AI has encountered an error...' and
+        clicks 'Return to the homepage' or reloads the target URL.
+        """
+        try:
+            txt = d.execute_script("return (document.body && document.body.innerText) || '';") or ""
+        except Exception:
+            txt = ""
+        txt_low = txt.lower()
+        if ("hailuo ai has encountered an error" in txt_low) or ("return to the homepage" in txt_low) or ("오류" in txt_low and "hailuo" in txt_low):
+            self.log("오류 화면 감지 – 복구 시도")
+            # Try clicking the visible button/link
+            js_click = """
+            (function(){
+              function findByText(tag){
+                const labels=[
+                  'Return to the homepage','홈으로','홈페이지로','Home'
+                ];
+                const els=document.querySelectorAll(tag);
+                for(const el of els){
+                  const t=(el.innerText||el.textContent||'').trim();
+                  if(!t) continue;
+                  for(const lb of labels){
+                    if(t.toLowerCase().includes(lb.toLowerCase())){
+                      try{ el.click(); return true; }catch(e){}
+                    }
+                  }
+                }
+                return false;
+              }
+              if(findByText('a')) return true;
+              if(findByText('button')) return true;
+              return false;
+            })();
+            """
+            clicked = False
+            try:
+                clicked = bool(d.execute_script(js_click))
+            except Exception:
+                clicked = False
+            if not clicked:
+                # Hard reload target URL
+                try:
+                    d.get(self.cfg.get("hailuo_url", "https://hailuoai.video/create/text-to-video"))
+                except Exception:
+                    pass
+            # small wait for render
+            time.sleep(1.0)
+        else:
+            # Not on error screen – quick check if a white screen is shown, then reload once
+            try:
+                ready = d.execute_script("return document.readyState;")
+            except Exception:
+                ready = None
+            if ready != 'complete':
+                try:
+                    d.refresh()
+                except Exception:
+                    pass
+                time.sleep(0.5)
 
     def _press_reset(self, d, el):
         for sel in list(self.cfg.get("reset_selectors", [])):
@@ -428,30 +557,134 @@ class App:
         # Remove non-BMP characters (e.g., some emoji) to avoid ChromeDriver errors
         return "".join(ch for ch in s if ord(ch) <= 0xFFFF)
 
+    def _copy_to_clipboard(self, text: str):
+        """Copy text to system clipboard via Tk root, mimicking Ctrl+C."""
+        try:
+            self.root.clipboard_clear()
+            self.root.clipboard_append(text)
+            # Ensure clipboard is updated immediately
+            self.root.update_idletasks()
+            self.log(f"클립보드에 프롬프트 복사({len(text)}자)")
+        except Exception as exc:
+            self.log(f"클립보드 복사 실패: {exc}")
+
+    def _human_click(self, d, el):
+        try:
+            d.execute_script("arguments[0].scrollIntoView({block:'center',behavior:'instant'});", el)
+        except Exception:
+            pass
+        try:
+            from selenium.webdriver.common.action_chains import ActionChains
+            ActionChains(d).move_to_element(el).pause(0.1).click().perform()
+            time.sleep(0.05)
+        except Exception:
+            try:
+                el.click()
+            except Exception:
+                try:
+                    d.execute_script("arguments[0].click();", el)
+                except Exception:
+                    return False
+        return True
+
+    def _insert_text_cdp(self, d, text: str) -> bool:
+        # Use DevTools to insert text at caret for better compatibility with React editors
+        try:
+            for chunk in text.split("\n"):
+                if chunk:
+                    d.execute_cdp_cmd("Input.insertText", {"text": chunk})
+                # Press Enter between lines
+                d.execute_cdp_cmd("Input.dispatchKeyEvent", {"type": "keyDown", "key": "Enter", "code": "Enter"})
+                d.execute_cdp_cmd("Input.dispatchKeyEvent", {"type": "keyUp", "key": "Enter", "code": "Enter"})
+            return True
+        except Exception:
+            return False
+
+    def _press_submit_heuristic(self, d, el):
+        """Attempt to auto-find a submit/generate button near the input element."""
+        labels = [
+            "generate", "create", "submit", "send", "start",
+            "generate video", "create video",
+            "생성", "만들기", "제출", "시작", "영상 만들기", "비디오 생성",
+        ]
+
+        def match_button(btn):
+            try:
+                if not btn.is_displayed() or not btn.is_enabled():
+                    return False
+            except Exception:
+                return False
+            txt = ""
+            try:
+                txt = (btn.text or "").strip()
+            except Exception:
+                txt = ""
+            if not txt:
+                try:
+                    txt = (btn.get_attribute("aria-label") or "").strip()
+                except Exception:
+                    txt = ""
+            if not txt:
+                return False
+            low = txt.lower()
+            return any(k in low for k in labels)
+
+        def try_click_buttons(buttons):
+            for b in buttons:
+                if match_button(b):
+                    try:
+                        self._human_click(d, b)
+                        time.sleep(0.1)
+                        return True
+                    except Exception:
+                        continue
+            return False
+
+        # 1) 우선 입력칸 주변 컨테이너 안에서 버튼 찾기
+        containers = []
+        cur = el
+        for _ in range(4):
+            if not cur:
+                break
+            containers.append(cur)
+            try:
+                parent = cur.find_element(By.XPATH, "..")
+            except Exception:
+                parent = None
+            cur = parent
+
+        for c in containers:
+            try:
+                buttons = c.find_elements(By.CSS_SELECTOR, "button, [role='button'], a[role='button'], div[role='button']")
+            except Exception:
+                buttons = []
+            if try_click_buttons(buttons):
+                return True
+
+        # 2) 페이지 전체에서 마지막으로 한 번 더 시도
+        try:
+            all_buttons = d.find_elements(By.CSS_SELECTOR, "button, [role='button'], a[role='button'], div[role='button']")
+        except Exception:
+            all_buttons = []
+        return try_click_buttons(all_buttons)
+
     def _fill_via_keys(self, d, el, text: str):
-        # Strictly use keyboard input so counters (0/2000) update correctly
+        # Prefer clipboard + Ctrl+V paste to mimic human copy/paste,
+        # falling back to per-character typing or CDP insertion.
         text = self._sanitize_bmp(text)
         try:
-            el.click()
+            self._human_click(d, el)
+            # 1) 시스템 클립보드에 먼저 복사 (Ctrl+C 역할)
+            self._copy_to_clipboard(text)
+            # 2) 기존 내용 전체 선택 후 삭제
             el.send_keys(Keys.CONTROL, "a")
             time.sleep(0.05)
             el.send_keys(Keys.BACKSPACE)
             time.sleep(0.05)
-            lines = text.splitlines()
-            for idx, line in enumerate(lines):
-                if idx > 0:
-                    try:
-                        el.send_keys(Keys.SHIFT, Keys.ENTER)
-                    except Exception:
-                        el.send_keys(Keys.ENTER)
-                    time.sleep(0.02)
-                if line:
-                    el.send_keys(line)
-                    time.sleep(0.01)
-            if not lines:
-                el.send_keys(" ")
-                time.sleep(0.02)
-            # Nudge input to ensure framework updates (optional)
+            # 3) Ctrl+V 로 한 번에 붙여넣기
+            el.send_keys(Keys.CONTROL, "v")
+            time.sleep(0.05)
+            # 4) 프레임워크 업데이트 유도용 살짝 입력
             try:
                 el.send_keys(" ")
                 el.send_keys(Keys.BACKSPACE)
@@ -459,6 +692,36 @@ class App:
                 pass
             return True
         except Exception:
+            # As a fallback, try per-character typing, then CDP-based insertion
+            try:
+                self._human_click(d, el)
+                lines = text.splitlines()
+                for idx, line in enumerate(lines):
+                    if idx > 0:
+                        try:
+                            el.send_keys(Keys.SHIFT, Keys.ENTER)
+                        except Exception:
+                            el.send_keys(Keys.ENTER)
+                        time.sleep(0.02)
+                    if line:
+                        el.send_keys(line)
+                        time.sleep(0.01)
+                if not lines:
+                    el.send_keys(" ")
+                    time.sleep(0.02)
+                try:
+                    el.send_keys(" ")
+                    el.send_keys(Keys.BACKSPACE)
+                except Exception:
+                    pass
+                return True
+            except Exception:
+                try:
+                    self._human_click(d, el)
+                    if self._insert_text_cdp(d, text):
+                        return True
+                except Exception:
+                    pass
             return False
 
     def _press_submit(self, d, el):
@@ -473,6 +736,12 @@ class App:
                             except Exception: pass
             except Exception:
                 continue
+        # 자동 모드: 주변/페이지에서 '생성/제출/Generate' 류 버튼 자동 탐색
+        try:
+            if self._press_submit_heuristic(d, el):
+                return True
+        except Exception:
+            pass
         # fallback keyboard
         for seq in [(Keys.CONTROL, Keys.ENTER), (Keys.ENTER,)]:
             try:
@@ -713,7 +982,9 @@ class App:
         if not picked:
             self.status_var.set("시간 초과")
             return
-        if kind == 'submit':
+        if kind == 'input':
+            key = 'input_selectors'
+        elif kind == 'submit':
             key = 'submit_selectors'
         elif kind == 'reset':
             key = 'reset_selectors'
@@ -724,8 +995,17 @@ class App:
         cur = list(self.cfg.get(key, []))
         self.cfg[key] = [picked] + [s for s in cur if s != picked]
         save_config(self.cfg_path, self.cfg)
-        label = '제출' if key=='submit_selectors' else ('초기화' if key=='reset_selectors' else '다운로드')
+        label_map = {
+            'input_selectors': '입력칸',
+            'submit_selectors': '제출',
+            'reset_selectors': '초기화',
+            'download_selectors': '다운로드',
+        }
+        label = label_map.get(key, key)
         self.status_var.set(f"{label} 버튼 지정: {picked}")
+
+    def on_capture_input(self):
+        self._capture_button(kind="input")
 
 
 if __name__ == "__main__":

@@ -1,0 +1,42 @@
+{
+  "prompts_file": "flow_prompts.txt",
+  "prompts_separator": "|||",
+  "check_interval_seconds": 180,
+  "flow_base_url": "https://labs.google/fx/ko/tools/flow",
+  "flow_project_url": "https://labs.google/fx/ko/tools/flow",
+  "chrome_profile_dir": "flow_chrome_profile",
+  "chrome_devtools_port": 9555,
+  "chrome_executable": "",
+  "input_selectors": [
+    "#__next > div.sc-c7ee1759-1.crzReP:nth-of-type(2) > div.sc-b0c0bd7-0.eJfSZK > div.sc-b0c0bd7-2.hclWoe > div.sc-c884da2c-0.nEiip > div.sc-c884da2c-4.hhzxgY:nth-of-type(2) > div.sc-c884da2c-6.fNIelL:nth-of-type(2) > div",
+    "#PINHOLE_TEXT_AREA_ELEMENT_ID",
+    "div.sc-77366d4e-0.eaiEre > div.sc-77366d4e-1.hAuGnH > div.sc-77366d4e-2.kqUDJM > div.sc-408537d4-0.eBSqXt > div.sc-408537d4-1.eiHkev > button:nth-of-type(2)"
+  ],
+  "submit_selectors": [
+    "#__next > div.sc-c7ee1759-1.crzReP:nth-of-type(2) > div.sc-b0c0bd7-0.eJfSZK > div.sc-b0c0bd7-2.hclWoe > div.sc-b0c0bd7-1.kvzLFA:nth-of-type(2) > div.sc-da3122e2-0.jOArTn > div.sc-897c0dbb-0.eHacXb > div.sc-77366d4e-0.eaiEre:nth-of-type(2) > div.sc-77366d4e-1.hAuGnH > div.sc-77366d4e-2.kqUDJM > div.sc-408537d4-0.eBSqXt:nth-of-type(2) > div.sc-408537d4-1.eiHkev:nth-of-type(2) > button.sc-c177465c-1.gdArnN.sc-408537d4-2.gdXWm:nth-of-type(2)",
+    "#__next > div.sc-c7ee1759-1.crzReP:nth-of-type(2) > div.sc-b0c0bd7-0.eJfSZK > div.sc-b0c0bd7-2.hclWoe > div.sc-c884da2c-0.nEiip > div.sc-c884da2c-4.hhzxgY:nth-of-type(2) > div.sc-c884da2c-6.fNIelL:nth-of-type(2) > div",
+    "div.sc-77366d4e-0.eaiEre > div.sc-77366d4e-1.hAuGnH > div.sc-77366d4e-2.kqUDJM > div.sc-408537d4-0.eBSqXt > div.sc-408537d4-1.eiHkev > button:nth-of-type(2)",
+    "#PINHOLE_TEXT_AREA_ELEMENT_ID"
+  ],
+  "reset_selectors": [],
+  "auto_download_enabled": false,
+  "download_dir": "flow_downloads",
+  "download_wait_seconds": 300,
+  "download_index": 1,
+  "download_selectors": [],
+  "dl_icon_selectors": [],
+  "dl_file_selectors": [],
+  "auto_screenshot": true,
+  "slot_names": [
+    "대한민국 원화",
+    "Slot 2",
+    "Slot 3",
+    "Slot 4",
+    "Slot 5",
+    "Slot 6",
+    "Slot 7",
+    "Slot 8",
+    "Slot 9",
+    "Slot 10"
+  ]
+}
