@@ -14,6 +14,63 @@ from tkinter.scrolledtext import ScrolledText
 import pyautogui
 import pyperclip
 
+# [알림창 클래스 추가]
+class CountdownAlert:
+    def __init__(self, master, seconds=30):
+        self.root = tk.Toplevel(master)
+        self.root.title("봇 출동 알림")
+        self.root.overrideredirect(True) # 테두리 없음
+        self.root.attributes("-topmost", True) # 항상 위에
+        self.root.attributes("-alpha", 0.9) # 약간 투명
+        self.root.configure(bg="#282A36")
+        
+        # 위치 설정 (화면 우측 하단 기본)
+        sw = self.root.winfo_screenwidth()
+        sh = self.root.winfo_screenheight()
+        w, h = 300, 80
+        x = sw - w - 20
+        y = sh - h - 100
+        self.root.geometry(f"{w}x{h}+{x}+{y}")
+        
+        # 드래그 이동 기능
+        self.root.bind("<Button-1>", self.start_move)
+        self.root.bind("<B1-Motion>", self.do_move)
+        
+        # UI
+        frame = tk.Frame(self.root, bg="#282A36", highlightbackground="#BD93F9", highlightthickness=2)
+        frame.pack(fill="both", expand=True)
+        
+        self.lbl_title = tk.Label(frame, text="👻 비전 봇 출동 준비!", font=("Malgun Gothic", 11, "bold"), bg="#282A36", fg="#FF79C6")
+        self.lbl_title.pack(pady=(10, 2))
+        
+        self.lbl_time = tk.Label(frame, text=f"{seconds}초 전", font=("Malgun Gothic", 16, "bold"), bg="#282A36", fg="#50FA7B")
+        self.lbl_time.pack(pady=(0, 10))
+        
+        self.x = 0
+        self.y = 0
+
+    def start_move(self, event):
+        self.x = event.x
+        self.y = event.y
+
+    def do_move(self, event):
+        deltax = event.x - self.x
+        deltay = event.y - self.y
+        x = self.root.winfo_x() + deltax
+        y = self.root.winfo_y() + deltay
+        self.root.geometry(f"+{x}+{y}")
+
+    def update_time(self, seconds):
+        if not self.root.winfo_exists(): return
+        self.lbl_time.config(text=f"{int(seconds)}초 전")
+        if seconds <= 5:
+            self.lbl_time.config(fg="#FF5555") # 5초 전부터 빨간색 경고
+
+    def close(self):
+        try:
+            self.root.destroy()
+        except: pass
+
 # --- 설정 ---
 APP_NAME = "Flow Veo Vision Bot"
 CONFIG_FILE = "flow_config.json"
@@ -36,6 +93,7 @@ class FlowVisionApp:
         self.prompts = []
         self.index = 0
         self.t_next = None
+        self.alert_window = None # 알림창 인스턴스
         
         # UI 초기화
         self.root = tk.Tk()
@@ -195,11 +253,29 @@ class FlowVisionApp:
         self.btn_stop.config(state="disabled")
         self.entry_interval.config(state="normal")
         self.lbl_status.config(text="⏹ 멈춤", fg="#FF5555")
+        
+        # 알림창 닫기
+        if self.alert_window:
+            self.alert_window.close()
+            self.alert_window = None
 
     def _tick(self):
         if self.running and self.t_next:
             remain = self.t_next - time.time()
+            
+            # [알림창 로직] 30초 전부터 카운트다운
+            if 0 < remain <= 30:
+                if self.alert_window is None:
+                    self.alert_window = CountdownAlert(self.root, remain)
+                else:
+                    self.alert_window.update_time(remain)
+            
             if remain <= 0:
+                # 작업 시작 전 알림창 닫기
+                if self.alert_window:
+                    self.alert_window.close()
+                    self.alert_window = None
+                    
                 self._run_task()
                 # 다음 시간 설정 (랜덤 변동 추가)
                 try:
