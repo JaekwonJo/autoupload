@@ -1126,12 +1126,18 @@ class FlowApp:
             "--no-first-run",
             "--disable-popup-blocking",
             "--disable-features=TranslateUI",
-            "--disable-blink-features=AutomationControlled", # 봇 탐지 우회 핵심
+            "--disable-blink-features=AutomationControlled", 
             "--disable-infobars",
             "--start-maximized",
+            "--no-sandbox",
+            "--disable-dev-shm-usage",
+            "--disable-background-timer-throttling",
+            "--disable-backgrounding-occluded-windows",
+            "--disable-renderer-backgrounding",
+            "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36"
         ]
         try:
-            self.log("Chrome 실행 시도 (봇 탐지 우회 모드)")
+            self.log("Chrome 실행 시도 (강력한 스텔스 모드)")
             subprocess.Popen(flags, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except Exception:
             self.log("Chrome 실행 실패")
