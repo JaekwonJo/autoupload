@@ -1,0 +1,36 @@
+2025/12/22-07:02:53.507 ac90 Reusing MANIFEST C:\Users\jaekw\Documents\autoupload\flow\flow_human_profile\Default\IndexedDB\https_labs.google_0.indexeddb.leveldb/MANIFEST-000001
+2025/12/22-07:02:53.507 ac90 Recovering log #25
+2025/12/22-07:02:53.507 ac90 Reusing old log C:\Users\jaekw\Documents\autoupload\flow\flow_human_profile\Default\IndexedDB\https_labs.google_0.indexeddb.leveldb/000025.log 
+2025/12/22-07:02:53.507 ac90 Delete type=2 #23
+2025/12/22-07:02:53.522 acc4 Level-0 table #30: started
+2025/12/22-07:02:53.524 acc4 Level-0 table #30: 1176 bytes OK
+2025/12/22-07:02:53.525 acc4 Delete type=0 #25
+2025/12/22-07:02:53.525 ac80 Manual compaction at level-0 from '\x00\x0b\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0c\x00\x00\x00' @ 0 : 0; will stop at '\x00\x0b\x00\x00\x05' @ 536 : 1
+2025/12/22-07:02:53.525 ac80 Compacting 1@0 + 1@1 files
+2025/12/22-07:02:53.526 ac80 Generated table #31@0: 147 keys, 3323 bytes
+2025/12/22-07:02:53.526 ac80 Compacted 1@0 + 1@1 files => 3323 bytes
+2025/12/22-07:02:53.527 ac80 compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/12/22-07:02:53.527 ac80 Delete type=2 #30
+2025/12/22-07:02:53.528 ac80 Manual compaction at level-0 from '\x00\x0b\x00\x00\x05' @ 536 : 1 .. '\x00\x0c\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/12/22-07:04:58.694 acc4 Level-0 table #33: started
+2025/12/22-07:04:58.696 acc4 Level-0 table #33: 1162 bytes OK
+2025/12/22-07:04:58.697 acc4 Delete type=2 #27
+2025/12/22-07:04:58.697 acc4 Delete type=0 #29
+2025/12/22-07:04:58.697 ac80 Manual compaction at level-0 from '\x00\x0c\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0d\x00\x00\x00' @ 0 : 0; will stop at '\x00\x0c\x00\x00\x05' @ 567 : 1
+2025/12/22-07:04:58.697 ac80 Compacting 1@0 + 1@1 files
+2025/12/22-07:04:58.699 ac80 Generated table #34@0: 147 keys, 3317 bytes
+2025/12/22-07:04:58.699 ac80 Compacted 1@0 + 1@1 files => 3317 bytes
+2025/12/22-07:04:58.699 ac80 compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/12/22-07:04:58.700 ac80 Delete type=2 #33
+2025/12/22-07:04:58.700 ac80 Manual compaction at level-0 from '\x00\x0c\x00\x00\x05' @ 567 : 1 .. '\x00\x0d\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/12/22-07:05:03.516 acc4 Level-0 table #36: started
+2025/12/22-07:05:03.518 acc4 Level-0 table #36: 1161 bytes OK
+2025/12/22-07:05:03.519 acc4 Delete type=2 #31
+2025/12/22-07:05:03.519 acc4 Delete type=0 #32
+2025/12/22-07:05:03.520 ac80 Manual compaction at level-0 from '\x00\x0d\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0e\x00\x00\x00' @ 0 : 0; will stop at '\x00\x0d\x00\x00\x05' @ 598 : 1
+2025/12/22-07:05:03.520 ac80 Compacting 1@0 + 1@1 files
+2025/12/22-07:05:03.521 ac80 Generated table #37@0: 148 keys, 3334 bytes
+2025/12/22-07:05:03.521 ac80 Compacted 1@0 + 1@1 files => 3334 bytes
+2025/12/22-07:05:03.522 ac80 compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/12/22-07:05:03.522 ac80 Delete type=2 #36
+2025/12/22-07:05:03.522 ac80 Manual compaction at level-0 from '\x00\x0d\x00\x00\x05' @ 598 : 1 .. '\x00\x0e\x00\x00\x00' @ 0 : 0; will stop at (end)

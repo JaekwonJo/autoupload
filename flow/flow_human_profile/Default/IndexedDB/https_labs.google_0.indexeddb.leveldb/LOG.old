@@ -1,0 +1,14 @@
+2025/12/22-06:56:20.320 756c Reusing MANIFEST C:\Users\jaekw\Documents\autoupload\flow\flow_human_profile\Default\IndexedDB\https_labs.google_0.indexeddb.leveldb/MANIFEST-000001
+2025/12/22-06:56:20.320 756c Recovering log #21
+2025/12/22-06:56:20.320 756c Reusing old log C:\Users\jaekw\Documents\autoupload\flow\flow_human_profile\Default\IndexedDB\https_labs.google_0.indexeddb.leveldb/000021.log 
+2025/12/22-06:56:20.320 756c Delete type=2 #19
+2025/12/22-06:56:20.332 a068 Level-0 table #26: started
+2025/12/22-06:56:20.334 a068 Level-0 table #26: 1175 bytes OK
+2025/12/22-06:56:20.335 a068 Delete type=0 #21
+2025/12/22-06:56:20.336 756c Manual compaction at level-0 from '\x00\x0a\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x0b\x00\x00\x00' @ 0 : 0; will stop at '\x00\x0a\x00\x00\x05' @ 505 : 1
+2025/12/22-06:56:20.336 756c Compacting 1@0 + 1@1 files
+2025/12/22-06:56:20.337 756c Generated table #27@0: 147 keys, 3328 bytes
+2025/12/22-06:56:20.337 756c Compacted 1@0 + 1@1 files => 3328 bytes
+2025/12/22-06:56:20.338 756c compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/12/22-06:56:20.338 756c Delete type=2 #26
+2025/12/22-06:56:20.338 756c Manual compaction at level-0 from '\x00\x0a\x00\x00\x05' @ 505 : 1 .. '\x00\x0b\x00\x00\x00' @ 0 : 0; will stop at (end)
