@@ -14,7 +14,20 @@ from tkinter.scrolledtext import ScrolledText
 import pyautogui
 import pyperclip
 
-# [알림창 클래스 추가]
+# --- 설정 ---
+APP_NAME = "Flow Veo Vision Bot (Full)"
+CONFIG_FILE = "flow_config.json"
+DEFAULT_CONFIG = {
+    "prompts_file": "flow_prompts.txt",
+    "prompts_separator": "|||",
+    "interval_seconds": 60,
+    "input_coords": {"x": 0, "y": 0},
+    "submit_coords": {"x": 0, "y": 0},
+    "prompt_slots": [],
+    "active_prompt_slot": 0
+}
+
+# [알림창 클래스]
 class CountdownAlert:
     def __init__(self, master, seconds=30):
         self.root = tk.Toplevel(master)
@@ -64,24 +77,12 @@ class CountdownAlert:
         if not self.root.winfo_exists(): return
         self.lbl_time.config(text=f"{int(seconds)}초 전")
         if seconds <= 5:
-            self.lbl_time.config(fg="#FF5555") # 5초 전부터 빨간색 경고
+            self.lbl_time.config(fg="#FF5555")
 
     def close(self):
         try:
             self.root.destroy()
         except: pass
-
-# --- 설정 ---
-APP_NAME = "Flow Veo Vision Bot"
-CONFIG_FILE = "flow_config.json"
-DEFAULT_CONFIG = {
-    "prompts_file": "flow_prompts.txt",
-    "prompts_separator": "|||",
-    "interval_seconds": 60,
-    "input_coords": {"x": 0, "y": 0},
-    "submit_coords": {"x": 0, "y": 0},
-    "prompt_slots": []
-}
 
 class FlowVisionApp:
     def __init__(self):
@@ -93,12 +94,12 @@ class FlowVisionApp:
         self.prompts = []
         self.index = 0
         self.t_next = None
-        self.alert_window = None # 알림창 인스턴스
+        self.alert_window = None
         
         # UI 초기화
         self.root = tk.Tk()
         self.root.title(APP_NAME)
-        self.root.geometry("600x650")
+        self.root.geometry("650x750")
         self.root.configure(bg="#1E1E2E")
         
         # 아이콘 (있으면)
@@ -129,6 +130,9 @@ class FlowVisionApp:
     def _ensure_prompt_slots(self):
         if not self.cfg.get("prompt_slots"):
             self.cfg["prompt_slots"] = [{"name": "기본", "file": "flow_prompts.txt"}]
+            # 10개 채우기
+            for i in range(2, 11):
+                self.cfg["prompt_slots"].append({"name": f"슬롯 {i}", "file": f"flow_prompts_slot{i}.txt"})
             self.save_config()
 
     def _build_ui(self):
@@ -145,10 +149,10 @@ class FlowVisionApp:
         # 1. 상단: 타이틀
         top = tk.Frame(main, bg="#1E1E2E")
         top.pack(fill="x", padx=20, pady=10)
-        tk.Label(top, text="🌙 Flow 비전 봇 (Smart Edition)", font=("Malgun Gothic", 14, "bold"), fg="#BD93F9", bg="#1E1E2E").pack(side="left")
+        tk.Label(top, text="🌙 Flow 비전 봇 (Full Ver)", font=("Malgun Gothic", 14, "bold"), fg="#BD93F9", bg="#1E1E2E").pack(side="left")
         
         # 2. 좌표 설정
-        coord_frame = tk.LabelFrame(main, text=" 1. 좌표 설정 (필수) ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=5)
+        coord_frame = tk.LabelFrame(main, text=" 1. 좌표 설정 ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=5)
         coord_frame.pack(fill="x", padx=20, pady=5)
         
         btn_box = tk.Frame(coord_frame, bg="#1E1E2E")
@@ -177,48 +181,44 @@ class FlowVisionApp:
         self.lbl_status = tk.Label(run_frame, text="대기 중...", bg="#1E1E2E", fg="#50FA7B")
         self.lbl_status.pack(pady=2)
 
-        # 4. 프롬프트 관리
+        # 4. 프롬프트 관리 (풀옵션 복구)
         prompt_frame = tk.LabelFrame(main, text=" 3. 프롬프트 관리 ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=5)
         prompt_frame.pack(fill="both", expand=True, padx=20, pady=10)
         
-        toolbar = tk.Frame(prompt_frame, bg="#1E1E2E")
-        toolbar.pack(fill="x", pady=(0, 5))
+        # 툴바 1: 슬롯, 파일 열기, 저장
+        toolbar1 = tk.Frame(prompt_frame, bg="#1E1E2E")
+        toolbar1.pack(fill="x", pady=(0, 5))
         
         self.slot_var = tk.StringVar()
         slots = [s["name"] for s in self.cfg["prompt_slots"]]
-        self.combo_slots = ttk.Combobox(toolbar, textvariable=self.slot_var, values=slots, state="readonly", width=15)
+        self.combo_slots = ttk.Combobox(toolbar1, textvariable=self.slot_var, values=slots, state="readonly", width=15)
         self.combo_slots.pack(side="left", padx=2)
         self.combo_slots.bind("<<ComboboxSelected>>", self.on_slot_change)
         
         current_idx = self.cfg.get("active_prompt_slot", 0)
         if 0 <= current_idx < len(slots):
             self.combo_slots.current(current_idx)
-        
-        ttk.Button(toolbar, text="💾 저장", command=self.on_save_prompts).pack(side="right", padx=2)
-        ttk.Button(toolbar, text="🔄 새로고침", command=self.on_reload).pack(side="right", padx=2)
+            
+        ttk.Button(toolbar1, text="📄 파일 열기", command=self.on_open_prompts).pack(side="left", padx=2)
+        ttk.Button(toolbar1, text="💾 저장", command=self.on_save_prompts).pack(side="right", padx=2)
+        ttk.Button(toolbar1, text="🔄 새로고침", command=self.on_reload).pack(side="right", padx=2)
 
-        # 에디터 (수정 가능)
+        # 툴바 2: 네비게이션
+        toolbar2 = tk.Frame(prompt_frame, bg="#1E1E2E")
+        toolbar2.pack(fill="x", pady=(0, 5))
+        
+        ttk.Button(toolbar2, text="⏮ 처음", width=6, command=self.on_first).pack(side="left", padx=2)
+        ttk.Button(toolbar2, text="◀ 이전", width=6, command=self.on_prev).pack(side="left", padx=2)
+        
+        self.lbl_pos = tk.Label(toolbar2, text="0 / 0", bg="#1E1E2E", fg="white", width=15, font=("Consolas", 10, "bold"))
+        self.lbl_pos.pack(side="left", padx=5)
+        
+        ttk.Button(toolbar2, text="다음 ▶", width=6, command=self.on_next).pack(side="left", padx=2)
+        ttk.Button(toolbar2, text="끝 ⏭", width=6, command=self.on_last).pack(side="left", padx=2)
+
+        # 에디터
         self.text_preview = ScrolledText(prompt_frame, height=10, bg="#282A36", fg="#F8F8F2", insertbackground="white", font=("Consolas", 10))
         self.text_preview.pack(fill="both", expand=True)
-
-    def on_slot_change(self, event=None):
-        idx = self.combo_slots.current()
-        if idx >= 0:
-            self.cfg["active_prompt_slot"] = idx
-            slot = self.cfg["prompt_slots"][idx]
-            self.cfg["prompts_file"] = slot["file"]
-            self.save_config()
-            self.on_reload()
-
-    def on_save_prompts(self):
-        try:
-            content = self.text_preview.get("1.0", "end-1c")
-            path = self.base / self.cfg["prompts_file"]
-            path.write_text(content, encoding="utf-8")
-            self.on_reload()
-            messagebox.showinfo("저장 완료", "프롬프트 파일이 저장되었습니다!")
-        except Exception as e:
-            messagebox.showerror("오류", f"저장 실패: {e}")
 
     def _get_coord_text(self):
         ix = self.cfg.get('input_coords', {}).get('x', 0)
@@ -246,23 +246,82 @@ class FlowVisionApp:
             
         threading.Thread(target=countdown, daemon=True).start()
 
+    def on_slot_change(self, event=None):
+        idx = self.combo_slots.current()
+        if idx >= 0:
+            self.cfg["active_prompt_slot"] = idx
+            slot = self.cfg["prompt_slots"][idx]
+            self.cfg["prompts_file"] = slot["file"]
+            self.save_config()
+            self.on_reload()
+
+    def on_open_prompts(self):
+        try:
+            path = self.base / self.cfg["prompts_file"]
+            if not path.exists():
+                path.write_text("", encoding="utf-8")
+            os.startfile(path)
+        except Exception as e:
+            messagebox.showerror("오류", f"파일 열기 실패: {e}")
+
+    def on_save_prompts(self):
+        try:
+            content = self.text_preview.get("1.0", "end-1c")
+            path = self.base / self.cfg["prompts_file"]
+            path.write_text(content, encoding="utf-8")
+            self.on_reload()
+            messagebox.showinfo("저장 완료", "프롬프트 파일이 저장되었습니다!")
+        except Exception as e:
+            messagebox.showerror("오류", f"저장 실패: {e}")
+
     def on_reload(self):
         try:
             path = self.base / self.cfg["prompts_file"]
+            if not path.exists():
+                path.write_text("", encoding="utf-8")
+            
             raw = path.read_text(encoding="utf-8")
             sep = self.cfg.get("prompts_separator", "|||")
             self.prompts = [p.strip() for p in raw.split(sep) if p.strip()]
-            self.text_preview.delete("1.0", "end")
-            if self.prompts:
-                self.text_preview.insert("1.0", self.prompts[0])
-                self.lbl_status.config(text=f"프롬프트 로드 완료 ({len(self.prompts)}개)")
-            else:
-                self.text_preview.insert("1.0", "(프롬프트 파일이 비어있습니다)")
+            
+            # 인덱스 범위 체크
+            if self.index >= len(self.prompts):
+                self.index = 0
+            
+            self._show()
+            self.lbl_status.config(text=f"프롬프트 로드 완료: 총 {len(self.prompts)}개", fg="#8BE9FD")
         except Exception as e:
-            self.lbl_status.config(text=f"로드 실패: {e}")
+            self.lbl_status.config(text=f"로드 실패: {e}", fg="#FF5555")
+
+    def _show(self):
+        self.text_preview.delete("1.0", "end")
+        if self.prompts and 0 <= self.index < len(self.prompts):
+            self.text_preview.insert("1.0", self.prompts[self.index])
+            self.lbl_pos.config(text=f"{self.index + 1} / {len(self.prompts)}")
+        else:
+            self.text_preview.insert("1.0", "(프롬프트 없음)")
+            self.lbl_pos.config(text="0 / 0")
+
+    def on_first(self):
+        self.index = 0
+        self._show()
+
+    def on_prev(self):
+        if self.index > 0:
+            self.index -= 1
+            self._show()
+
+    def on_next(self):
+        if self.prompts and self.index < len(self.prompts) - 1:
+            self.index += 1
+            self._show()
+
+    def on_last(self):
+        if self.prompts:
+            self.index = len(self.prompts) - 1
+            self._show()
 
     def on_start(self):
-        # 좌표 확인
         ix = self.cfg.get('input_coords', {}).get('x', 0)
         sx = self.cfg.get('submit_coords', {}).get('x', 0)
         
@@ -275,7 +334,6 @@ class FlowVisionApp:
         self.btn_stop.config(state="normal")
         self.entry_interval.config(state="disabled")
         
-        # 첫 실행 즉시 시작
         self.t_next = time.time()
         self.lbl_status.config(text="🚀 자동화 시작!", fg="#50FA7B")
 
@@ -286,7 +344,6 @@ class FlowVisionApp:
         self.entry_interval.config(state="normal")
         self.lbl_status.config(text="⏹ 멈춤", fg="#FF5555")
         
-        # 알림창 닫기
         if self.alert_window:
             self.alert_window.close()
             self.alert_window = None
@@ -303,7 +360,6 @@ class FlowVisionApp:
                     self.alert_window.update_time(remain)
             
             if remain <= 0:
-                # 작업 시작 전 알림창 닫기
                 if self.alert_window:
                     self.alert_window.close()
                     self.alert_window = None
@@ -329,9 +385,8 @@ class FlowVisionApp:
             self.on_stop()
             return
 
+        self._show() # 현재 진행 중인 프롬프트 표시
         prompt = self.prompts[self.index]
-        self.text_preview.delete("1.0", "end")
-        self.text_preview.insert("1.0", f"[진행 중: {self.index+1}/{len(self.prompts)}]\n{prompt}")
         
         ix = self.cfg["input_coords"]["x"]
         iy = self.cfg["input_coords"]["y"]
@@ -356,7 +411,6 @@ class FlowVisionApp:
             pyperclip.copy(prompt)
             time.sleep(0.2)
             
-            # a 눌렀다 지우기 (키보드 이벤트 발생)
             pyautogui.press('a')
             time.sleep(0.1)
             pyautogui.press('backspace')
@@ -370,7 +424,7 @@ class FlowVisionApp:
             self._human_move(sx, sy)
             pyautogui.click()
             
-            self.lbl_status.config(text="✅ 제출 완료! 대기 모드 진입", fg="#50FA7B")
+            self.lbl_status.config(text=f"✅ {self.index+1}번 제출 완료! 대기 중...", fg="#50FA7B")
             self.index += 1
             
         except Exception as e:
@@ -379,15 +433,12 @@ class FlowVisionApp:
             self.on_stop()
 
     def _human_move(self, x, y):
-        """사람처럼 마우스 이동 (곡선 + 속도 변화)"""
         start_x, start_y = pyautogui.position()
         duration = random.uniform(0.5, 1.0)
-        # 중간에 튀는 점 하나 생성
         mid_x = start_x + (x - start_x) * random.uniform(0.3, 0.7) + random.randint(-50, 50)
         mid_y = start_y + (y - start_y) * random.uniform(0.3, 0.7) + random.randint(-50, 50)
-        
-        # pyautogui.moveTo는 tween을 지원 (easeOutQuad 등)
-        pyautogui.moveTo(x, y, duration=duration, tween=pyautogui.easeOutQuad)
+        pyautogui.moveTo(mid_x, mid_y, duration=duration/2, tween=pyautogui.easeOutQuad)
+        pyautogui.moveTo(x, y, duration=duration/2, tween=pyautogui.easeInQuad)
 
 if __name__ == "__main__":
     FlowVisionApp().root.mainloop()
