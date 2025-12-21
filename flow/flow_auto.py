@@ -1062,7 +1062,7 @@ class FlowApp:
         else:
             # 멈춰 있을 때는 타이머 스타일만 초기화
             self._reset_timer_pulse()
-        self.root.after(200, self._tick)
+        self.root.after(1000, self._tick)
 
     def run(self):
         self.root.protocol("WM_DELETE_WINDOW", self.root.destroy)
@@ -1799,6 +1799,41 @@ class FlowApp:
         except Exception:
             return False
 
+    def _select_style_heuristic(self, d: webdriver.Chrome) -> bool:
+        """
+        Flow 업데이트로 인해 스타일(Cinematic 등)을 선택해야만 생성이 되는 경우가 있음.
+        화면에서 스타일 버튼을 찾아 클릭합니다.
+        """
+        # 우선순위가 높은 스타일 목록
+        styles = ["Cinematic", "Film Noir", "Hyper-Realism", "3D Render", "Anime", "Digital Art"]
+        
+        for style in styles:
+            try:
+                # 텍스트를 포함하는 요소 찾기 (대소문자 무시를 위해 translate 등 쓸 수도 있지만 간단히 contains로)
+                xpath = f"//*[contains(text(), '{style}')]"
+                candidates = d.find_elements(By.XPATH, xpath)
+                
+                for el in candidates:
+                    if el.is_displayed():
+                        # 클릭 가능한지 확인 (부모가 버튼인 경우 포함)
+                        target = el
+                        try:
+                            parent = el.find_element(By.XPATH, "..")
+                            tag = parent.tag_name.lower()
+                            role = parent.get_attribute("role")
+                            if tag == "button" or role == "button" or "option" in (role or ""):
+                                target = parent
+                        except:
+                            pass
+                        
+                        self.log(f"스타일 버튼 클릭 시도: {style}")
+                        self._human_click(d, target)
+                        time.sleep(0.5)
+                        return True
+            except Exception:
+                pass
+        return False
+
     def _press_submit(self, d: webdriver.Chrome, el) -> bool:
         for sel in list(self.cfg.get("submit_selectors", [])):
             try:
@@ -1857,19 +1892,27 @@ class FlowApp:
         self.log(f"{prefix} 입력칸 초기화 시도")
         self._press_reset(d, el)
         raw = self.prompts[self.index]
-        # 요청에 따라, 장면 제목/영상 프롬프트/장면설명 등을 포함한
-        # 전체 블록을 그대로 Flow 입력칸에 넣어 줍니다.
+        
         text = raw
-        self.log(f"{prefix} 프롬프트 준비: 전체 {len(text)}자를 그대로 Flow에 보냅니다.")
+        self.log(f"{prefix} 프롬프트 준비: {len(text)}자")
+        
+        # 1. 텍스트 입력 (클립보드 방식이 가장 안전)
         ok_fill = self._fill_via_keys(d, el, text)
         if not ok_fill:
             self.status_var.set("프롬프트 입력에 실패했어요.")
             self.log(f"{prefix} 입력 실패")
-            # 세션이 진행 중이면 실패 카운트
             if self.session_start_time is not None:
                 self.session_fail += 1
             return False
-        self.log(f"{prefix} 입력 완료({len(text)}자), 생성 버튼 누르기 시도")
+            
+        # 2. 스타일 선택 (중요: 업데이트로 인해 필수일 수 있음)
+        # 렉 방지를 위해 0.5초 대기 후 시도
+        time.sleep(0.5)
+        self._select_style_heuristic(d)
+        
+        self.log(f"{prefix} 입력/스타일 선택 완료, 생성 버튼 누르기 시도")
+        
+        # 3. 제출 버튼 클릭
         ok_submit = self._press_submit(d, el)
         self.log(f"{prefix} 제출 성공" if ok_submit else f"{prefix} 제출 실패")
 
