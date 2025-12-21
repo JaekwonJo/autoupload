@@ -1799,43 +1799,8 @@ class FlowApp:
         except Exception:
             return False
 
-    def _select_style_heuristic(self, d: webdriver.Chrome) -> bool:
-        """
-        Flow 업데이트로 인해 스타일(Cinematic 등)을 선택해야만 생성이 되는 경우가 있음.
-        화면에서 스타일 버튼을 찾아 클릭합니다.
-        """
-        # 우선순위가 높은 스타일 목록
-        styles = ["Cinematic", "Film Noir", "Hyper-Realism", "3D Render", "Anime", "Digital Art"]
-        
-        for style in styles:
-            try:
-                # 텍스트를 포함하는 요소 찾기 (대소문자 무시를 위해 translate 등 쓸 수도 있지만 간단히 contains로)
-                xpath = f"//*[contains(text(), '{style}')]"
-                candidates = d.find_elements(By.XPATH, xpath)
-                
-                for el in candidates:
-                    if el.is_displayed():
-                        # 클릭 가능한지 확인 (부모가 버튼인 경우 포함)
-                        target = el
-                        try:
-                            parent = el.find_element(By.XPATH, "..")
-                            tag = parent.tag_name.lower()
-                            role = parent.get_attribute("role")
-                            if tag == "button" or role == "button" or "option" in (role or ""):
-                                target = parent
-                        except:
-                            pass
-                        
-                        self.log(f"스타일 버튼 클릭 시도: {style}")
-                        self._human_click(d, target)
-                        time.sleep(0.5)
-                        return True
-            except Exception:
-                pass
-        return False
-
     def _press_submit(self, d: webdriver.Chrome, el) -> bool:
-        for sel in list(self.cfg.get("submit_selectors", [])):
+        # 1. 휴리스틱(텍스트/aria-label 기반) 탐색
             try:
                 for b in d.find_elements(By.CSS_SELECTOR, sel):
                     if b.is_displayed() and b.is_enabled():
@@ -1905,12 +1870,9 @@ class FlowApp:
                 self.session_fail += 1
             return False
             
-        # 2. 스타일 선택 (중요: 업데이트로 인해 필수일 수 있음)
-        # 렉 방지를 위해 0.5초 대기 후 시도
-        time.sleep(0.5)
-        self._select_style_heuristic(d)
-        
-        self.log(f"{prefix} 입력/스타일 선택 완료, 생성 버튼 누르기 시도")
+        # 스타일 선택 없이 즉시 제출로 진행 (사용자 요청)
+        time.sleep(0.3) 
+        self.log(f"{prefix} 입력 완료, 생성 버튼 누르기 시도")
         
         # 3. 제출 버튼 클릭
         ok_submit = self._press_submit(d, el)
