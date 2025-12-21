@@ -1789,12 +1789,42 @@ class FlowApp:
         except Exception:
             return False
 
+    def _select_style_heuristic(self, d: webdriver.Chrome) -> bool:
+        # 스타일 선택이 필수일 수 있으므로, 가장 일반적인 스타일 하나를 시도합니다.
+        targets = ["Cinematic", "Film Noir", "Digital Art", "Anime"]
+        for t in targets:
+            try:
+                xpath = f"//*[contains(text(), '{t}')]"
+                els = d.find_elements(By.XPATH, xpath)
+                for el in els:
+                    if el.is_displayed():
+                        self._human_click(d, el)
+                        self.log(f"스타일 선택 시도: {t}")
+                        time.sleep(0.5)
+                        return True
+            except:
+                pass
+        return False
+
     def _press_submit(self, d: webdriver.Chrome, el) -> bool:
-        # 1. 휴리스틱(텍스트/aria-label 기반) 탐색
+        # 1. 설정된 selector 우선 클릭 (가장 정확함)
+        selectors = self.cfg.get("submit_selectors", [])
+        for sel in selectors:
+            try:
+                btns = d.find_elements(By.CSS_SELECTOR, sel)
+                for b in btns:
+                    if b.is_displayed():
+                        self.log("설정된 생성 버튼 클릭")
+                        self._human_click(d, b)
+                        time.sleep(0.5)
+                        return True
+            except: pass
+
+        # 2. 휴리스틱(텍스트/aria-label 기반) 탐색
         if self._press_submit_heuristic(d, el):
             return True
         
-        # 2. 실패 시, 엔터키 전송 시도
+        # 3. 실패 시, 엔터키 전송 시도
         try:
             el.send_keys(Keys.CONTROL, Keys.ENTER)
             time.sleep(0.5)
@@ -1836,7 +1866,7 @@ class FlowApp:
         text = raw
         self.log(f"{prefix} 프롬프트 준비: {len(text)}자")
         
-        # 1. 텍스트 입력 (클립보드 방식이 가장 안전)
+        # 1. 텍스트 입력 (휴먼 타이핑)
         ok_fill = self._fill_via_keys(d, el, text)
         if not ok_fill:
             self.status_var.set("프롬프트 입력에 실패했어요.")
@@ -1845,8 +1875,10 @@ class FlowApp:
                 self.session_fail += 1
             return False
             
-        # 스타일 선택 없이 즉시 제출로 진행 (사용자 요청)
-        time.sleep(0.3) 
+        # 2. 스타일 선택 (실패 원인 유력 후보)
+        time.sleep(0.5)
+        self._select_style_heuristic(d)
+        
         self.log(f"{prefix} 입력 완료, 생성 버튼 누르기 시도")
         
         # 3. 제출 버튼 클릭
