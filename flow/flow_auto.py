@@ -211,8 +211,12 @@ class FlowVisionApp:
         self.btn_stop = ttk.Button(ctrl_box, text="🛑 멈추기", command=self.on_stop, state="disabled")
         self.btn_stop.pack(side="left", fill="x", expand=True)
         
-        self.lbl_status = tk.Label(run_frame, text="대기 중...", bg="#1E1E2E", fg="#50FA7B")
+        self.lbl_status = tk.Label(run_frame, text="대기 중...", bg="#1E1E2E", fg="#50FA7B", font=("Malgun Gothic", 11, "bold"))
         self.lbl_status.pack(pady=2)
+        
+        # [ETA 라벨 추가]
+        self.lbl_eta = tk.Label(run_frame, text="-", bg="#1E1E2E", fg="#FF79C6", font=("Malgun Gothic", 9))
+        self.lbl_eta.pack(pady=(0, 5))
 
         # 4. 프롬프트 관리 (풀옵션 복구)
         prompt_frame = tk.LabelFrame(main, text=" 3. 프롬프트 관리 ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=5)
@@ -394,8 +398,9 @@ class FlowVisionApp:
         self.running = False
         self.btn_start.config(state="normal")
         self.btn_stop.config(state="disabled")
+        # [수정] 멈췄을 때 간격 수정 가능하도록 잠금 해제
         self.entry_interval.config(state="normal")
-        self.lbl_status.config(text="⏹ 멈춤", fg="#FF5555")
+        self.lbl_status.config(text="⏹ 멈춤 (설정 변경 가능)", fg="#FF5555")
         
         if self.alert_window:
             self.alert_window.close()
@@ -405,6 +410,29 @@ class FlowVisionApp:
         if self.running and self.t_next:
             remain = self.t_next - time.time()
             
+            # 1. 다음 작업 카운트다운 표시
+            if remain > 0:
+                self.lbl_status.config(text=f"⏳ 다음 작업까지 {int(remain)}초...", fg="#F1FA8C")
+            else:
+                self.lbl_status.config(text="🚀 작업 시작!", fg="#50FA7B")
+
+            # 2. 전체 완료 예상 시간(ETA) 계산
+            try:
+                base_interval = int(self.entry_interval.get())
+            except: base_interval = 60
+            
+            remain_count = len(self.prompts) - self.index
+            total_remain_sec = remain_count * base_interval + max(0, int(remain))
+            
+            # 현재 시각 + 남은 초 = 완료 예정 시각
+            finish_time = datetime.fromtimestamp(time.time() + total_remain_sec)
+            finish_str = finish_time.strftime("%p %I:%M")
+            
+            # 남은 시간 (분)
+            remain_min = total_remain_sec // 60
+            
+            self.lbl_eta.config(text=f"📅 예상 완료: {finish_str} (약 {remain_min}분 남음)")
+
             # [알림창 로직] 30초 전부터 카운트다운
             if 0 < remain <= 30:
                 if self.alert_window is None:
@@ -418,15 +446,20 @@ class FlowVisionApp:
                     self.alert_window = None
                     
                 self._run_task()
-                # 다음 시간 설정 (랜덤 변동 추가)
-                try:
-                    base = int(self.entry_interval.get())
-                except: base = 60
-                variation = random.randint(-5, 30)
-                interval = max(10, base + variation)
+                
+                # [다음 시간 설정 - 랜덤 변동 강화]
+                # ±20% 범위 내에서 랜덤 변동 (최소 5초 ~ 최대 30초 변동폭 제한)
+                variation = random.randint(-min(30, base_interval//5), min(30, base_interval//5))
+                if base_interval < 30:
+                    variation = random.randint(-5, 10)
+                    
+                interval = max(10, base_interval + variation)
+                
                 self.t_next = time.time() + interval
-            else:
-                self.lbl_status.config(text=f"다음 작업까지 {int(remain)}초...", fg="#F1FA8C")
+                self.log(f"🎲 다음 작업은 {interval}초 뒤에 시작합니다")
+        else:
+            self.lbl_status.config(text="대기 중...", fg="#50FA7B")
+            self.lbl_eta.config(text="-")
         
         self.root.after(1000, self._tick)
 
