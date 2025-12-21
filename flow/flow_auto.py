@@ -130,7 +130,7 @@ class FlowVisionApp:
         self.t_next = None
         self.alert_window = None
         
-        self._prevent_sleep()
+        # [수정] 초기화 시에는 절전 방지를 하지 않습니다. (시작할 때만 활성화)
         
         self.root = tk.Tk()
         self.root.title(APP_NAME)
@@ -150,52 +150,51 @@ class FlowVisionApp:
         self.root.after(1000, self._tick)
 
     def _prevent_sleep(self):
+        """윈도우가 절전 모드로 들어가는 것을 방지합니다."""
         try:
             ctypes.windll.kernel32.SetThreadExecutionState(
                 ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED
             )
+            self.log("☕ 불침번 활성화: 작업 중에는 화면이 꺼지지 않습니다.")
         except: pass
 
-    def load_config(self):
-        if not self.cfg_path.exists():
-            return DEFAULT_CONFIG.copy()
+    def _allow_sleep(self):
+        """윈도우 절전 모드를 다시 허용합니다."""
         try:
-            return json.loads(self.cfg_path.read_text(encoding="utf-8"))
-        except:
-            return DEFAULT_CONFIG.copy()
+            ctypes.windll.kernel32.SetThreadExecutionState(ES_CONTINUOUS)
+            self.log("💤 불침번 해제: 이제 윈도우 설정에 따라 절전 모드가 가능합니다.")
+        except: pass
 
-    def save_config(self):
-        self.cfg_path.write_text(json.dumps(self.cfg, indent=2, ensure_ascii=False), encoding="utf-8")
-
-    def _ensure_prompt_slots(self):
-        if not self.cfg.get("prompt_slots"):
-            self.cfg["prompt_slots"] = [{"name": "기본", "file": "flow_prompts.txt"}]
-            for i in range(2, 11):
-                self.cfg["prompt_slots"].append({"name": f"슬롯 {i}", "file": f"flow_prompts_slot{i}.txt"})
-            self.save_config()
-
-    def _build_ui(self):
-        style = ttk.Style()
-        style.theme_use('clam')
-        style.configure("TButton", font=("Malgun Gothic", 10), padding=6, background="#3E3E5E", foreground="white")
-        style.map("TButton", background=[('active', '#5E5E7E')])
-        style.configure("Accent.TButton", background="#FF79C6", foreground="black", font=("Malgun Gothic", 10, "bold"))
+    def on_start(self):
+        ix = self.cfg.get('input_coords', {}).get('x', 0)
+        sx = self.cfg.get('submit_coords', {}).get('x', 0)
+        if ix == 0 or sx == 0:
+            messagebox.showwarning("주의", "좌표 설정을 먼저 해주세요!")
+            return
+            
+        # [불침번 시작!]
+        self._prevent_sleep()
         
-        main = tk.Frame(self.root, bg="#1E1E2E")
-        main.pack(fill="both", expand=True)
+        self.running = True
+        self.btn_start.config(state="disabled")
+        self.btn_stop.config(state="normal")
+        self.entry_interval.config(state="disabled")
+        self.t_next = time.time()
+        self.lbl_status.config(text="🚀 자동화 시작!", fg="#50FA7B")
 
-        # 1. 상단
-        top = tk.Frame(main, bg="#1E1E2E")
-        top.pack(fill="x", padx=20, pady=10)
+    def on_stop(self):
+        self.running = False
+        self.btn_start.config(state="normal")
+        self.btn_stop.config(state="disabled")
+        self.entry_interval.config(state="normal")
+        self.lbl_status.config(text="⏹ 멈춤 (설정 변경 가능)", fg="#FF5555")
         
-        tk.Label(top, text="🌙 Flow 비전 봇 (Ultimate)", font=("Malgun Gothic", 14, "bold"), fg="#BD93F9", bg="#1E1E2E").pack(side="left")
+        # [불침번 해제!]
+        self._allow_sleep()
         
-        info_panel = tk.Frame(top, bg="#1E1E2E")
-        info_panel.pack(side="right")
-        self.lbl_status = tk.Label(info_panel, text="대기 중...", bg="#1E1E2E", fg="#50FA7B", font=("Malgun Gothic", 12, "bold"))
-        self.lbl_status.pack(anchor="e")
-        self.lbl_eta = tk.Label(info_panel, text="-", bg="#1E1E2E", fg="#FF79C6", font=("Malgun Gothic", 10))
-        self.lbl_eta.pack(anchor="e")
+        if self.alert_window:
+            self.alert_window.close()
+            self.alert_window = None
 
         # 2. 좌표 설정
         coord_frame = tk.LabelFrame(main, text=" 1. 좌표 설정 ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=5)
