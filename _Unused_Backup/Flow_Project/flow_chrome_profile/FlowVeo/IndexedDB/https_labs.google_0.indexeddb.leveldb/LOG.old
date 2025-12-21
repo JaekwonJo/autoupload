@@ -1,0 +1,24 @@
+2025/11/27-07:53:50.419 3948 Reusing MANIFEST C:\Users\jaekw\autoupload\Flow_Project\flow_chrome_profile\FlowVeo\IndexedDB\https_labs.google_0.indexeddb.leveldb/MANIFEST-000001
+2025/11/27-07:53:50.419 3948 Recovering log #25
+2025/11/27-07:53:50.419 3948 Reusing old log C:\Users\jaekw\autoupload\Flow_Project\flow_chrome_profile\FlowVeo\IndexedDB\https_labs.google_0.indexeddb.leveldb/000025.log 
+2025/11/27-07:53:50.438 57bc Level-0 table #30: started
+2025/11/27-07:53:50.441 57bc Level-0 table #30: 1537 bytes OK
+2025/11/27-07:53:50.443 57bc Delete type=0 #25
+2025/11/27-07:53:50.444 57bc Manual compaction at level-0 from '\x00\x10\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x11\x00\x00\x00' @ 0 : 0; will stop at '\x00\x10\x00\x00\x05' @ 883 : 1
+2025/11/27-07:53:50.444 57bc Compacting 1@0 + 1@1 files
+2025/11/27-07:53:50.447 57bc Generated table #31@0: 250 keys, 4596 bytes
+2025/11/27-07:53:50.447 57bc Compacted 1@0 + 1@1 files => 4596 bytes
+2025/11/27-07:53:50.449 57bc compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/11/27-07:53:50.449 57bc Delete type=2 #30
+2025/11/27-07:53:50.450 3948 Manual compaction at level-0 from '\x00\x10\x00\x00\x05' @ 883 : 1 .. '\x00\x11\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/11/27-07:53:55.233 57bc Level-0 table #33: started
+2025/11/27-07:53:55.238 57bc Level-0 table #33: 5678 bytes OK
+2025/11/27-07:53:55.240 57bc Delete type=2 #27
+2025/11/27-07:53:55.240 57bc Delete type=0 #29
+2025/11/27-07:53:55.241 a8c Manual compaction at level-0 from '\x00\x11\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00\x12\x00\x00\x00' @ 0 : 0; will stop at '\x00\x11\x00\x00\x05' @ 998 : 1
+2025/11/27-07:53:55.241 a8c Compacting 1@0 + 1@1 files
+2025/11/27-07:53:55.244 a8c Generated table #34@0: 259 keys, 4689 bytes
+2025/11/27-07:53:55.244 a8c Compacted 1@0 + 1@1 files => 4689 bytes
+2025/11/27-07:53:55.247 a8c compacted to: files[ 0 1 1 0 0 0 0 ]
+2025/11/27-07:53:55.247 a8c Delete type=2 #33
+2025/11/27-07:53:55.247 a8c Manual compaction at level-0 from '\x00\x11\x00\x00\x05' @ 998 : 1 .. '\x00\x12\x00\x00\x00' @ 0 : 0; will stop at (end)

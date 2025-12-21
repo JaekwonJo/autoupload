@@ -1,0 +1,6 @@
+2025/12/19-11:15:38.608 2570 Creating DB C:\Users\jaekw\autoupload\Youtube_Heart_Bot\heart_chrome_profile\Default\IndexedDB\https_studio.youtube.com_0.indexeddb.leveldb since it was missing.
+2025/12/19-11:15:38.618 2570 Reusing MANIFEST C:\Users\jaekw\autoupload\Youtube_Heart_Bot\heart_chrome_profile\Default\IndexedDB\https_studio.youtube.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/12/19-22:17:25.476 608c Level-0 table #5: started
+2025/12/19-22:17:25.480 608c Level-0 table #5: 2537 bytes OK
+2025/12/19-22:17:25.484 608c Delete type=0 #3
+2025/12/19-22:17:25.484 608c Manual compaction at level-0 from (begin) .. (end); will stop at (end)

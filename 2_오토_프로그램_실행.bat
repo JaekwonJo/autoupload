@@ -1,30 +1,19 @@
 @echo off
 setlocal
-chcp 65001 >nul
 cd /d %~dp0
-set "PYCMD=python"
-where py >nul 2>&1 && set "PYCMD=py -3"
 
-rem Optional: set Tk paths for Tkinter (same as Sora launcher)
-rem set "_TCL=%USERPROFILE%\AppData\Local\Programs\Python\Python313\tcl\tcl8.6"
-rem set "_TK=%USERPROFILE%\AppData\Local\Programs\Python\Python313\tcl\tk8.6"
-rem if exist "%_TCL%" set "TCL_LIBRARY=%_TCL%"
-rem if exist "%_TK%" set "TK_LIBRARY=%_TK%"
+rem 1. Python 3 위치 찾기 (py 런처 사용)
+for /f "delims=" %%i in ('py -3 -c "import sys; print(sys.executable)"') do set "PYTHON_EXE=%%i"
 
-echo [Flow Veo3.1 Auto] Checking Python...
-%PYCMD% --version >nul 2>&1
-if errorlevel 1 (
-  echo Python is not installed. Please install Python 3 and run this again.
-  pause
-  exit /b 1
+rem 2. python.exe -> pythonw.exe 로 변경 (콘솔 없는 버전)
+set "PYTHONW_EXE=%PYTHON_EXE:python.exe=pythonw.exe%"
+
+rem 3. 프로그램 실행 (검은 화면 없이)
+if exist "%PYTHONW_EXE%" (
+    start "" "%PYTHONW_EXE%" flow\flow_auto.py
+) else (
+    rem pythonw가 없으면 그냥 python으로 실행 (혹시 모르니)
+    start "" "%PYTHON_EXE%" flow\flow_auto.py
 )
 
-echo [Flow Veo3.1 Auto] Starting process...
-rem Run directly to show errors
-%PYCMD% flow\flow_auto.py
-
-echo.
-echo Program exited.
-pause
 exit
-endlocal
