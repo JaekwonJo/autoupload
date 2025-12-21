@@ -1154,46 +1154,44 @@ class FlowApp:
             return True
             
         chrome = self._resolve_chrome_path()
-        # 깨끗한 프로필 사용
         profile = self.base / self.cfg.get("chrome_profile_dir", "flow_human_profile")
         profile.mkdir(parents=True, exist_ok=True)
         
-        # [강력 스텔스 실행 플래그]
-        flags = [
-            chrome,
+        # [강력 실행] 윈도우 start 명령어로 강제 실행
+        # 긴 명령어 문자열 생성
+        args = [
+            f'"{chrome}"',
             f"--remote-debugging-port={port}",
-            f"--user-data-dir={profile}",
+            f'--user-data-dir="{profile}"',
             "--profile-directory=Default",
             "--no-first-run",
             "--disable-popup-blocking",
-            "--disable-features=TranslateUI",
-            "--disable-blink-features=AutomationControlled", # 봇 탐지 방지
-            "--disable-infobars",
             "--start-maximized",
+            "--disable-blink-features=AutomationControlled",
             "--no-sandbox",
-            "--disable-dev-shm-usage",
-            "--user-agent=Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36"
+            "--disable-infobars"
         ]
+        cmd_str = " ".join(args)
         
         try:
-            self.log("Chrome 실행 시도 (스텔스 모드)...")
-            # 에러 확인을 위해 stderr는 파이프로 연결하지 않음
-            subprocess.Popen(flags)
+            self.log("🚀 Chrome 강제 실행 시도 (Shell Start)...")
+            # shell=True와 start 명령어로 윈도우가 직접 창을 띄우게 함
+            subprocess.Popen(f'start "" {cmd_str}', shell=True)
         except Exception as e:
             self.log(f"Chrome 실행 실패: {e}")
-            messagebox.showerror("실패", f"크롬 실행 중 오류가 발생했습니다:\n{e}")
+            messagebox.showerror("실패", "크롬 실행 명령을 보냈으나 실패했습니다.")
             return False
             
-        # 포트가 열릴 때까지 대기 (최대 30초)
-        self.log("크롬이 켜지기를 기다리는 중...")
+        # 포트가 열릴 때까지 대기
+        self.log("크롬 창이 뜨기를 기다리는 중...")
         for i in range(30):
             if self._is_debug_port_alive(port):
-                self.log(f"Chrome 준비 완료! ({i+1}초 소요)")
+                self.log(f"✅ Chrome 준비 완료! ({i+1}초 소요)")
                 return True
             time.sleep(1)
             
         self.log("Chrome 실행 대기 시간 초과")
-        messagebox.showwarning("시간 초과", "크롬이 실행되었지만 연결되지 않았습니다.\n이미 실행된 크롬이 있다면 닫고 다시 시도해보세요.")
+        messagebox.showwarning("확인 필요", "크롬 실행 명령은 보냈으나 연결되지 않았습니다.\n혹시 크롬 창이 떴다면 닫지 말고 다시 실행해보세요.")
         return False
 
     def _get_driver(self):
