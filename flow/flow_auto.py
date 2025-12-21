@@ -2,6 +2,7 @@ import json
 import os
 import subprocess
 import time
+import random
 from datetime import datetime
 from pathlib import Path
 
@@ -121,6 +122,22 @@ class FlowApp:
         try:
             self.root = tk.Tk()
             self.root.title(APP_NAME)
+            
+            # --- 아이콘 설정 (Icon Setting) ---
+            try:
+                # 1. 현재 실행 위치에 icon.ico가 있는지 확인
+                if os.path.exists("icon.ico"):
+                    self.root.iconbitmap("icon.ico")
+                # 2. 혹은 스크립트가 있는 폴더에 icon.ico가 있는지 확인
+                elif os.path.exists(os.path.join(os.path.dirname(__file__), "icon.ico")):
+                    self.root.iconbitmap(os.path.join(os.path.dirname(__file__), "icon.ico"))
+                # 3. 상위 폴더(루트) 확인
+                elif os.path.exists(os.path.join(os.path.dirname(__file__), "..", "icon.ico")):
+                    self.root.iconbitmap(os.path.join(os.path.dirname(__file__), "..", "icon.ico"))
+            except Exception:
+                pass # 아이콘 로드 실패 시 무시 (기본 아이콘 사용)
+            # -------------------------------
+
             self.root.geometry("980x740")
             self.root.minsize(900, 660)
             self.root.configure(bg="#050816")
@@ -955,11 +972,17 @@ class FlowApp:
 
         self.running = True
         ok = self._auto_submit_current()
-        self.t_next = time.time() + int(self.interval_var.get())
+        
+        # 랜덤 변동 추가 (-5초 ~ +30초)
+        base_iv = int(self.interval_var.get())
+        variation = random.randint(-5, 30)
+        final_iv = max(10, base_iv + variation) # 최소 10초 보장
+        self.t_next = time.time() + final_iv
+        
         self.status_var.set(
-            "자동 흐름을 시작했어요. (방금 1회 제출 완료)"
+            f"자동 시작됨 (다음: {final_iv}초 후)"
             if ok
-            else "자동 흐름을 시작했지만 방금 제출에 실패했어요."
+            else "시작했으나 전송 실패"
         )
         self.log(
             "자동 제출 시작 – 즉시 1회 실행 성공"
@@ -1008,7 +1031,13 @@ class FlowApp:
             remain = int(self.t_next - time.time())
             if remain <= 0:
                 ok = self._auto_submit_current()
-                self.t_next = time.time() + int(self.interval_var.get())
+                
+                # 랜덤 변동 추가 (-5초 ~ +30초)
+                base_iv = int(self.interval_var.get())
+                variation = random.randint(-5, 30)
+                final_iv = max(10, base_iv + variation)
+                self.t_next = time.time() + final_iv
+                
                 if ok and self.auto_next_var.get():
                     if self.index < len(self.prompts) - 1:
                         self.index += 1

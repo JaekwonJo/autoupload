@@ -1,42 +1,37 @@
 @echo off
 setlocal
-cd /d "%~dp0"
+chcp 65001 >nul
+cd /d %~dp0
 
-echo [YouTube Heart Bot] Finding correct Python...
+echo [YouTube Bot] Starting...
 
-REM Check standard install locations first to avoid broken C:\Python313
-if exist "%USERPROFILE%\AppData\Local\Programs\Python\Python313\python.exe" (
-    set "PYCMD=%USERPROFILE%\AppData\Local\Programs\Python\Python313\python.exe"
-    goto :FOUND
-)
-
-if exist "%USERPROFILE%\AppData\Local\Programs\Python\Python312\python.exe" (
-    set "PYCMD=%USERPROFILE%\AppData\Local\Programs\Python\Python312\python.exe"
-    goto :FOUND
-)
-
-if exist "%USERPROFILE%\AppData\Local\Programs\Python\Python311\python.exe" (
-    set "PYCMD=%USERPROFILE%\AppData\Local\Programs\Python\Python311\python.exe"
-    goto :FOUND
-)
-
-REM Fallback to system command if explicit paths fail
+rem 1. Python Check
 set "PYCMD=python"
+where py >nul 2>&1 && set "PYCMD=py -3"
 
-:FOUND
-echo Using Python: "%PYCMD%"
+%PYCMD% --version >nul 2>&1
+if errorlevel 1 (
+  echo Python not found! Please install Python.
+  pause
+  exit /b 1
+)
 
-echo [YouTube Heart Bot] Installing requirements...
-"%PYCMD%" -m pip install selenium webdriver-manager
+rem 2. Install Deps (Quick Check)
+rem We assume they are installed from previous setup, but a quick check won't hurt.
+rem Suppress output to keep it clean.
+%PYCMD% -c "import selenium" >nul 2>&1
+if errorlevel 1 (
+  echo Installing requirements...
+  %PYCMD% -m pip install selenium webdriver-manager
+)
 
-echo.
-echo [YouTube Heart Bot] Starting...
-"%PYCMD%" heart_bot.py
-
-if %ERRORLEVEL% NEQ 0 (
-    echo.
-    echo Error occurred.
+rem 3. Launch GUI (Hidden Console)
+rem Using pythonw if available, or start /w
+if exist "%~dp0heart_bot.py" (
+    start "" pythonw heart_bot.py
+) else (
+    echo heart_bot.py not found!
     pause
 )
-pause
-endlocal
+
+exit

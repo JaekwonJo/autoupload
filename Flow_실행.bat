@@ -19,10 +19,16 @@ if errorlevel 1 (
   exit /b 1
 )
 
-echo [Flow Veo3.1 Auto] Starting...
-%PYCMD% -u flow\flow_auto.py
-set ERR=%ERRORLEVEL%
-echo Finished. (exit code %ERR%)
-echo If there was a problem, please check flow\logs\flow_run_*.log or flow_crash_*.log.
-pause
+echo [Flow Veo3.1 Auto] Starting background process...
+rem Try to run with pythonw (no console)
+start "" pythonw flow\flow_auto.py
+
+if errorlevel 1 (
+  echo 'pythonw' failed to start. Trying standard python...
+  %PYCMD% flow\flow_auto.py
+  pause
+) else (
+  rem Close this window immediately
+  exit
+)
 endlocal

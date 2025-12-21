@@ -17,7 +17,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.action_chains import ActionChains
 from webdriver_manager.chrome import ChromeDriverManager
 
-APP_NAME = "YouTube 만능 관리 봇 (Final Fix)"
+APP_NAME = "YouTube 시청자 소통 봇 (Pro)"
 DEFAULT_STUDIO_URL = "https://studio.youtube.com/"
 CONFIG_FILE = "heart_config.json"
 
@@ -41,13 +41,21 @@ class YouTubeManagerBot:
         self.last_scroll_height = 0
         self.scroll_stuck_count = 0
         
+        # --- UI 초기화 ---
         self.root = tk.Tk()
         self.root.title(APP_NAME)
-        self.root.geometry("1000x850")
-        self.root.configure(bg="#F3F0FF") 
+        self.root.geometry("1100x850")
+        self.root.configure(bg="#F8F9FA")
+        
+        # 아이콘 설정 (있으면)
+        try:
+            icon_path = self.base.parent / "icon.ico"
+            if icon_path.exists():
+                self.root.iconbitmap(str(icon_path))
+        except: pass
 
         self._build_ui()
-        self.log(f"{APP_NAME} 준비 완료 (Shadow DOM V4) 💜")
+        self.log(f"{APP_NAME} 준비 완료. 환영합니다!")
 
     def load_config(self):
         if not self.cfg_path.exists():
@@ -68,463 +76,478 @@ class YouTubeManagerBot:
     def _build_ui(self):
         style = ttk.Style()
         style.theme_use('clam')
-        style.configure("TButton", font=("Pretendard", 10), padding=6)
-        style.configure("Accent.TButton", background="#845EF7", foreground="white", font=("Pretendard", 11, "bold"))
-        style.map("Accent.TButton", background=[('active', '#7048E8')])
+        style.configure("TButton", font=("Malgun Gothic", 10), padding=6)
+        style.configure("Accent.TButton", background="#FA5252", foreground="white", font=("Malgun Gothic", 11, "bold"))
+        style.map("Accent.TButton", background=[('active', '#E03131')])
+        style.configure("TLabel", background="#F8F9FA", font=("Malgun Gothic", 10))
+        style.configure("TCheckbutton", background="#F8F9FA", font=("Malgun Gothic", 10))
 
-        paned = tk.PanedWindow(self.root, orient="horizontal", bg="#F3F0FF")
-        paned.pack(fill="both", expand=True, padx=10, pady=10)
+        paned = tk.PanedWindow(self.root, orient="horizontal", bg="#F8F9FA", sashwidth=6)
+        paned.pack(fill="both", expand=True, padx=15, pady=15)
 
-        left_frame = tk.Frame(paned, bg="#F3F0FF")
-        right_frame = tk.Frame(paned, bg="#F3F0FF")
-        paned.add(left_frame, minsize=400)
+        left_frame = tk.Frame(paned, bg="#F8F9FA")
+        right_frame = tk.Frame(paned, bg="#F8F9FA")
+        paned.add(left_frame, minsize=420)
         paned.add(right_frame, minsize=500)
 
-        # --- 왼쪽: 컨트롤 패널 ---
-        tk.Label(left_frame, text="💜 유튜브 만능 관리 봇", font=("Pretendard", 18, "bold"), bg="#F3F0FF", fg="#5F3DC4").pack(pady=(10, 5))
-        tk.Label(left_frame, text="하트/좋아요 픽스 + 답글 기능 강화", font=("Pretendard", 10), bg="#F3F0FF", fg="#777").pack(pady=(0, 20))
+        # === [좌측] 제어 패널 ===
+        tk.Label(left_frame, text="💜 시청자 소통 센터", font=("Malgun Gothic", 18, "bold"), fg="#495057", bg="#F8F9FA").pack(anchor="w", pady=(0, 5))
+        tk.Label(left_frame, text="유튜브 스튜디오 댓글 자동 관리", font=("Malgun Gothic", 10), fg="#868E96", bg="#F8F9FA").pack(anchor="w", pady=(0, 20))
 
-        # 1. 크롬 열기
-        ttk.Button(left_frame, text="🌐 1. 스튜디오 열기 (로그인)", command=self.open_chrome).pack(fill="x", pady=5)
+        # 1. 연결
+        step1_frame = tk.LabelFrame(left_frame, text=" 1. 스튜디오 연결 ", font=("Malgun Gothic", 10, "bold"), bg="#F8F9FA", fg="#228BE6", padx=10, pady=10)
+        step1_frame.pack(fill="x", pady=5)
+        ttk.Button(step1_frame, text="🌐 크롬 브라우저 열기 (로그인 필요)", command=self.open_chrome).pack(fill="x")
+
+        # 2. 설정
+        step2_frame = tk.LabelFrame(left_frame, text=" 2. 인간적인 딜레이 설정 (봇 탐지 방지) ", font=("Malgun Gothic", 10, "bold"), bg="#F8F9FA", fg="#228BE6", padx=10, pady=10)
+        step2_frame.pack(fill="x", pady=15)
         
-        # 2. 휴식 간격 설정
-        tk.Label(left_frame, text="⏱️ 2. 답글 딜레이 설정", font=("Pretendard", 12, "bold"), bg="#F3F0FF", fg="#555").pack(anchor="w", pady=(15, 5))
-        
-        delay_frame = tk.Frame(left_frame, bg="#F3F0FF")
-        delay_frame.pack(fill="x", pady=5)
-        
-        tk.Label(delay_frame, text="최소", bg="#F3F0FF").pack(side="left")
-        self.entry_min = tk.Entry(delay_frame, width=5, justify="center")
+        delay_inner = tk.Frame(step2_frame, bg="#F8F9FA")
+        delay_inner.pack(fill="x")
+        tk.Label(delay_inner, text="답글 작성 후").pack(side="left")
+        self.entry_min = tk.Entry(delay_inner, width=5, justify="center")
         self.entry_min.pack(side="left", padx=5)
         self.entry_min.insert(0, str(self.cfg.get("min_delay", 10.0)))
-        
-        tk.Label(delay_frame, text="초 ~ 최대", bg="#F3F0FF").pack(side="left")
-        self.entry_max = tk.Entry(delay_frame, width=5, justify="center")
+        tk.Label(delay_inner, text="초 ~").pack(side="left")
+        self.entry_max = tk.Entry(delay_inner, width=5, justify="center")
         self.entry_max.pack(side="left", padx=5)
         self.entry_max.insert(0, str(self.cfg.get("max_delay", 15.0)))
-        tk.Label(delay_frame, text="초 (랜덤)", bg="#F3F0FF").pack(side="left")
+        tk.Label(delay_inner, text="초 랜덤 휴식").pack(side="left")
 
-        # 타이머 UI
-        tk.Label(left_frame, text="⏳ 실시간 휴식 타이머", font=("Pretendard", 10, "bold"), bg="#F3F0FF", fg="#7950F2").pack(anchor="w", pady=(10, 2))
-        self.timer_label = tk.Label(left_frame, text="대기 중...", bg="#F3F0FF", fg="#555")
-        self.timer_label.pack(anchor="w", padx=5)
-        
-        self.progress = ttk.Progressbar(left_frame, orient="horizontal", length=300, mode="determinate")
-        self.progress.pack(fill="x", pady=5)
+        # 타이머
+        self.timer_label = tk.Label(step2_frame, text="대기 중...", fg="#ADB5BD", font=("Malgun Gothic", 9))
+        self.timer_label.pack(anchor="w", pady=(5, 0))
+        self.progress = ttk.Progressbar(step2_frame, orient="horizontal", mode="determinate")
+        self.progress.pack(fill="x", pady=2)
 
-        # 3. 옵션 및 시작
-        tk.Label(left_frame, text="🚀 3. 실행 옵션", font=("Pretendard", 12, "bold"), bg="#F3F0FF", fg="#555").pack(anchor="w", pady=(15, 5))
+        # 3. 실행
+        step3_frame = tk.LabelFrame(left_frame, text=" 3. 작업 시작 ", font=("Malgun Gothic", 10, "bold"), bg="#F8F9FA", fg="#228BE6", padx=10, pady=10)
+        step3_frame.pack(fill="x", pady=5)
         
         self.var_heart_like = tk.BooleanVar(value=True)
         self.var_reply = tk.BooleanVar(value=True)
         
-        chk_frame = tk.Frame(left_frame, bg="#F3F0FF")
-        chk_frame.pack(fill="x", pady=5)
-        tk.Checkbutton(chk_frame, text="하트+좋아요 찍기", variable=self.var_heart_like, bg="#F3F0FF", font=("Pretendard", 11)).pack(side="left", padx=5)
-        tk.Checkbutton(chk_frame, text="답글 달기", variable=self.var_reply, bg="#F3F0FF", font=("Pretendard", 11)).pack(side="left", padx=5)
+        chk_inner = tk.Frame(step3_frame, bg="#F8F9FA")
+        chk_inner.pack(fill="x", pady=(0, 10))
+        ttk.Checkbutton(chk_inner, text="하트+좋아요 찍기", variable=self.var_heart_like).pack(side="left", padx=(0, 15))
+        ttk.Checkbutton(chk_inner, text="준비된 답글 달기", variable=self.var_reply).pack(side="left")
 
-        self.btn_start = ttk.Button(left_frame, text="▶ 작업 시작", style="Accent.TButton", command=self.start_loop)
-        self.btn_start.pack(fill="x", pady=(10, 5))
-        
-        self.btn_stop = ttk.Button(left_frame, text="⏹ 멈추기", command=self.stop_loop)
+        self.btn_start = ttk.Button(step3_frame, text="▶ 작업 시작 (START)", style="Accent.TButton", command=self.start_loop)
+        self.btn_start.pack(fill="x", pady=2)
+        self.btn_stop = ttk.Button(step3_frame, text="⏹ 작업 중단 (STOP)", command=self.stop_loop)
         self.btn_stop.pack(fill="x", pady=2)
 
-        # 로그
-        tk.Label(left_frame, text="로그", bg="#F3F0FF", fg="#555", font=("Pretendard", 10, "bold")).pack(anchor="w", pady=(20, 5))
-        self.log_text = scrolledtext.ScrolledText(left_frame, height=12, state="disabled", font=("Consolas", 9))
+        # 로그창
+        tk.Label(left_frame, text="진행 로그:", font=("Malgun Gothic", 9, "bold")).pack(anchor="w", pady=(15, 2))
+        self.log_text = scrolledtext.ScrolledText(left_frame, height=10, state="disabled", font=("Consolas", 9), bg="#F1F3F5")
         self.log_text.pack(fill="both", expand=True)
 
-        # --- 오른쪽: 답글 에디터 ---
-        tk.Label(right_frame, text="📝 답글 대본 입력", font=("Pretendard", 12, "bold"), bg="#F3F0FF", fg="#555").pack(pady=(10, 5))
-        tk.Label(right_frame, text="1. @아이디 (설명)\n[답글 복사] 내용...", bg="#F3F0FF", fg="#777", justify="left").pack(pady=(0, 5))
-        
-        self.editor_text = scrolledtext.ScrolledText(right_frame, font=("Malgun Gothic", 10))
-        self.editor_text.pack(fill="both", expand=True, padx=5)
-        
-        # 기본 예시 텍스트
-        example_text = """
-1. @영림하-j6h (전세사기 피해 언급)
-답글: 맞습니다. 피해자분들의 눈물을 생각하면 정말 가만히 있을 수가 없죠.. 😢
 
-2. @리시앙에게진심인 (집의 본질)
-[답글 복사] 명언입니다. 집은 '사는(Live) 곳'이지 투기판의 '칩'이 아니니까요. 🔥
+        # === [우측] 대본 에디터 ===
+        right_top = tk.Frame(right_frame, bg="#F8F9FA")
+        right_top.pack(fill="x", pady=(0, 5))
+        tk.Label(right_top, text="📝 답글 매칭 대본", font=("Malgun Gothic", 12, "bold"), fg="#495057", bg="#F8F9FA").pack(side="left")
+        ttk.Button(right_top, text="📂 파일 불러오기", command=self.load_reply_file).pack(side="right")
+
+        self.editor_text = scrolledtext.ScrolledText(right_frame, font=("Malgun Gothic", 10), undo=True)
+        self.editor_text.pack(fill="both", expand=True, padx=2, pady=2)
+
+        # 사용자 요청 예시 텍스트 설정
+        default_script = """1. 역사 팩트 체크형 📜
+ @야무진-x8j (29분 전): 크리스마스 자체가 예수님의 탄생일이 아닙니다. 태양신의 탄생일이었던 동지제를 변질시킨거죠.
+
+↳ 답글 (똑똑즈 TtokTtokz): 오! 역시 우리 채널 시청자분들은 지식 수준이 상당하시네요! 🕵️‍♂️ 말씀하신 대로 크리스마스의 기원에는 로마의 '동지제' 같은 다양한 역사적 배경이 섞여 있죠. 똑똑즈는 그 위에 **'자본주의'**라는 강력한 양념이 어떻게 뿌려졌는지를 다뤄봤는데, 기원까지 짚어주시니 영상이 더 풍성해지는 기분입니다! 지식 나눔 감사합니다! 🎓✨
+
+2. 자본주의를 깨달은 고등학생 🎒
+ @Ihate-schoolsomuch (2시간 전): 자본주의를 맛본 고등학생 입장이되니 크리스마스에 선물 주는 문화도 사기극이라 확신함. 근데 아이들 입장에서는 돈 쓰기 싫은 부모들의 변명으로 들릴뿐.
+
+↳ 답글 (똑똑즈 TtokTtokz): 와... 고등학생인데 벌써 자본주의의 민낯을 보셨군요! 🐯 장난감 회사의 전략을 간파하다니, 미래의 워런 버핏이 여기 있었네요. 😂 맞아요, "이거 다 상술이야!"라고만 하면 동심 파괴처럼 들릴 수 있죠. 그래서 우리는 **'상술인 건 알지만, 그 안에서 현명하게 행복을 찾는 법'**을 배우는 거랍니다! (시험 공부 화이팅이에요! 📖🔥)
+
+3. 피드백 감사형 (자막 위치 수정) 🙏
+ @김정우-s7y8v (4시간 전): 자막 위로 올려주셨군요 감사합니다 다음편부터 적용 된다 하셨는데 앞으로 더욱 열심히 보러 오겠습니다.
+
+↳ 답글 (똑똑즈 TtokTtokz): 정우님! 🐯✨ 소중한 의견 주신 덕분에 저희 채널이 한 단계 더 업그레이드될 수 있었습니다! 시청자분들이 편하게 보시는 게 저희에겐 0순위거든요. 🫡 약속드린 대로 다음 편부터는 훨씬 보기 편한 자막으로 찾아뵙겠습니다! 앞으로도 '출석 체크' 잊지 마세요! 충성!
 """
-        self.editor_text.insert("1.0", example_text)
+        self.editor_text.insert("1.0", default_script)
 
-        btn_apply = ttk.Button(right_frame, text="✅ 이 내용으로 적용하기 (Parsing)", command=self.parse_editor_content)
-        btn_apply.pack(fill="x", padx=5, pady=5)
-        
-        self.lbl_status = tk.Label(right_frame, text="준비된 답글: 0명", bg="#F3F0FF", fg="#E03131", font=("Pretendard", 11, "bold"))
-        self.lbl_status.pack(pady=5)
+        btn_parse = ttk.Button(right_frame, text="✅ 위 내용 분석하여 적용하기 (Analyze)", command=self.parse_editor_content)
+        btn_parse.pack(fill="x", pady=10)
+
+        self.lbl_status = tk.Label(right_frame, text="준비된 답글: 0개", bg="#F8F9FA", fg="#E03131", font=("Malgun Gothic", 12, "bold"))
+        self.lbl_status.pack(pady=(0, 10))
+
+    # --- 기능 로직 ---
 
     def log(self, msg):
         try:
             ts = datetime.now().strftime("%H:%M:%S")
-            text = f"[{ts}] {msg}\n"
             self.log_text.config(state="normal")
-            self.log_text.insert("end", text)
+            self.log_text.insert("end", f"[{ts}] {msg}\n")
             self.log_text.see("end")
             self.log_text.config(state="disabled")
-        except:
-            pass
-    
-    def _start_countdown(self, duration, callback):
-        if not self.running: return
-        start_time = time.time()
-        end_time = start_time + duration
-        
-        def update():
-            if not self.running: return
-            now = time.time()
-            remain = end_time - now
-            if remain <= 0:
-                self.progress['value'] = 0
-                self.timer_label.config(text="휴식 끝! 다시 일합니다.", fg="#555")
-                callback()
-            else:
-                percent = (remain / duration) * 100
-                self.progress['value'] = percent
-                self.timer_label.config(text=f"휴식 중... {remain:.1f}초 남음", fg="#E03131")
-                self.root.after(50, update)
-        update()
+        except: pass
 
     def load_reply_file(self):
-        filename = filedialog.askopenfilename(title="답글 텍스트 파일 열기", filetypes=[("Text files", "*.txt"), ("All files", "*.*")])
+        filename = filedialog.askopenfilename(title="파일 열기", filetypes=[("Text Files", "*.txt"), ("All Files", "*.*")])
         if filename:
-            content = ""
-            encodings = ['utf-8', 'cp949', 'euc-kr', 'utf-16']
-            for enc in encodings:
-                try:
-                    content = Path(filename).read_text(encoding=enc)
-                    break
-                except UnicodeDecodeError:
-                    continue
-            
-            if content:
+            try:
+                content = Path(filename).read_text(encoding="utf-8")
                 self.editor_text.delete("1.0", "end")
                 self.editor_text.insert("1.0", content)
                 self.parse_editor_content()
-                self.log(f"파일 불러옴: {Path(filename).name}")
-            else:
-                messagebox.showerror("오류", "파일을 읽을 수 없습니다. (인코딩 문제)")
+                self.log(f"파일 로드 완료: {Path(filename).name}")
+            except Exception as e:
+                messagebox.showerror("오류", f"파일 읽기 실패: {e}")
 
     def parse_editor_content(self):
-        content = self.editor_text.get("1.0", "end")
-        new_data = {}
-        lines = content.splitlines()
-        current_id = None
+        """
+        사용자가 제공한 형식을 파싱합니다.
+        형식 특징: 번호로 블록 구분, @아이디 라인, ↳ 답글 라인
+        """
+        text = self.editor_text.get("1.0", "end")
+        
+        # 결과를 저장할 딕셔너리
+        parsed_data = {}
+        
+        # 1. 텍스트를 줄 단위로 분리
+        lines = text.splitlines()
+        
+        current_user_id = None
         
         for line in lines:
             line = line.strip()
-            line = line.replace('\u200b', '').replace('\ufeff', '')
             if not line: continue
             
-            # 관대한 아이디 찾기
-            if "@" in line and not line.startswith("답글") and not line.startswith("[답글"):
-                match = re.search(r"(@[^ \(\)\t\n]+)", line)
+            # A. 사용자 아이디 찾기 (@로 시작하거나 포함된 라인)
+            # 예: "@야무진-x8j (29분 전): ..." -> @야무진-x8j 추출
+            if "@" in line and "답글" not in line:
+                # 정규식으로 @아이디 부분만 추출 (공백, 괄호 전까지)
+                match = re.search(r"(@[\w\-]+)", line)
                 if match:
-                    current_id = match.group(1).strip()
+                    current_user_id = match.group(1)
+                    # print(f"Found User: {current_user_id}")
                     continue
             
-            # 다양한 답글 형식 인식
-            reply_match = re.match(r"^(\[답글 복사\]|\[답글\]|답글:?)\s*(.*)", line)
-            
-            if reply_match and current_id:
-                reply_msg = reply_match.group(2).strip()
-                if reply_msg:
-                    new_data[current_id] = reply_msg
+            # B. 답글 내용 찾기 (↳ 답글 ... : ...)
+            # 예: "↳ 답글 (똑똑즈 TtokTtokz): 내용..."
+            if (line.startswith("↳") or "답글" in line) and current_user_id:
+                # 콜론(:) 뒤의 내용이 진짜 답글 내용
+                parts = line.split(":", 1)
+                if len(parts) > 1:
+                    reply_content = parts[1].strip()
+                    if reply_content:
+                        parsed_data[current_user_id] = reply_content
+                        # print(f"Mapped {current_user_id} -> {reply_content[:10]}...")
+                        # 매칭 후 아이디 초기화 (다음 블록을 위해)
+                        # current_user_id = None 
+                        # (단, 한 아이디에 여러 줄일 수도 있으니 초기화는 신중히. 여기선 1:1 매핑 가정)
         
-        self.reply_data = new_data
+        self.reply_data = parsed_data
         count = len(self.reply_data)
-        self.lbl_status.config(text=f"준비된 답글: {count}명")
+        self.lbl_status.config(text=f"준비된 답글: {count}개")
         
         if count > 0:
-            sample = list(self.reply_data.items())[0]
-            self.log(f"✅ 대본 분석 완료! 총 {count}명의 답글 준비.")
-            self.log(f"   (예시: {sample[0]} -> {sample[1][:10]}...)")
+            self.log(f"✅ 대본 분석 성공! 총 {count}명의 타겟을 찾았습니다.")
+            # 검증용 로그
+            first_user = list(parsed_data.keys())[0]
+            self.log(f"   (예: {first_user} 님에게 답글 준비됨)")
         else:
-            self.log("⚠️ 인식된 답글이 없습니다.")
+            self.log("⚠️ 분석된 데이터가 없습니다. 형식을 확인해주세요.")
+            messagebox.showwarning("분석 실패", "형식에 맞는 데이터(아이디(@), 답글)를 찾지 못했습니다.")
 
     def open_chrome(self):
+        # ... (기존과 동일한 크롬 실행 로직) ...
         port = self.cfg["chrome_devtools_port"]
-        
         try:
+            # 이미 켜진 크롬에 연결 시도
             opts = ChromeOptions()
             opts.add_experimental_option("debuggerAddress", f"127.0.0.1:{port}")
             svc = ChromeService(ChromeDriverManager().install())
             self.driver = webdriver.Chrome(service=svc, options=opts)
-            self.log("♻️ 이미 실행 중인 크롬을 찾았습니다! 연결 성공.")
-            try:
-                self.driver.switch_to.window(self.driver.window_handles[0])
-            except: pass
+            self.log("♻️ 실행 중인 크롬에 연결되었습니다.")
             return
-        except Exception:
+        except:
             pass
-
-        self.log("새 크롬 창을 실행합니다...")
+        
+        self.log("새 크롬 창을 시작합니다...")
         try:
-            profile = self.base / self.cfg["chrome_profile_dir"]
-            profile.mkdir(exist_ok=True)
+            profile_path = self.base / self.cfg["chrome_profile_dir"]
+            profile_path.mkdir(exist_ok=True)
             
-            chrome_candidates = [
-                Path("C:/Program Files/Google/Chrome/Application/chrome.exe"),
-                Path("C:/Program Files (x86)/Google/Chrome/Application/chrome.exe"),
-                Path(os.environ.get("LOCALAPPDATA", "")) / "Google/Chrome/Application/chrome.exe",
-                Path(os.environ.get("PROGRAMFILES", "")) / "Google/Chrome/Application/chrome.exe"
+            # Windows Chrome 경로 탐색
+            candidates = [
+                r"C:\Program Files\Google\Chrome\Application\chrome.exe",
+                r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe",
+                os.path.expandvars(r"%LOCALAPPDATA%\Google\Chrome\Application\chrome.exe"),
+                os.path.expandvars(r"%PROGRAMFILES%\Google\Chrome\Application\chrome.exe")
             ]
-            chrome_exe = None
-            for p in chrome_candidates:
-                if p.exists():
-                    chrome_exe = str(p)
-                    break
+            chrome_exe = next((c for c in candidates if os.path.exists(c)), None)
             
             if not chrome_exe:
-                messagebox.showerror("오류", "크롬을 찾을 수 없습니다.")
+                messagebox.showerror("오류", "크롬 브라우저를 찾을 수 없습니다.")
                 return
 
             cmd = [
                 chrome_exe,
                 f"--remote-debugging-port={port}",
-                f"--user-data-dir={profile}",
+                f"--user-data-dir={profile_path}",
                 "--no-first-run",
                 "--disable-popup-blocking",
                 DEFAULT_STUDIO_URL
             ]
-            subprocess.Popen(cmd)
-            time.sleep(2)
+            # subprocess.Popen(cmd) # 콘솔창 뜨는 문제 방지
+            subprocess.Popen(cmd, creationflags=subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0)
+            
+            time.sleep(3)
             
             opts = ChromeOptions()
             opts.add_experimental_option("debuggerAddress", f"127.0.0.1:{port}")
             svc = ChromeService(ChromeDriverManager().install())
             self.driver = webdriver.Chrome(service=svc, options=opts)
-            self.log("크롬 연결 성공!")
+            self.log("✅ 크롬 실행 및 연결 성공!")
             
         except Exception as e:
-            self.log(f"크롬 연결 실패: {e}")
-            messagebox.showerror("오류", f"크롬 연결 실패:\n{e}")
+            self.log(f"크롬 실행 실패: {e}")
+            messagebox.showerror("실패", str(e))
+
+    def _start_countdown(self, duration, callback):
+        if not self.running: return
+        start_ts = time.time()
+        
+        def update_timer():
+            if not self.running: return
+            elapsed = time.time() - start_ts
+            remain = duration - elapsed
+            
+            if remain <= 0:
+                self.progress['value'] = 0
+                self.timer_label.config(text="휴식 끝! 다시 작업합니다.", fg="#228BE6")
+                callback()
+            else:
+                pct = (remain / duration) * 100
+                self.progress['value'] = pct
+                self.timer_label.config(text=f"⏳ 봇 탐지 회피 중... {remain:.1f}초 남음", fg="#E03131")
+                self.root.after(100, update_timer)
+        
+        update_timer()
 
     def start_loop(self):
         if not self.driver:
-            self.log("먼저 크롬을 열어주세요.")
+            messagebox.showwarning("주의", "먼저 '크롬 브라우저 열기'를 눌러주세요.")
             return
         
+        self.parse_editor_content() # 시작 전 다시 파싱
         if self.var_reply.get() and not self.reply_data:
-            if not messagebox.askyesno("확인", "준비된 답글 데이터가 없습니다.\n답글 없이 진행할까요?"):
+            if not messagebox.askyesno("확인", "준비된 답글이 없습니다. 하트/좋아요만 하시겠습니까?"):
                 return
 
         self.save_config()
-        # 스크롤 초기화
-        self.scroll_stuck_count = 0
-        self.last_scroll_height = 0
-
         self.running = True
         self.btn_start.config(state="disabled")
         self.btn_stop.config(state="normal")
-        self.log("💜 자동화 시작! (화면 분석 중...)")
+        self.scroll_stuck_count = 0
+        self.last_scroll_height = 0
         
+        self.log("▶ 자동화 작업을 시작합니다.")
         self.root.after(100, self._process_comments)
 
     def stop_loop(self):
         self.running = False
         self.btn_start.config(state="normal")
         self.btn_stop.config(state="disabled")
-        self.log("⏹ 작업 중단")
-        self.timer_label.config(text="중지됨", fg="#555")
-        self.progress['value'] = 0
-
-    def _get_random_delay(self):
-        try:
-            mn = float(self.entry_min.get())
-            mx = float(self.entry_max.get())
-            if mn < 0: mn = 0
-            if mx < mn: mx = mn
-        except:
-            mn, mx = 10.0, 15.0
-        return random.uniform(mn, mx)
+        self.log("⏹ 작업이 사용자에 의해 중단되었습니다.")
+        self.timer_label.config(text="중지됨")
 
     def _process_comments(self):
-        if not self.running:
-            return
-
+        if not self.running: return
+        
         try:
-            reply_json = json.dumps(self.reply_data, ensure_ascii=False)
-            do_heart_like = "true" if self.var_heart_like.get() else "false"
-            do_reply = "true" if self.var_reply.get() else "false"
+            # JS로 현재 화면의 댓글 요소 분석 및 행동 결정
+            # (Python에서 요소를 하나하나 찾으면 느리고 StaleElement 에러가 잦음)
             
-            js_script = f"""
-            return (function(replyData, doHeartLike, doReply) {{
-                function queryShadowRoot(root) {{
-                    let boxes = [];
+            js_code = """
+            return (function(replyData, doHeartLike, doReply) {
+                // Shadow DOM 내부 탐색 헬퍼
+                function getAllComments(root) {
+                    let comments = [];
+                    // ytcp-comment-thread 요소 찾기
                     let threads = root.querySelectorAll('ytcp-comment-thread');
-                    threads.forEach(t => boxes.push(t));
-                    let allNodes = root.querySelectorAll('*');
-                    allNodes.forEach(node => {{
-                        if (node.shadowRoot) {{
-                            boxes = boxes.concat(queryShadowRoot(node.shadowRoot));
-                        }}
-                    }});
-                    return boxes;
-                }}
+                    threads.forEach(t => comments.push(t));
+                    
+                    // 재귀적으로 ShadowRoot 탐색
+                    let walker = document.createTreeWalker(root, NodeFilter.SHOW_ELEMENT, null, false);
+                    while(walker.nextNode()) {
+                        let node = walker.currentNode;
+                        if(node.shadowRoot) {
+                            comments = comments.concat(getAllComments(node.shadowRoot));
+                        }
+                    }
+                    return comments;
+                }
 
-                let threads = queryShadowRoot(document.body);
+                let threads = getAllComments(document.body);
                 
-                for (let thread of threads) {{
+                for (let thread of threads) {
+                    // 화면에 보이는지 체크 (대략적으로)
                     if (thread.offsetParent === null) continue;
 
-                    let authorEl = thread.querySelector('#author-text');
-                    let authorText = authorEl ? authorEl.innerText.trim() : "";
+                    // 작성자 이름 찾기 (#author-text > span.name 혹은 #author-text 자체)
+                    let authorEl = thread.querySelector('#author-text .name') || thread.querySelector('#author-text');
+                    let authorName = authorEl ? authorEl.textContent.trim() : "";
                     
-                    let targetHandle = null;
-                    if (doReply) {{
-                        for (let handle in replyData) {{
-                            if (authorText.includes(handle)) {{
-                                targetHandle = handle;
+                    // 작성자 아이디(핸들) 찾기 - 보통 텍스트에 포함됨
+                    // 정확한 매칭을 위해 replyData의 키가 authorName에 포함되는지 확인
+                    let targetKey = null;
+                    if (doReply) {
+                        for (let key in replyData) {
+                            // key: @username
+                            if (authorName.includes(key)) {
+                                targetKey = key;
                                 break;
-                            }}
-                        }}
-                    }}
+                            }
+                        }
+                    }
 
-                    // 1. 하트 & 좋아요 (강화된 로직)
-                    if (doHeartLike) {{
-                        // 아이콘 버튼들 찾기 (ytcp-icon-button)
-                        // 좋아요: #like-button, 하트: #heart-button
+                    // --- 1. 하트/좋아요 로직 ---
+                    if (doHeartLike) {
                         let likeBtn = thread.querySelector('#like-button');
                         let heartBtn = thread.querySelector('#heart-button');
-
-                        // 좋아요: aria-pressed 체크 (true면 이미 눌림)
-                        // data-bot-clicked가 없어야 함
-                        if (likeBtn && !likeBtn.hasAttribute('data-bot-clicked')) {{
-                            if (likeBtn.getAttribute('aria-pressed') !== 'true') {{
-                                likeBtn.scrollIntoView({{block: 'center', inline: 'center'}});
+                        
+                        // 이미 봇이 처리했는지 체크 (Attribute 이용)
+                        if (likeBtn && !likeBtn.hasAttribute('data-bot-done')) {
+                            let pressed = likeBtn.getAttribute('aria-pressed') === 'true';
+                            if (!pressed) {
+                                likeBtn.scrollIntoView({block: 'center'});
                                 likeBtn.click();
-                                likeBtn.setAttribute('data-bot-clicked', 'true');
-                                return {{action: 'like'}};
-                            }} else {{
-                                // 이미 눌려있으면 패스 마킹 (다시 안 보게)
-                                likeBtn.setAttribute('data-bot-clicked', 'true');
-                            }}
-                        }}
-
-                        // 하트: aria-pressed 체크
-                        if (heartBtn && !heartBtn.hasAttribute('data-bot-clicked')) {{
-                            if (heartBtn.getAttribute('aria-pressed') !== 'true') {{
-                                heartBtn.scrollIntoView({{block: 'center', inline: 'center'}});
+                                likeBtn.setAttribute('data-bot-done', 'true');
+                                return {type: 'like', name: authorName};
+                            }
+                            likeBtn.setAttribute('data-bot-done', 'true'); // 이미 눌려있어도 마킹
+                        }
+                        
+                        if (heartBtn && !heartBtn.hasAttribute('data-bot-done')) {
+                            let pressed = heartBtn.getAttribute('aria-pressed') === 'true';
+                            // 'unhearted' 클래스 혹은 pressed 속성 확인
+                            if (!pressed) {
+                                heartBtn.scrollIntoView({block: 'center'});
                                 heartBtn.click();
-                                heartBtn.setAttribute('data-bot-clicked', 'true');
-                                return {{action: 'heart'}};
-                            }} else {{
-                                heartBtn.setAttribute('data-bot-clicked', 'true');
-                            }}
-                        }}
-                    }}
+                                heartBtn.setAttribute('data-bot-done', 'true');
+                                return {type: 'heart', name: authorName};
+                            }
+                            heartBtn.setAttribute('data-bot-done', 'true');
+                        }
+                    }
 
-                    // 2. 답글
-                    if (doReply && targetHandle) {{
+                    // --- 2. 답글 로직 ---
+                    if (doReply && targetKey) {
+                        // 이미 답글 달았는지 체크
                         if (thread.hasAttribute('data-bot-replied')) continue;
                         
+                        // 내가 이미 단 답글이 있는지 확인 (reply-dialog 내부 등)
+                        // 하지만 DOM 구조상 복잡하므로, 일단 'data-bot-replied' 속성으로 제어하고,
+                        // 화면상에 '답글' 버튼이 있는지 확인
+                        
                         let replyBtn = thread.querySelector('#reply-button');
-                        let inputArea = thread.querySelector('#contenteditable-root');
+                        let inputArea = thread.querySelector('#contenteditable-root'); // 입력창
                         
-                        // 답글 창이 안 열려있으면 열기
-                        if (!inputArea && replyBtn) {{
-                            replyBtn.scrollIntoView({{block: 'center', inline: 'center'}});
+                        // 입력창이 없고 답글버튼이 있으면 -> 답글 버튼 클릭
+                        if (!inputArea && replyBtn) {
+                            replyBtn.scrollIntoView({block: 'center'});
                             replyBtn.click();
-                            return {{action: 'open_reply'}};
-                        }}
+                            return {type: 'open_reply_box'};
+                        }
                         
-                        // 열려있으면 입력
-                        if (inputArea) {{
+                        // 입력창이 있으면 -> 텍스트 입력 준비
+                        if (inputArea) {
                             inputArea.focus();
-                            thread.setAttribute('data-bot-replied', 'true');
-                            return {{
-                                action: 'type_reply',
-                                text: replyData[targetHandle],
-                                handle: targetHandle
-                            }}; 
-                        }}
-                    }}
-                }}
+                            thread.setAttribute('data-bot-replied', 'true'); // 처리 완료 표시
+                            return {
+                                type: 'write_reply', 
+                                name: authorName, 
+                                content: replyData[targetKey],
+                                key: targetKey
+                            };
+                        }
+                    }
+                }
                 
-                // 현재 보이는 화면에서 할 일이 없음 -> 스크롤 정보 리턴
-                return {{
-                    action: 'none', 
-                    scrollHeight: document.documentElement.scrollHeight,
-                    scrollY: window.scrollY
-                }};
-            }})({reply_json}, {do_heart_like}, {do_reply});
+                // 아무 작업도 안 했다면 -> 스크롤 정보 반환
+                return {
+                    type: 'scroll', 
+                    h: document.documentElement.scrollHeight, 
+                    y: window.scrollY
+                };
+
+            })(arguments[0], arguments[1], arguments[2]);
             """
             
-            result = self.driver.execute_script(js_script)
-            action = result.get('action')
+            # JS 실행
+            reply_json_obj = self.reply_data
+            result = self.driver.execute_script(js_code, reply_json_obj, self.var_heart_like.get(), self.var_reply.get())
             
-            if action == 'like':
-                self.log("👍 좋아요 클릭!")
-                self.root.after(100, self._process_comments) # 딜레이 없이 바로 다음
+            action_type = result.get('type')
+            
+            if action_type == 'like':
+                self.log(f"👍 좋아요: {result.get('name')}")
+                self.root.after(200, self._process_comments) # 딜레이 짧게
                 
-            elif action == 'heart':
-                self.log("❤️ 하트 클릭!")
-                self.root.after(100, self._process_comments)
+            elif action_type == 'heart':
+                self.log(f"❤️ 하트: {result.get('name')}")
+                self.root.after(200, self._process_comments)
                 
-            elif action == 'open_reply':
-                # 답글 창 열릴 때까지 약간 대기
-                self.root.after(800, self._process_comments)
+            elif action_type == 'open_reply_box':
+                # 답글 창 열리는 애니메이션 대기
+                self.root.after(1000, self._process_comments)
                 
-            elif action == 'type_reply':
-                text = result.get('text')
-                handle = result.get('handle')
-                self.log(f"📝 {handle}님에게 답글 작성 중...")
+            elif action_type == 'write_reply':
+                target_user = result.get('name')
+                content = result.get('content')
+                self.log(f"📝 {target_user}님께 답글 작성 시작...")
                 
-                try:
-                    self.root.clipboard_clear()
-                    self.root.clipboard_append(text)
-                    self.root.update()
-                    
-                    ac = ActionChains(self.driver)
-                    ac.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
-                    time.sleep(1.0) # 타이핑 확인 딜레이
-                    ac.key_down(Keys.CONTROL).send_keys(Keys.ENTER).key_up(Keys.CONTROL).perform()
-                    
-                    self.log(f"✅ 답글 전송 완료!")
-                    
-                    # 답글 후 휴식
-                    delay = self._get_random_delay()
-                    self.log(f"   ☕ 답글 작성 후 휴식... ({delay:.1f}초)")
-                    self._start_countdown(delay, self._process_comments)
-                    
-                except Exception as e:
-                    self.log(f"답글 작성 실패: {e}")
-                    self.root.after(100, self._process_comments)
+                # 클립보드 복사 -> 붙여넣기 (가장 안정적)
+                self.root.clipboard_clear()
+                self.root.clipboard_append(content)
+                self.root.update()
                 
-            else:
-                # 할 일 없음 -> 스크롤 내리기
-                if self.running:
-                    current_h = result.get('scrollHeight', 0)
-                    
-                    # 스크롤 종료 체크
-                    if current_h == self.last_scroll_height:
-                        self.scroll_stuck_count += 1
-                    else:
-                        self.scroll_stuck_count = 0
-                        self.last_scroll_height = current_h
-                    
-                    # 3번 이상 높이 변화가 없으면 종료
-                    if self.scroll_stuck_count >= 3:
-                        self.log("🏁 모든 댓글을 확인했습니다. (스크롤 끝)")
-                        self.stop_loop()
-                        messagebox.showinfo("완료", "모든 작업이 끝났습니다!")
-                        return
+                # Ctrl + V
+                ac = ActionChains(self.driver)
+                ac.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
+                time.sleep(1.0) # 붙여넣기 대기
+                
+                # Ctrl + Enter (전송)
+                ac.key_down(Keys.CONTROL).send_keys(Keys.ENTER).key_up(Keys.CONTROL).perform()
+                
+                self.log(f"✅ 답글 전송 완료!")
+                
+                # ★ 중요: 랜덤 딜레이 (10~15초)
+                delay = random.uniform(self.cfg["min_delay"], self.cfg["max_delay"])
+                self.log(f"☕ 자연스러움을 위해 {delay:.1f}초 쉽니다...")
+                self._start_countdown(delay, self._process_comments)
+                
+            elif action_type == 'scroll':
+                # 스크롤 내리기
+                current_h = result.get('h')
+                if current_h == self.last_scroll_height:
+                    self.scroll_stuck_count += 1
+                else:
+                    self.scroll_stuck_count = 0
+                    self.last_scroll_height = current_h
+                
+                if self.scroll_stuck_count >= 5: # 5번 이상 변화 없으면 끝
+                    self.log("🏁 더 이상 댓글이 없습니다. 작업 완료!")
+                    self.stop_loop()
+                    messagebox.showinfo("완료", "모든 댓글 확인 완료!")
+                    return
 
-                    self.log("더 찾으러 내려갑니다... ⬇️")
-                    self.driver.execute_script(f"window.scrollBy(0, {self.cfg.get('scroll_step', 600)});")
-                    
-                    # 로딩 대기
-                    self.root.after(2000, self._process_comments)
+                self.log("⬇️ 스크롤 내리는 중...")
+                self.driver.execute_script(f"window.scrollBy(0, {self.cfg['scroll_step']});")
+                self.root.after(1500, self._process_comments)
 
         except Exception as e:
-            self.log(f"오류: {e}")
-            self.running = False
-            self.btn_start.config(state="normal")
-            self.btn_stop.config(state="disabled")
+            self.log(f"❌ 오류 발생: {e}")
+            # 오류 나도 멈추지 않고 잠시 후 재시도
+            self.root.after(3000, self._process_comments)
 
 if __name__ == "__main__":
     YouTubeManagerBot().root.mainloop()
