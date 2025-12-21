@@ -1165,19 +1165,7 @@ class FlowApp:
                 raise e2
             
         return self.driver
-            self.driver.execute_cdp_cmd(
-                "Page.setDownloadBehavior",
-                {"behavior": "allow", "downloadPath": str(dl_dir)},
-            )
-            self.log(f"Chrome 다운로드 경로 설정: {dl_dir}")
-        except Exception as exc:
-            self.log(f"Chrome 다운로드 경로 설정 실패: {exc}")
-        try:
-            self.driver.execute_cdp_cmd("Page.bringToFront", {})
-        except Exception:
-            pass
-        self.log("Chrome 세션 연결 완료")
-        return self.driver
+
 
     def _get_target_url(self) -> str:
         url = str(self.cfg.get("flow_project_url") or "").strip()
