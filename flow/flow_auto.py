@@ -1583,32 +1583,37 @@ class FlowApp:
     def _fill_via_keys(self, d: webdriver.Chrome, el, text: str) -> bool:
         """
         [물리적 입력 모드 - 정밀 타격 버전]
-        요소의 화면상 절대 좌표를 계산하여 마우스를 직접 이동시켜 클릭한 후 입력합니다.
         """
         text = self._sanitize_bmp(text)
         
         try:
             self.log("🖱️ 좌표 계산 및 이동 중...")
             
-            # 1. 요소의 화면상 절대 좌표 계산 (JS 이용)
-            # window.screenX: 브라우저 창의 모니터 내 X 좌표
-            # element.getBoundingClientRect(): 뷰포트 내 요소 좌표
-            # window.outerHeight - window.innerHeight: 상단 UI(주소창 등) 높이 대략적 계산
+            target_x = 0
+            target_y = 0
             
-            metrics = d.execute_script("""
-                const rect = arguments[0].getBoundingClientRect();
-                const uiHeight = window.outerHeight - window.innerHeight;
-                return {
-                    x: window.screenX + rect.left + rect.width / 2,
-                    y: window.screenY + rect.top + rect.height / 2 + (uiHeight * 0.7) // 상단 바 보정
-                };
-            """, el)
+            # [우선순위 1] 사용자가 직접 지정한 좌표가 있으면 사용
+            saved_coords = self.cfg.get("input_coords")
+            if saved_coords:
+                target_x = int(saved_coords.get("x", 0))
+                target_y = int(saved_coords.get("y", 0))
+                self.log(f"📍 저장된 좌표 사용: {target_x}, {target_y}")
             
-            target_x = int(metrics['x'])
-            target_y = int(metrics['y'])
+            # [우선순위 2] 없으면 자동 계산
+            if target_x == 0 or target_y == 0:
+                metrics = d.execute_script("""
+                    const rect = arguments[0].getBoundingClientRect();
+                    const uiHeight = window.outerHeight - window.innerHeight;
+                    return {
+                        x: window.screenX + rect.left + rect.width / 2,
+                        y: window.screenY + rect.top + rect.height / 2 + (uiHeight * 0.8)
+                    };
+                """, el)
+                target_x = int(metrics['x'])
+                target_y = int(metrics['y'])
             
             # 2. 마우스 이동 및 클릭
-            pyautogui.moveTo(target_x, target_y, duration=0.5) # 0.5초 동안 부드럽게 이동
+            pyautogui.moveTo(target_x, target_y, duration=0.5)
             pyautogui.click()
             time.sleep(0.5)
             
@@ -1839,6 +1844,21 @@ class FlowApp:
         return False
 
     def _press_submit(self, d: webdriver.Chrome, el) -> bool:
+        # [우선순위 0] 사용자가 직접 지정한 좌표가 있으면 무조건 클릭 (PyAutoGUI)
+        saved_coords = self.cfg.get("submit_coords")
+        if saved_coords:
+            try:
+                tx = int(saved_coords.get("x", 0))
+                ty = int(saved_coords.get("y", 0))
+                if tx > 0 and ty > 0:
+                    self.log(f"📍 저장된 생성 버튼 좌표 클릭: {tx}, {ty}")
+                    pyautogui.moveTo(tx, ty, duration=0.5)
+                    pyautogui.click()
+                    time.sleep(0.5)
+                    return True
+            except Exception as e:
+                self.log(f"좌표 클릭 실패: {e}")
+
         # 1. 설정된 selector 우선 클릭 (가장 정확함)
         selectors = self.cfg.get("submit_selectors", [])
         for sel in selectors:
@@ -2011,9 +2031,21 @@ class FlowApp:
               }
               if(e.key==='Enter' || e.key.toLowerCase()==='s'){
                 e.preventDefault(); e.stopPropagation();
-                // Enter 로 지정하는 모드는 2단계 다운로드 + 기타(입력칸/생성 버튼)에 사용
                 const t=state.prev;
                 state.sel=uniqueSelector(t);
+                
+                // [좌표 계산] 화면상 절대 좌표 (PyAutoGUI용)
+                const rect = t.getBoundingClientRect();
+                const winX = window.screenX || window.screenLeft || 0;
+                const winY = window.screenY || window.screenTop || 0;
+                // 상단 UI 높이 추정 (전체화면이 아닐 때)
+                const uiH = (window.outerHeight - window.innerHeight) || 0;
+                
+                state.coords = {
+                    x: Math.round(winX + rect.left + (rect.width/2)),
+                    y: Math.round(winY + rect.top + (rect.height/2) + (uiH * 0.8)) // 상단바 보정
+                };
+                
                 state.done=true; state.cleanup(); window.__cap=state; return;
               }
               return;
@@ -2059,10 +2091,12 @@ class FlowApp:
 
         start = time.time()
         picked = None
+        picked_coords = None
         while time.time() - start < 60:
             try:
+                # coords도 같이 반환받음
                 res = d.execute_script(
-                    "return window.__cap && window.__cap.done ? {sel: window.__cap.sel, cancel: window.__cap.cancel} : null;"
+                    "return window.__cap && window.__cap.done ? {sel: window.__cap.sel, coords: window.__cap.coords, cancel: window.__cap.cancel} : null;"
                 )
             except Exception:
                 res = None
@@ -2071,6 +2105,7 @@ class FlowApp:
                     self.status_var.set("지정을 취소했어요.")
                     return
                 picked = (res.get("sel") or "").strip()
+                picked_coords = res.get("coords")
                 break
             time.sleep(0.1)
 
@@ -2080,8 +2115,12 @@ class FlowApp:
 
         if kind == "input":
             key = "input_selectors"
+            if picked_coords:
+                self.cfg["input_coords"] = picked_coords
         elif kind == "submit":
             key = "submit_selectors"
+            if picked_coords:
+                self.cfg["submit_coords"] = picked_coords
         elif kind == "download1":
             key = "download_selector_main"
         elif kind == "download2":
