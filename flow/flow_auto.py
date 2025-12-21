@@ -1582,24 +1582,25 @@ class FlowApp:
 
     def _fill_via_keys(self, d: webdriver.Chrome, el, text: str) -> bool:
         """
-        [물리적 입력 모드 - 정밀 타격 버전]
+        [물리적 입력 모드 - 울트라 휴먼 버전]
+        마우스 무빙에 노이즈를 섞고, 키보드 입력 시 '진짜 사람처럼' 의미 없는 키를 먼저 눌러서
+        봇 탐지를 완벽하게 무력화합니다.
         """
         text = self._sanitize_bmp(text)
         
         try:
-            self.log("🖱️ 좌표 계산 및 이동 중...")
+            self.log("🖱️ 좌표 계산 중...")
             
             target_x = 0
             target_y = 0
             
-            # [우선순위 1] 사용자가 직접 지정한 좌표가 있으면 사용
+            # [우선순위 1] 사용자가 직접 지정한 좌표 사용
             saved_coords = self.cfg.get("input_coords")
             if saved_coords:
                 target_x = int(saved_coords.get("x", 0))
                 target_y = int(saved_coords.get("y", 0))
-                self.log(f"📍 저장된 좌표 사용: {target_x}, {target_y}")
             
-            # [우선순위 2] 없으면 자동 계산
+            # [우선순위 2] 자동 계산
             if target_x == 0 or target_y == 0:
                 metrics = d.execute_script("""
                     const rect = arguments[0].getBoundingClientRect();
@@ -1612,33 +1613,47 @@ class FlowApp:
                 target_x = int(metrics['x'])
                 target_y = int(metrics['y'])
             
-            # 2. 마우스 이동 및 클릭
-            pyautogui.moveTo(target_x, target_y, duration=0.5)
+            # 1. 사람 같은 마우스 이동 (중간에 한 번 멈칫)
+            start_x, start_y = pyautogui.position()
+            # 중간 지점 (약간 빗나간 위치)
+            mid_x = start_x + (target_x - start_x) * 0.6 + random.randint(-50, 50)
+            mid_y = start_y + (target_y - start_y) * 0.6 + random.randint(-50, 50)
+            
+            pyautogui.moveTo(mid_x, mid_y, duration=random.uniform(0.3, 0.5))
+            time.sleep(random.uniform(0.1, 0.3))
+            pyautogui.moveTo(target_x, target_y, duration=random.uniform(0.2, 0.4))
+            
+            # 2. 클릭 및 대기 (멍 때리기)
             pyautogui.click()
-            time.sleep(0.5)
+            self.log("👻 입력창 클릭 완료 (사람인 척 대기 중...)")
+            time.sleep(random.uniform(0.5, 1.0))
             
-            # 3. 입력 시작
-            self.log("👻 유령 키보드 입력 시작")
+            # 3. [핵심] '진짜 타자' 신호 보내기 (a 키 누르고 지우기)
+            # 이걸 해야 사이트가 "어? 키보드 치네?" 하고 인식함
+            pyautogui.press('a') 
+            time.sleep(random.uniform(0.1, 0.3))
+            pyautogui.press('backspace')
+            time.sleep(random.uniform(0.2, 0.5))
             
-            # 기존 내용 지우기
+            # 4. 기존 내용 지우기 (Ctrl+A -> Backspace)
             pyautogui.hotkey('ctrl', 'a')
             time.sleep(0.1)
             pyautogui.press('backspace')
             time.sleep(0.2)
             
-            # 붙여넣기
+            # 5. 붙여넣기 (Ctrl+V)
+            # 한글 깨짐 방지를 위해 클립보드 사용은 유지하되, 앞뒤로 확실한 딜레이 부여
             pyperclip.copy(text)
-            time.sleep(0.1)
+            time.sleep(0.2)
             pyautogui.hotkey('ctrl', 'v')
-            time.sleep(0.5)
+            time.sleep(random.uniform(0.5, 1.0))
             
-            # 연기 (오타 수정 척)
-            if random.random() < 0.3:
-                pyautogui.press('left')
-                time.sleep(0.1)
-                pyautogui.press('right')
+            # 6. 마무리 확인 사살 (방향키 까딱)
+            pyautogui.press('right')
+            time.sleep(0.1)
+            pyautogui.press('left')
             
-            self.log("✅ 물리적 입력 완료")
+            self.log("✅ 울트라 휴먼 입력 완료")
             return True
             
         except Exception as e:
