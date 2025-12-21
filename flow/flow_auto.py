@@ -1791,32 +1791,17 @@ class FlowApp:
 
     def _press_submit(self, d: webdriver.Chrome, el) -> bool:
         # 1. 휴리스틱(텍스트/aria-label 기반) 탐색
-            try:
-                for b in d.find_elements(By.CSS_SELECTOR, sel):
-                    if b.is_displayed() and b.is_enabled():
-                        try:
-                            b.click()
-                            return True
-                        except Exception:
-                            try:
-                                d.execute_script("arguments[0].click();", b)
-                                return True
-                            except Exception:
-                                pass
-            except Exception:
-                continue
+        if self._press_submit_heuristic(d, el):
+            return True
+        
+        # 2. 실패 시, 엔터키 전송 시도
         try:
-            if self._press_submit_heuristic(d, el):
-                return True
+            el.send_keys(Keys.CONTROL, Keys.ENTER)
+            time.sleep(0.5)
+            return True
         except Exception:
             pass
-        for seq in [(Keys.CONTROL, Keys.ENTER), (Keys.ENTER,)]:
-            try:
-                el.send_keys(*seq)
-                time.sleep(0.6)
-                return True
-            except Exception:
-                continue
+            
         return False
 
     def _auto_submit_current(self) -> bool:
