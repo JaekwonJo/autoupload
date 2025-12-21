@@ -5,6 +5,7 @@ import random
 import threading
 from pathlib import Path
 from datetime import datetime
+import ctypes
 
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
@@ -14,8 +15,13 @@ from tkinter.scrolledtext import ScrolledText
 import pyautogui
 import pyperclip
 
+# --- 윈도우 절전 방지 상수 ---
+ES_CONTINUOUS = 0x80000000
+ES_SYSTEM_REQUIRED = 0x00000001
+ES_DISPLAY_REQUIRED = 0x00000002
+
 # --- 설정 ---
-APP_NAME = "Flow Veo Vision Bot (Final)"
+APP_NAME = "Flow Veo Vision Bot (Ultimate)"
 CONFIG_FILE = "flow_config.json"
 DEFAULT_CONFIG = {
     "prompts_file": "flow_prompts.txt",
@@ -68,7 +74,7 @@ class CountdownAlert:
         deltay = event.y - self.y
         x = self.root.winfo_x() + deltax
         y = self.root.winfo_y() + deltay
-        self.root.geometry(f"{x}+{y}")
+        self.root.geometry(f"+{x}+{y}")
 
     def update_time(self, seconds):
         if not self.root.winfo_exists(): return
@@ -77,7 +83,8 @@ class CountdownAlert:
             self.lbl_time.config(fg="#FF5555")
 
     def close(self):
-        try: self.root.destroy()
+        try:
+            self.root.destroy()
         except: pass
 
 # [좌표 캡처 오버레이]
@@ -123,9 +130,11 @@ class FlowVisionApp:
         self.t_next = None
         self.alert_window = None
         
+        self._prevent_sleep()
+        
         self.root = tk.Tk()
         self.root.title(APP_NAME)
-        self.root.geometry("700x800")
+        self.root.geometry("800x800")
         self.root.configure(bg="#1E1E2E")
         
         try:
@@ -139,6 +148,13 @@ class FlowVisionApp:
         self.on_reload()
         
         self.root.after(1000, self._tick)
+
+    def _prevent_sleep(self):
+        try:
+            ctypes.windll.kernel32.SetThreadExecutionState(
+                ES_CONTINUOUS | ES_SYSTEM_REQUIRED | ES_DISPLAY_REQUIRED
+            )
+        except: pass
 
     def load_config(self):
         if not self.cfg_path.exists():
@@ -172,7 +188,7 @@ class FlowVisionApp:
         top = tk.Frame(main, bg="#1E1E2E")
         top.pack(fill="x", padx=20, pady=10)
         
-        tk.Label(top, text="🌙 Flow 비전 봇 (Final Ver)", font=("Malgun Gothic", 14, "bold"), fg="#BD93F9", bg="#1E1E2E").pack(side="left")
+        tk.Label(top, text="🌙 Flow 비전 봇 (Ultimate)", font=("Malgun Gothic", 14, "bold"), fg="#BD93F9", bg="#1E1E2E").pack(side="left")
         
         info_panel = tk.Frame(top, bg="#1E1E2E")
         info_panel.pack(side="right")
@@ -303,7 +319,8 @@ class FlowVisionApp:
     def on_open_prompts(self):
         try:
             os.startfile(self.base / self.cfg["prompts_file"])
-        except: pass
+        except Exception as e:
+            messagebox.showerror("오류", f"파일 열기 실패: {e}")
 
     def on_save_prompts(self):
         try:
@@ -311,9 +328,9 @@ class FlowVisionApp:
             path = self.base / self.cfg["prompts_file"]
             path.write_text(content, encoding="utf-8")
             self.on_reload()
-            messagebox.showinfo("완료", "저장되었습니다.")
+            messagebox.showinfo("저장 완료", "프롬프트 파일이 저장되었습니다!")
         except Exception as e:
-            messagebox.showerror("오류", str(e))
+            messagebox.showerror("오류", f"저장 실패: {e}")
 
     def on_reload(self):
         try:
@@ -460,7 +477,7 @@ class FlowVisionApp:
             self._human_move(sx, sy)
             pyautogui.click()
             
-            self.log("✅ 제출 완료")
+            self.log(f"✅ 제출 완료")
             
         except Exception as e:
             self.log(f"❌ 오류: {e}")
