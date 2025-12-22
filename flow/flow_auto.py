@@ -3,6 +3,7 @@ import os
 import time
 import random
 import threading
+import math
 from pathlib import Path
 from datetime import datetime
 import ctypes
@@ -142,7 +143,9 @@ class FlowVisionApp:
         self.t_next = None
         self.alert_window = None
         
-        # [수정] 초기화 시에는 절전 방지를 하지 않습니다. (시작할 때만 활성화)
+        # [휴식 시스템]
+        self.task_count = 0
+        self.next_break_threshold = random.randint(5, 12) # 5~12회마다 긴 휴식
         
         self.root = tk.Tk()
         self.root.title(APP_NAME)
@@ -196,7 +199,6 @@ class FlowVisionApp:
             messagebox.showwarning("주의", "좌표 설정을 먼저 해주세요!")
             return
             
-        # [불침번 시작!]
         self._prevent_sleep()
         
         self.running = True
@@ -205,6 +207,10 @@ class FlowVisionApp:
         self.entry_interval.config(state="disabled")
         self.t_next = time.time()
         self.lbl_status.config(text="🚀 자동화 시작!", fg="#50FA7B")
+        
+        # 시작할 때 휴식 카운터 초기화
+        self.task_count = 0
+        self.next_break_threshold = random.randint(5, 12)
 
     def on_stop(self):
         self.running = False
@@ -213,7 +219,6 @@ class FlowVisionApp:
         self.entry_interval.config(state="normal")
         self.lbl_status.config(text="⏹ 멈춤 (설정 변경 가능)", fg="#FF5555")
         
-        # [불침번 해제!]
         self._allow_sleep()
         
         if self.alert_window:
@@ -223,7 +228,7 @@ class FlowVisionApp:
     def _build_ui(self):
         main = self.root
 
-        # 1. 상태 바 (Header)
+        # 1. 상태 바
         header_frame = tk.Frame(main, bg="#282A36", height=40)
         header_frame.pack(fill="x")
         
@@ -405,29 +410,6 @@ class FlowVisionApp:
         else:
             self.lbl_pos.config(text="0 / 0")
 
-    def on_start(self):
-        ix = self.cfg.get('input_coords', {}).get('x', 0)
-        sx = self.cfg.get('submit_coords', {}).get('x', 0)
-        if ix == 0 or sx == 0:
-            messagebox.showwarning("주의", "좌표 설정을 먼저 해주세요!")
-            return
-        self.running = True
-        self.btn_start.config(state="disabled")
-        self.btn_stop.config(state="normal")
-        self.entry_interval.config(state="disabled")
-        self.t_next = time.time()
-        self.lbl_status.config(text="🚀 자동화 시작!", fg="#50FA7B")
-
-    def on_stop(self):
-        self.running = False
-        self.btn_start.config(state="normal")
-        self.btn_stop.config(state="disabled")
-        self.entry_interval.config(state="normal")
-        self.lbl_status.config(text="⏹ 멈춤 (설정 변경 가능)", fg="#FF5555")
-        if self.alert_window:
-            self.alert_window.close()
-            self.alert_window = None
-
     def _tick(self):
         if self.running and self.t_next:
             remain = self.t_next - time.time()
@@ -475,6 +457,16 @@ class FlowVisionApp:
             self.on_stop()
             return
 
+        # [NEW] 생체 리듬 휴식 (Bio-Break)
+        self.task_count += 1
+        if self.task_count >= self.next_break_threshold:
+            self._take_bio_break()
+            # 휴식 후 카운터 리셋
+            self.task_count = 0
+            self.next_break_threshold = random.randint(5, 12)
+            # 휴식 끝났으니 바로 재개
+            return
+
         self._show()
         prompt = self.prompts[self.index]
         self.log(f"▶ 진행: {self.index+1}/{len(self.prompts)}")
@@ -485,36 +477,50 @@ class FlowVisionApp:
         sy = self.cfg["submit_coords"]["y"]
         
         try:
-            # 1. 입력창 클릭
+            # 0. 의미 없는 긁기 & 딴짓 (25% 확률)
+            if random.random() < 0.25:
+                self.lbl_status.config(text="🤔 생각하는 중... (딴짓)", fg="#FFB86C")
+                self._random_aimless_action()
+
+            # 1. 입력창 이동 (베지에 곡선 & 오버슈트 적용)
             self.lbl_status.config(text="🖱️ 입력창 이동...", fg="white")
-            self._human_move(ix, iy)
-            pyautogui.click()
-            time.sleep(random.uniform(0.5, 1.0))
-            
-            # 2. 지우기
+            self._human_move_advanced(ix, iy, overshoot=True)
+            time.sleep(random.uniform(0.1, 0.3))
+            pyautogui.click() # 클릭도 살짝 딜레이 후
+
+            # 2. 지우기 (기존 내용)
+            time.sleep(random.uniform(0.2, 0.5))
             pyautogui.hotkey("ctrl", "a")
-            time.sleep(0.1)
+            time.sleep(random.uniform(0.1, 0.3))
             pyautogui.press("backspace")
-            time.sleep(0.2)
+            time.sleep(random.uniform(0.2, 0.5))
             
-            # 3. 입력
+            # 3. 입력 (오타 포함)
             self.lbl_status.config(text="✍️ 입력 중...", fg="white")
-            pyperclip.copy(prompt)
-            time.sleep(0.2)
-            pyautogui.press('a')
-            time.sleep(0.1)
-            pyautogui.press('backspace')
-            time.sleep(0.2)
-            pyautogui.hotkey("ctrl", "v")
+            
+            # 혹시 모를 앞글자 씹힘 방지용 더미 클릭/대기
+            if random.random() < 0.2:
+                pyautogui.press('shift')
+                time.sleep(0.1)
+
+            # [NEW] 오타 포함 타이핑
+            self._human_type_advanced(prompt)
+            
             time.sleep(random.uniform(0.8, 1.5))
             
-            # 4. 버튼 클릭
+            # 4. 버튼 클릭 (베지에 곡선 & 오버슈트)
             self.lbl_status.config(text="🖱️ 버튼 클릭...", fg="white")
-            self._human_move(sx, sy)
+            self._human_move_advanced(sx, sy, overshoot=True)
+            time.sleep(random.uniform(0.1, 0.3))
             pyautogui.click()
             
             self.log(f"✅ 제출 완료")
             
+            # 5. 제출 후 가만히 있지 않고 마우스를 살짝 치움 (30% 확률)
+            if random.random() < 0.3:
+                time.sleep(0.5)
+                self._human_move_advanced(sx + random.randint(100, 300), sy + random.randint(-100, 100))
+
         except Exception as e:
             self.log(f"❌ 오류: {e}")
             self.running = False
@@ -523,13 +529,138 @@ class FlowVisionApp:
         finally:
             self.index += 1
 
-    def _human_move(self, x, y):
+    # [NEW] 생체 리듬 휴식
+    def _take_bio_break(self):
+        # 3분 ~ 10분 (초 단위)
+        break_time = random.randint(180, 600)
+        finish_at = time.time() + break_time
+        
+        self.log(f"☕ [휴식] {break_time}초 동안 멍 때리기 (인간 흉내)")
+        
+        while time.time() < finish_at:
+            if not self.running: break
+            remain = int(finish_at - time.time())
+            self.lbl_status.config(text=f"☕ 휴식 중... {remain}초 남음", fg="#FF5555")
+            
+            # 휴식 중에도 가끔 마우스 툭 건드림 (절전 방지 느낌)
+            if random.random() < 0.05:
+                x, y = pyautogui.position()
+                pyautogui.moveTo(x + random.randint(-5, 5), y + random.randint(-5, 5), duration=0.2)
+            
+            self.root.update()
+            time.sleep(1)
+        
+        self.log("☕ 휴식 끝! 다시 일하러 갑니다.")
+        # 휴식이 끝났으니 이번 턴 작업을 수행하도록 설정 (재귀 호출 대신 플래그 처리해도 되지만, 여기선 Tick이 다음을 부르므로 이번 작업은 Skip됨.
+        # 즉, 휴식 타임 = 이번 프롬프트 건너뛰기가 아니라, 이번 시간(Tick)을 휴식으로 쓴 것.
+        # 프롬프트 인덱스는 증가시키지 않았으므로 다음 Tick에 다시 시도하게 됨.
+
+    # [NEW] 의미 없는 딴짓
+    def _random_aimless_action(self):
+        action = random.choice(["scroll", "select_text", "wiggle", "pause"])
+        if action == "scroll":
+            # 스크롤 살짝
+            pyautogui.scroll(random.randint(-200, 200))
+            time.sleep(random.uniform(0.5, 1.0))
+        elif action == "select_text":
+            # 아무데나 드래그하는 척
+            x, y = pyautogui.position()
+            pyautogui.dragRel(random.randint(-50, 50), 0, duration=0.5, button='left')
+            time.sleep(0.3)
+            pyautogui.click() # 선택 해제
+        elif action == "wiggle":
+            x, y = pyautogui.position()
+            self._human_move_advanced(x + random.randint(-30, 30), y + random.randint(-30, 30))
+        elif action == "pause":
+            time.sleep(random.uniform(1.5, 3.5))
+
+    # [NEW] 베지에 곡선 & 오버슈트 이동
+    def _human_move_advanced(self, target_x, target_y, overshoot=False):
         start_x, start_y = pyautogui.position()
-        duration = random.uniform(0.5, 1.0)
-        mid_x = start_x + (x - start_x) * random.uniform(0.3, 0.7) + random.randint(-50, 50)
-        mid_y = start_y + (y - start_y) * random.uniform(0.3, 0.7) + random.randint(-50, 50)
-        pyautogui.moveTo(mid_x, mid_y, duration=duration/2, tween=pyautogui.easeOutQuad)
-        pyautogui.moveTo(x, y, duration=duration/2, tween=pyautogui.easeInQuad)
+        
+        # 오버슈트: 목표 지점을 살짝 지나쳤다가 돌아옴
+        if overshoot and random.random() < 0.2: # 20% 확률
+            overshoot_x = target_x + random.randint(-20, 20)
+            overshoot_y = target_y + random.randint(-20, 20)
+            
+            # 1. 오버슈트 지점까지 이동
+            self._move_bezier(start_x, start_y, overshoot_x, overshoot_y)
+            time.sleep(random.uniform(0.05, 0.15))
+            
+            # 2. 다시 정확한 지점으로 이동
+            self._move_bezier(overshoot_x, overshoot_y, target_x, target_y, duration_base=0.3)
+        else:
+            # 그냥 이동
+            self._move_bezier(start_x, start_y, target_x, target_y)
+
+        # 도착 후 미세 조정 (Jitter)
+        if random.random() < 0.5:
+            jitter_x = random.randint(-2, 2)
+            jitter_y = random.randint(-2, 2)
+            pyautogui.moveRel(jitter_x, jitter_y, duration=0.1)
+
+    def _move_bezier(self, x1, y1, x2, y2, duration_base=None):
+        # 제어점 생성 (직선 경로에서 랜덤하게 벗어난 점)
+        dist = math.hypot(x2 - x1, y2 - y1)
+        if duration_base is None:
+            duration = random.uniform(0.5, 1.2) + (dist / 2000) # 거리에 비례해 시간 추가
+        else:
+            duration = duration_base
+
+        # 제어점 2개 생성 (3차 베지에)
+        ctrl1_x = x1 + (x2 - x1) * 0.33 + random.randint(-100, 100)
+        ctrl1_y = y1 + (y2 - y1) * 0.33 + random.randint(-100, 100)
+        ctrl2_x = x1 + (x2 - x1) * 0.66 + random.randint(-100, 100)
+        ctrl2_y = y1 + (y2 - y1) * 0.66 + random.randint(-100, 100)
+
+        # 경로 따라 이동
+        steps = int(duration * 60) # 60 FPS
+        if steps < 5: steps = 5
+        
+        for i in range(steps + 1):
+            t = i / steps
+            # Ease-in-out 효과 (t를 변형)
+            t_eased = t * t * (3 - 2 * t) 
+            
+            # 3차 베지에 공식
+            bx = (1-t_eased)**3 * x1 + \
+                 3 * (1-t_eased)**2 * t_eased * ctrl1_x + \
+                 3 * (1-t_eased) * t_eased**2 * ctrl2_x + \
+                 t_eased**3 * x2
+            
+            by = (1-t_eased)**3 * y1 + \
+                 3 * (1-t_eased)**2 * t_eased * ctrl1_y + \
+                 3 * (1-t_eased) * t_eased**2 * ctrl2_y + \
+                 t_eased**3 * y2
+                 
+            pyautogui.moveTo(bx, by)
+            # 루프 내 sleep은 최소화 (moveTo 자체가 시간이 걸릴 수 있지만 duration=0으로 호출하므로 즉시 이동)
+            # 하지만 너무 빠르면 안되므로 아주 짧게 대기
+            time.sleep(duration / steps)
+
+    # [NEW] 오타 시뮬레이션 타이핑
+    def _human_type_advanced(self, text):
+        for char in text:
+            # 1. 3% 확률로 오타 발생
+            if random.random() < 0.03:
+                wrong_char = chr(ord(char) + 1) # 대충 다음 아스키코드
+                pyautogui.write(wrong_char)
+                time.sleep(random.uniform(0.1, 0.4))
+                
+                # 아차차! 지우기
+                pyautogui.press("backspace")
+                time.sleep(random.uniform(0.1, 0.3))
+
+            # 2. 타이핑 (한글은 복붙, 영어는 타이핑)
+            if 32 <= ord(char) <= 126: 
+                pyautogui.write(char)
+            else:
+                pyperclip.copy(char)
+                time.sleep(0.01)
+                pyautogui.hotkey("ctrl", "v")
+            
+            # 3. 타이핑 간격 랜덤 (리듬감)
+            time.sleep(random.uniform(0.03, 0.15))
 
 if __name__ == "__main__":
     FlowVisionApp().root.mainloop()
