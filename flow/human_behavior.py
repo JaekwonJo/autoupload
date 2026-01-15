@@ -153,7 +153,7 @@ class HumanActor:
         [Advanced Human Movement]
         직선 이동 금지! 베지에 곡선과 가속도 물리 엔진 적용.
         """
-        start_x, start__y = pyautogui.position()
+        start_x, start_y = pyautogui.position()
         
         # 기본 속도보다 훨씬 빠르게 설정 (답답함 해소)
         base_speed = self.get_effective_speed() * random.uniform(0.5, 0.8) # 숫자가 작을수록 빠름
