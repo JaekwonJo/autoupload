@@ -153,7 +153,7 @@ class HumanActor:
         [Advanced Human Movement]
         직선 이동 금지! 베지에 곡선과 가속도 물리 엔진 적용.
         """
-        start_x, start_y = pyautogui.position()
+        start_x, start__y = pyautogui.position()
         
         # 기본 속도보다 훨씬 빠르게 설정 (답답함 해소)
         base_speed = self.get_effective_speed() * random.uniform(0.5, 0.8) # 숫자가 작을수록 빠름
@@ -279,6 +279,30 @@ class HumanActor:
     #     """
     #     pass
 
+    def _force_cursor_to_end_aggressive(self):
+        """
+        [초강력 귀소 본능 - 거북이 안전 모드]
+        렉이 걸려도 무조건 커서를 맨 뒤로 보내버리는 '확인 사살' 함수.
+        사용자 요청: "천천히 1초씩 멈춰가면서 해도 되니까 안전하게"
+        """
+        # print("🛡️ [Safety] Returning cursor to end (Slow & Safe)...")
+        
+        # 1. 일단 렉이 풀리길 0.5초 기다림
+        time.sleep(0.5)
+        
+        # 2. Ctrl 키를 '꾹' 누른 상태에서 End 키를 '탁' 침
+        with pyautogui.hold('ctrl'):
+            time.sleep(0.2) # Ctrl 누르고 잠깐 대기
+            pyautogui.press('end')
+            time.sleep(0.2) # End 누르고 잠깐 대기
+            
+        # 3. 혹시 씹혔을까 봐 한 번 더! (확인 사살)
+        time.sleep(0.5)
+        pyautogui.hotkey('ctrl', 'end')
+        
+        # 4. 커서가 이동할 시간 충분히 줌 (1초)
+        time.sleep(1.0)
+
     # -------------------------------------------------------------------------
     # [Extreme Human Typing Engine V2 - Rhythm & Safe Return]
     # -------------------------------------------------------------------------
@@ -352,18 +376,8 @@ class HumanActor:
             if char == ' ':
                 current_delay += random.uniform(0.05, 0.1) # 단어 사이 미세 휴식
             
-            # 6. 마우스 불안증 (타이핑 중 마우스 건드리기)
-            # [CRITICAL FIX] 마우스가 흔들리다가 실수로 '클릭'을 해버리면 커서가 엉뚱한 곳으로 튄다!
-            # 마우스 액션 후에는 무조건 커서 위치를 재정렬해야 함.
-            clicked = self._jitter_mouse_during_typing(input_area)
-            
-            if clicked:
-                # 마우스가 클릭을 했다면, 커서가 이동했을 수 있음.
-                # 다음 글자 쓰기 전에 무조건 맨 뒤로 복귀!
-                # print("🖱️ [Human] Mouse clicked! restoring cursor...")
-                time.sleep(0.05)
-                pyautogui.hotkey('ctrl', 'end')
-                time.sleep(0.05)
+            # 6. 마우스 불안증 (타이핑 중 마우스 움직이기 - 클릭 절대 안함)
+            self._jitter_mouse_during_typing(input_area)
             
             time.sleep(current_delay)
             i += 1
@@ -382,25 +396,10 @@ class HumanActor:
             time.sleep(random.uniform(0.05, 0.15) * speed)
             
         # 2. 고민하는 척 (Pause)
-        time.sleep(random.uniform(0.3, 0.8) * speed)
+        time.sleep(random.uniform(0.5, 1.0)) # 더 길게 생각함
         
-        # 3. [CRITICAL] 원위치 복귀 (3중 안전 장치)
-        # 절대 꼬이지 않게 '끝'으로 가는 모든 키를 다 동원합니다.
-        
-        # (A) 일단 End 키 (줄의 끝으로)
-        pyautogui.press('end')
-        time.sleep(0.05)
-        
-        # (B) 아래 방향키 (혹시 윗줄로 갔을까봐)
-        pyautogui.press('down') 
-        time.sleep(0.05)
-        
-        # (C) Ctrl + End (문서의 진짜 끝으로)
-        # 꾹 누르는 느낌을 주기 위해 keyDown/keyUp 사용 권장이나 hotkey에 interval 추가
-        pyautogui.hotkey('ctrl', 'end', interval=0.1)
-        
-        # (D) 확실히 도착했는지 0.1초 대기
-        time.sleep(0.15)
+        # 3. [CRITICAL] 원위치 복귀 (초강력 버전 호출)
+        self._force_cursor_to_end_aggressive()
 
     def _get_dynamic_typing_delay(self, base_speed):
         # (이 함수는 이제 type_text 내부 로직으로 대체되었으나 호환성을 위해 남김)
@@ -426,6 +425,7 @@ class HumanActor:
         for _ in range(typo_count):
             wrong_char = neighbor if _ == 0 else self._get_neighbor_key(neighbor)
             pyautogui.write(wrong_char)
+            # 마우스 흔들기 (클릭 없이)
             self._jitter_mouse_during_typing(input_area)
             time.sleep(random.uniform(0.05, 0.15) * speed)
         
@@ -453,8 +453,7 @@ class HumanActor:
     def _jitter_mouse_during_typing(self, input_area):
         """
         타이핑 중에 마우스를 가만히 두지 않고 입력창 내부에서 빙빙 돌리거나 떤다.
-        input_area: {x1, y1, x2, y2}
-        Returns: True if clicked, False otherwise
+        [수정] 절대 클릭하지 않음. 움직임만 있음.
         """
         if random.random() > 0.4: return False # 너무 자주는 정신사나움
         
@@ -465,11 +464,6 @@ class HumanActor:
             # 입력창 내에서 랜덤 이동
             tx = random.randint(input_area['x1'], input_area['x2'])
             ty = random.randint(input_area['y1'], input_area['y2'])
-            
-            # 가끔은 입력창 근처 외부로 나갔다 들어옴 (User error simulation)
-            if random.random() < 0.1:
-                tx += random.randint(-50, 50)
-                ty += random.randint(-50, 50)
         else:
             # 영역 모르면 현재 위치 주변에서 떨림
             tx = current_x + random.randint(-30, 30)
@@ -482,15 +476,7 @@ class HumanActor:
         
         pyautogui.moveRel(dx, dy, duration=random.uniform(0.05, 0.1))
         
-        # Very rare random click inside box (Refocusing)
-        if input_area and random.random() < 0.05:
-            # Ensure strictly inside before clicking
-            cx, cy = pyautogui.position()
-            if (input_area['x1'] < cx < input_area['x2']) and \
-               (input_area['y1'] < cy < input_area['y2']):
-                pyautogui.click()
-                return True # 클릭했음!
-        
+        # [삭제] 클릭 로직 완전 제거 (안전 제일)
         return False
                 
     # -------------------------------------------------------------------------

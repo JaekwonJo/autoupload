@@ -1,38 +1,3 @@
-Scene 26 (00:03:51 ~ 00:03:59) Prompt :
-3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat standing proudly next to an infinitely high tower made of colorful glowing blocks, **camera tilting up slowly to show the height**, magnificent scale. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 27 (00:03:59 ~ 00:04:08) Prompt :
-3d pixar studio style. a cute chubby white robot labelled "GPT" handing a bag of money to a shop, while a cute chubby red robot labelled "Google" wearing a yellow construction hard hat magically summons glowing chips from thin air effortlessly, magical creation. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 28 (00:04:08 ~ 00:04:19) Prompt :
-3d pixar studio style. a cute chubby white robot labelled "GPT" shivering in a stormy rain, **fast camera transition to** a cute chubby red robot labelled "Google" wearing a yellow construction hard hat sitting comfortably inside a warm majestic golden castle. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 29 (00:04:19 ~ 00:04:29) Prompt :
-3d pixar studio style. a cute chubby white robot labelled "GPT" and a red robot labelled "Google" wearing a yellow construction hard hat standing side by side, magical glowing orbs magically floating and rotating around them dynamically, symbolizing equality. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 30 (00:04:29 ~ 00:04:38) Prompt :
-3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat surrounded by thousands of magically floating magical screens playing videos, colorful and vibrant atmosphere, magical effects. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 31 (00:04:38 ~ 00:04:47) Prompt :
-3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat holding a realistic Earth globe in space, spinning it with a finger, causing magical beams of red, yellow, blue, and green light to shoot out from the Earth, blockbuster scale. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 32 (00:04:47 ~ 00:04:57) Prompt :
-3d pixar studio style. a cute chubby white robot labelled "GPT" standing on a digital ground that suddenly cracks and splits open like a cliff, the robot losing balance and looking terrified, red emergency lights flashing, siren atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 33 (00:04:57 ~ 00:05:06) Prompt :
-3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat standing triumphantly on top of a giant green planet labelled "Android", waving a flag, conquering atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 34 (00:05:06 ~ 00:05:16) Prompt :
-3d pixar studio style. a realistic Earth globe being completely covered by layers of red, yellow, blue, green, and gold colors, **camera zooming out slowly** to show total conquest of the planet. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
 
 Scene 35 (00:05:16 ~ 00:05:25) Prompt :
 3d pixar studio style. a cute chubby white robot labelled "GPT" trapped inside a glowing blue digital prison cell, holding bars and looking out sadly, futuristic jail. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
