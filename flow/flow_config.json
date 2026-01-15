@@ -1,83 +1,96 @@
 {
-  "prompts_file": "flow_prompts.txt",
-  "prompts_separator": "|||",
-  "check_interval_seconds": 120,
-  "flow_base_url": "https://labs.google/fx/ko/tools/flow",
-  "flow_project_url": "https://labs.google/fx/ko/tools/flow",
-  "chrome_profile_dir": "flow_human_profile",
-  "chrome_devtools_port": 9555,
-  "chrome_executable": "",
-  "input_selectors": [
-    "#PINHOLE_TEXT_AREA_ELEMENT_ID",
-    "div.sc-77366d4e-0.eaiEre > div.sc-77366d4e-1.hAuGnH > div.sc-77366d4e-2.kqUDJM > div.sc-408537d4-0.eBSqXt > div.sc-408537d4-1.eiHkev > button.sc-c177465c-1.gdArnN.sc-408537d4-2.gdXWm",
-    "div.sc-77366d4e-0.eaiEre > div.sc-77366d4e-1.hAuGnH > div.sc-77366d4e-2.kqUDJM > div.sc-408537d4-0.eBSqXt > div.sc-408537d4-1.eiHkev > button:nth-of-type(2)"
-  ],
-  "submit_selectors": [
-    "div.sc-77366d4e-0.eaiEre > div.sc-77366d4e-1.hAuGnH > div.sc-77366d4e-2.kqUDJM > div.sc-408537d4-0.eBSqXt > div.sc-408537d4-1.eiHkev > button.sc-c177465c-1.gdArnN.sc-408537d4-2.gdXWm",
-    "#PINHOLE_TEXT_AREA_ELEMENT_ID",
-    "div.sc-77366d4e-0.eaiEre > div.sc-77366d4e-1.hAuGnH > div.sc-77366d4e-2.kqUDJM > div.sc-408537d4-0.eBSqXt > div.sc-408537d4-1.eiHkev > button:nth-of-type(2)"
-  ],
-  "reset_selectors": [],
-  "auto_download_enabled": true,
-  "download_dir": "flow_downloads",
-  "download_wait_seconds": 300,
-  "download_index": 1,
-  "download_selectors": [
-    "button[type=\"button\"]",
-    "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr"
-  ],
-  "prompt_slots": [
-    {
-      "name": "풀빌라바가지",
-      "file": "flow_prompts.txt"
+    "prompts_file": "flow_prompts.txt",
+    "prompts_separator": "|||",
+    "check_interval_seconds": 120,
+    "flow_base_url": "https://labs.google/fx/ko/tools/flow",
+    "flow_project_url": "https://labs.google/fx/ko/tools/flow",
+    "chrome_profile_dir": "flow_human_profile",
+    "chrome_devtools_port": 9555,
+    "chrome_executable": "",
+    "input_selectors": [
+        "#PINHOLE_TEXT_AREA_ELEMENT_ID",
+        "div.sc-77366d4e-0.eaiEre > div.sc-77366d4e-1.hAuGnH > div.sc-77366d4e-2.kqUDJM > div.sc-408537d4-0.eBSqXt > div.sc-408537d4-1.eiHkev > button.sc-c177465c-1.gdArnN.sc-408537d4-2.gdXWm",
+        "div.sc-77366d4e-0.eaiEre > div.sc-77366d4e-1.hAuGnH > div.sc-77366d4e-2.kqUDJM > div.sc-408537d4-0.eBSqXt > div.sc-408537d4-1.eiHkev > button:nth-of-type(2)"
+    ],
+    "submit_selectors": [
+        "div.sc-77366d4e-0.eaiEre > div.sc-77366d4e-1.hAuGnH > div.sc-77366d4e-2.kqUDJM > div.sc-408537d4-0.eBSqXt > div.sc-408537d4-1.eiHkev > button.sc-c177465c-1.gdArnN.sc-408537d4-2.gdXWm",
+        "#PINHOLE_TEXT_AREA_ELEMENT_ID",
+        "div.sc-77366d4e-0.eaiEre > div.sc-77366d4e-1.hAuGnH > div.sc-77366d4e-2.kqUDJM > div.sc-408537d4-0.eBSqXt > div.sc-408537d4-1.eiHkev > button:nth-of-type(2)"
+    ],
+    "reset_selectors": [],
+    "auto_download_enabled": true,
+    "download_dir": "flow_downloads",
+    "download_wait_seconds": 300,
+    "download_index": 1,
+    "download_selectors": [
+        "button[type=\"button\"]",
+        "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr"
+    ],
+    "prompt_slots": [
+        {
+            "name": "구글제국",
+            "file": "flow_prompts.txt"
+        },
+        {
+            "name": "통신사에게 호구",
+            "file": "flow_prompts_slot2.txt"
+        },
+        {
+            "name": "AI서비스 무료의 진실",
+            "file": "flow_prompts_slot3.txt"
+        },
+        {
+            "name": "응급실 뺑뺑이",
+            "file": "flow_prompts_slot4.txt"
+        },
+        {
+            "name": "중국소유대한민국",
+            "file": "flow_prompts_slot5.txt"
+        },
+        {
+            "name": "중국 경제 붕괴",
+            "file": "flow_prompts_slot6.txt"
+        },
+        {
+            "name": "산타와 루돌프",
+            "file": "flow_prompts_slot7.txt"
+        },
+        {
+            "name": "골프붕괴",
+            "file": "flow_prompts_slot8.txt"
+        },
+        {
+            "name": "1216부동산붕괴",
+            "file": "flow_prompts_slot9.txt"
+        },
+        {
+            "name": "핀테크",
+            "file": "flow_prompts_slot10.txt"
+        }
+    ],
+    "active_prompt_slot": 0,
+    "prompt_save_dir": "",
+    "download_selector_main": "button[type=\"button\"]",
+    "download_selector_quality": "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr",
+    "input_coords": {
+        "x": 2344,
+        "y": 1245
     },
-    {
-      "name": "통신사에게 호구",
-      "file": "flow_prompts_slot2.txt"
+    "submit_coords": {
+        "x": 1452,
+        "y": 1074
     },
-    {
-      "name": "AI서비스 무료의 진실",
-      "file": "flow_prompts_slot3.txt"
+    "interval_seconds": 60,
+    "input_area": {
+        "x1": 999,
+        "y1": 1271,
+        "x2": 1267,
+        "y2": 1286
     },
-    {
-      "name": "응급실 뺑뺑이",
-      "file": "flow_prompts_slot4.txt"
-    },
-    {
-      "name": "중국소유대한민국",
-      "file": "flow_prompts_slot5.txt"
-    },
-    {
-      "name": "중국 경제 붕괴",
-      "file": "flow_prompts_slot6.txt"
-    },
-    {
-      "name": "산타와 루돌프",
-      "file": "flow_prompts_slot7.txt"
-    },
-    {
-      "name": "골프붕괴",
-      "file": "flow_prompts_slot8.txt"
-    },
-    {
-      "name": "1216부동산붕괴",
-      "file": "flow_prompts_slot9.txt"
-    },
-    {
-      "name": "핀테크",
-      "file": "flow_prompts_slot10.txt"
+    "submit_area": {
+        "x1": 1543,
+        "y1": 1318,
+        "x2": 1561,
+        "y2": 1334
     }
-  ],
-  "active_prompt_slot": 0,
-  "prompt_save_dir": "",
-  "download_selector_main": "button[type=\"button\"]",
-  "download_selector_quality": "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr",
-  "input_coords": {
-    "x": 1005,
-    "y": 1267
-  },
-  "submit_coords": {
-    "x": 1564,
-    "y": 1315
-  }
 }

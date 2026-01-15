@@ -1,790 +1,217 @@
-장면 1
 
-영상 프롬프트: 3d pixar studio style, a cute boy character wearing a hoodie relaxing in a warm steaming pool with a dreamy expression, imagining a vacation, suddenly the scene turns red and he wakes up looking shocked and terrified, cinematic lighting, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: (검은 화면에서 계산기 두드리는 소리만 타닥! 타닥! 들림)
-(화면 팍! 켜지면서 영수증 그래픽 등장)
-방값 45만 원? 오! 쌀쌀한데 온수 풀이나 갈까? 클릭. 어? 온수 추가 10만 원?
-
-|||
-
-장면 2
-
-영상 프롬프트: 3d pixar studio style, a cute boy character wearing a hoodie sitting at a table, first extra cute characters pop up next to him and a stack of dollar bills appears with a twinkling effect, then bbq meat and firewood pop up on the table and another larger stack of dollar bills appears instantly, the boy looks increasingly shocked and surprised with wide eyes as more money appears, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그래, 겨울이니까.
-인원 추가 6만 원? 바베큐 5만 원? 불멍 3만 원?
-(계산기 엔터 소리 쾅!) 합계 82만 원. (정적 1초) 미쳤습니까?
-
-|||
-
-장면 3
-
-영상 프롬프트: 3d pixar studio style, a cute cat character with a towel on its head relaxing in a snowy outdoor hot spring in Japan, delicious sashimi and sushi plates are placed next to the cat, peaceful and happy atmosphere, snow falling gently, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이 돈이면 지금 당장 후쿠오카행 비행기 타고 가서,
-료칸에서 가이세키 요리 먹고, 온천 지지고,
-돈키호테 털어와도 남습니다.
-
-|||
-
-장면 4
-
-영상 프롬프트: 3d pixar studio style, a golden luxurious building in the background, a cute bear character wearing tattered beggar clothes sitting miserably on the ground in front of it, a cold wind blows lonely leaves across the screen, sad atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 도대체 대한민국 펜션은 금으로 지었길래
-하룻밤에 80만 원을 달라는 걸까요? 더 웃긴 건 뭔지 아세요?
-이렇게 받아도 사장님은 "남는 게 없다"고 합니다.
-
-|||
-
-장면 5
-
-영상 프롬프트: 3d pixar studio style, a cute boy character wearing a hoodie waving a magic wand, sparkling magic dust fills the screen clearing away a dark fog to reveal a hidden complex structure behind it, magical visual effects, dynamic camera angle, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 거짓말 같죠? 오늘 똑똑즈가,
-여러분의 지갑을 털어가는 'K-관광의 미친 가격표',
-그 뒤에 숨은 진짜 도둑놈들을 현미경으로 찢어발겨 드립니다. 채널 고정.
-
-|||
-
-장면 6
-
-영상 프롬프트: 3d pixar studio style, a foggy empty city street with no people, cute animal characters wearing face masks looking out of windows with sad eyes, desolate and quiet atmosphere, soft lighting, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: (화면 전환 효과 : 슉!) 자, 시계바늘을 조금만 뒤로 돌려볼까요?
-바야흐로 2020년, 전 세계를 공포로 몰아넣었던
-코로나 팬데믹 시절입니다.
-
-|||
-
-장면 7
-
-영상 프롬프트: 3d pixar studio style, a cute girl character wearing a hoodie holding a travel suitcase, standing inside a transparent glass box unable to get out, stamping her feet in frustration, invisible barrier, wanting to travel, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 기억나시죠? 해외여행은 꿈도 못 꾸고,
-사람 많은 곳은 무서워서 갈 수도 없었던 그 시절.
-우리의 여행 욕구는 마그마처럼 끓어오르는데, 분출구가 막혀버렸습니다.
-
-|||
-
-장면 8
-
-영상 프롬프트: 3d pixar studio style, a dark forest at night, a single beautiful modern villa building is brightly lit and glowing warmly, a spotlight shines on the house, cozy and inviting atmosphere amidst the darkness, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그때, 혜성처럼 등장한 구세주가 있었으니...
-바로 '프라이빗 독채 풀빌라'였습니다.
-"우리끼리만 쓴다!", "비대면 체크인!", "호텔보다 안전하다!"
-
-|||
-
-장면 9
-
-영상 프롬프트: 3d pixar studio style, a cute bear character laughing happily looking up at the sky, dollar bills and gold coins raining down from the sky like a heavy shower, the bear is dancing with joy, bright and rich atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이 마케팅은 그야말로 대박을 쳤습니다.
-1박에 50만 원, 70만 원을 불러도 예약 전쟁이 벌어졌죠.
-몇 달 뒤 예약까지 꽉꽉 들어차는 기현상이 벌어졌습니다.
-
-|||
-
-장면 10
-
-영상 프롬프트: 3d pixar studio style, a cute boy character in hoodie and a bear and a cat running excitedly towards a shiny building with a dollar sign, dynamic motion blur, bright sunny day, eager expressions, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 자, 여기서 경제학의 기본 원리가 작동합니다.
-돈 냄새를 맡은 자들이 몰려들기 시작하죠.
-그 당시 은행 금리가 어땠나요? 네, 제로 금리 수준이었습니다.
-
-|||
-
-장면 11
-
-영상 프롬프트: 3d pixar studio style, a large cute dinosaur character with a gentle smile handing out heavy bags of money to smaller animal characters, the animals look happy receiving the bags, warm lighting, generous atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 돈 빌리는 게 세상에서 제일 쉬웠어요.
-전국의 은퇴자분들, 자영업자분들, 심지어 젊은 투자자들까지.
-너도나도 빚을 내서 땅을 사고, 건물을 올리기 시작합니다.
-
-|||
-
-장면 12
-
-영상 프롬프트: 3d pixar studio style, a green 3d map terrain, construction flags and signposts popping up quickly one by one like popcorn, energetic and fast-paced visual, bright colors, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: "야, 이거 짓기만 하면 1년에 2억은 번대!"
-"옆집 철수네 아빠도 펜션 지어서 벤츠 뽑았대!"
-제주도, 강원도, 가평, 양평, 경주, 여수...
-
-|||
-
-장면 13
-
-영상 프롬프트: 3d pixar studio style, a beautiful green field, identical white modern villa buildings popping up one after another rapidly filling the field, blooming like flowers, 3d animation style, bright daylight, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 대한민국 방방곡곡, 뷰가 좀 좋다 싶은 곳은 모조리 파헤쳐지고
-그 자리에 쌍둥이처럼 똑같이 생긴
-'감성 풀빌라'들이 우후죽순 들어섰습니다.
-
-|||
-
-장면 14
-
-영상 프롬프트: 3d pixar studio style, a cute bear character and a girl character in hoodie holding champagne glasses and toasting, colorful fireworks exploding in the background, festive and celebratory atmosphere, confetti falling, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이때까지만 해도 다들 행복했죠.
-부동산 가격은 오르고, 예약은 풀이고, 통장에 돈은 꽂히고.
-하지만, 우리는 알고 있습니다.
-
-|||
-
-장면 15
-
-영상 프롬프트: 3d pixar studio style, many soap bubbles floating in the air suddenly burst all at once, immediately a large airplane soars up into the sky breaking through clouds, dynamic and dramatic shift, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 모든 버블은 반드시 터진다는 것을요.
-2023년, 엔데믹이 선언되고 하늘길이 열렸습니다.
-그리고 2024년, 2025년... 금리가 미친 듯이 치솟았습니다.
-
+Scene 26 (00:03:51 ~ 00:03:59) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat standing proudly next to an infinitely high tower made of colorful glowing blocks, **camera tilting up slowly to show the height**, magnificent scale. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 16
-
-영상 프롬프트: 3d pixar studio style, an airplane flying over a beautiful blue ocean, seen through the plane window a cute boy character in hoodie is waving hand and smiling, bright blue sky, feeling of travel, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 사람들은 이제 선택할 수 있게 되었죠.
-"80만 원 내고 가평 갈래? 아니면 그 돈으로 일본 갈래?"
-답은 너무나 뻔했습니다.
-
-|||
-
-장면 17
-
-영상 프롬프트: 3d pixar studio style, a deserted village of modern villas, a cute bear character sitting alone shivering in the cold, a strong snowstorm blowing through the empty streets, lonely and cold blue lighting, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 소비자들은 냉정하게 등을 돌렸고,
-무리하게 빚을 내서 건물을 올린 사장님들은
-이제 이자 폭탄과 공실의 공포 속에 남겨졌습니다.
-
-|||
-
-장면 18
-
-영상 프롬프트: 3d pixar studio style, a cute bear character standing with arms crossed and chin up looking arrogant and stubborn, a cute girl character in hoodie standing next to him making a questioning gesture with palms up, tension between them, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그런데 말이죠.
-손님이 없으면 가격을 내려야 정상 아닌가요?
-이게 수요와 공급의 법칙이잖아요? 그런데 왜! 도대체 왜!
-
-|||
-
-장면 19
-
-영상 프롬프트: 3d pixar studio style, a modern villa building, a bright red arrow shoots up from the roof like a rocket into the sky, a cute boy character in hoodie watches it covering his mouth in shock, dynamic upward motion, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 아직도 숙박비는 요지부동, 아니 오히려 더 오르는 걸까요?
-지금부터 그 충격적인 비용의 비밀을
-낱낱이 파헤쳐 보겠습니다.
-
-
-|||
-
-장면 20
-
-영상 프롬프트: 3d pixar studio style, a cute bear character holding a money bag tightly, multiple shadowy hands appearing from the darkness trying to grab the bag, the bear looks panicked and scared, dramatic lighting, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 여러분이 결제하는 80만 원.
-이 돈이 전부 사장님 주머니로 들어가서,
-사장님이 호의호식할까요? 천만에요.
-
-|||
-
-장면 21
-
-영상 프롬프트: 3d pixar studio style, a giant gold coin with a TTZ logo engraved on it floating in water, a school of cute piranhas swarming and biting the coin, the coin breaking into pieces instantly, underwater scene, bubbles, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이 80만 원은 결제되는 순간,
-마치 피라냐 떼가 달려들듯,
-사방에서 뜯어먹기 시작합니다.
-
-|||
-
-장면 22
-
-영상 프롬프트: 3d pixar studio style, a cute girl character in hoodie standing and looking at a huge luxurious outdoor swimming pool, steam rising from the warm water, grand scale, winter background, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 첫 번째 범인, 바로 '에너지 비용'입니다.
-여러분, 풀빌라의 핵심이 뭐죠?
-네, 바로 '수영장'입니다.
-
-|||
-
-장면 23
-
-영상 프롬프트: 3d pixar studio style, a winter landscape covered in snow and ice, in the center a swimming pool is boiling with hot steam rising vigorously, extreme contrast between cold surroundings and hot water, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그것도 그냥 수영장이 아니라,
-한겨울에도 김이 모락모락 나는
-따뜻한 '온수풀'이죠.
-
-|||
-
-장면 24
-
-영상 프롬프트: 3d pixar studio style, a cute bear character sweating and shoveling bundles of paper money into a burning furnace, fire burning brightly inside, money burning effect, boiler room setting, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이게 낭만적으로 보이지만,
-물리학적으로 접근하면 그야말로
-**'돈을 태우는 아궁이'**입니다.
-
-|||
-
-장면 25
-
-영상 프롬프트: 3d pixar studio style, a gigantic water tank towering over a tiny cute girl character, sharp icicles hanging from the tank, cold blue atmosphere, feeling of overwhelming scale, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 보통 풀빌라 수영장에 물이 20톤에서 30톤 정도 들어갑니다.
-이 엄청난 양의 물을,
-영하의 날씨에 30도 이상으로 유지한다?
-
-|||
-
-장면 26
-
-영상 프롬프트: 3d pixar studio style, electric wires connected to a building sparking red electricity aggressively, visual effect of energy overload, intense flashes, danger warning feeling, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이건 거의 목욕탕 하나를 개인적으로 돌리는
-수준의 에너지가 필요합니다.
-그런데 2024년부터 전기세, 가스비가 어떻게 됐죠?
-
-|||
-
-장면 27
-
-영상 프롬프트: 3d pixar studio style, a giant bill paper suddenly falls from the sky and crushes a cute bear character flat on the ground, the bear is flattened under the heavy paper, comic slapstick style, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 네, 폭등했습니다. 가정용 전기가 아니라
-상업용 전기를 쓴다 해도, 누진세 구간을 넘나드는 순간
-고지서에는 0이 하나 더 붙습니다.
-
+Scene 27 (00:03:59 ~ 00:04:08) Prompt :
+3d pixar studio style. a cute chubby white robot labelled "GPT" handing a bag of money to a shop, while a cute chubby red robot labelled "Google" wearing a yellow construction hard hat magically summons glowing chips from thin air effortlessly, magical creation. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 28
-
-영상 프롬프트: 3d pixar studio style, a cute bear character pumping water into a jar, but the bottom of the jar is broken and water pours out immediately, endless futile labor, frustrated expression, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 사장님들 사이에서는 이런 말이 돕니다.
-"온수풀 한 번 돌리면, 10만 원 받아도 본전이다."
-그러니까 '온수 추가 비용 10만 원'은
 
+Scene 28 (00:04:08 ~ 00:04:19) Prompt :
+3d pixar studio style. a cute chubby white robot labelled "GPT" shivering in a stormy rain, **fast camera transition to** a cute chubby red robot labelled "Google" wearing a yellow construction hard hat sitting comfortably inside a warm majestic golden castle. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 29
-
-영상 프롬프트: 3d pixar studio style, a cute bear character receiving a coin, suddenly a yellow lightning monster appears and snatches the coin away instantly, the bear looks bewildered with empty hands, fast motion, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 사장님이 남겨 먹으려는 게 아니라,
-한전과 가스공사에 고스란히 바치는 돈이라는 겁니다.
-이걸 안 받으면? 사장님은 손님 받을 때마다 적자가 납니다.
-
+Scene 29 (00:04:19 ~ 00:04:29) Prompt :
+3d pixar studio style. a cute chubby white robot labelled "GPT" and a red robot labelled "Google" wearing a yellow construction hard hat standing side by side, magical glowing orbs magically floating and rotating around them dynamically, symbolizing equality. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 30
 
-영상 프롬프트: 3d pixar studio style, a giant cute monster standing behind a smartphone looming over it, the monster looks dominant and powerful, purple lighting, mystery atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 두 번째 범인, 여기가 진짜 핵심입니다.
-바로 **'플랫폼의 통행세'**입니다.
-여러분, 숙박 예약할 때 어디서 하시나요?
-
+Scene 30 (00:04:29 ~ 00:04:38) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat surrounded by thousands of magically floating magical screens playing videos, colorful and vibrant atmosphere, magical effects. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 31
-
-영상 프롬프트: 3d pixar studio style, a cute boy character pressing a button on a smartphone, immediately gold coins in his pocket float up into the air and vanish like magic dust, magical disappearance effect, the boy looks surprised, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 야X자, 여X어때, 에X비앤비... 다들 앱으로 하시죠?
-우리가 앱에서 "예약하기"를 누르는 순간,
-숙박비의 약 10%에서 15%가 수수료로 빠져나갑니다.
 
+Scene 31 (00:04:38 ~ 00:04:47) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat holding a realistic Earth globe in space, spinning it with a finger, causing magical beams of red, yellow, blue, and green light to shoot out from the Earth, blockbuster scale. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 32
-
-영상 프롬프트: 3d pixar studio style, a modern villa house, paper money bills floating up from the roof into the air and dissolving into nothingness, visual effect of deduction/disappearing, clear blue sky, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 80만 원짜리 방이라면?
-앉은 자리에서 8만 원에서 12만 원이
-플랫폼 회사로 직행합니다.
-
+Scene 32 (00:04:47 ~ 00:04:57) Prompt :
+3d pixar studio style. a cute chubby white robot labelled "GPT" standing on a digital ground that suddenly cracks and splits open like a cliff, the robot losing balance and looking terrified, red emergency lights flashing, siren atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 33
 
-영상 프롬프트: 3d pixar studio style, a cute cat character shrugging shoulders with an indifferent expression, a large ominous dark shadow looming behind the cat, contrast between light and shadow, suspenseful atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: "에이, 뭐 플랫폼도 먹고살아야지,
-그 정도는 낼 수 있잖아?" 라고 생각하시나요?
-진짜 무서운 건 수수료가 아닙니다.
-
+Scene 33 (00:04:57 ~ 00:05:06) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat standing triumphantly on top of a giant green planet labelled "Android", waving a flag, conquering atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 34
-
-영상 프롬프트: 3d pixar studio style, a beautiful house, a 3d golden star icon pops up above the house followed by a fire shape icon popping up, bright and shiny UI elements appearing in the air, cheery sound effect visualization, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: 바로 **'광고비'**입니다. 여러분, 앱 켰을 때
-제일 위에 뜨는 숙소들 있죠?
-"추천 숙소", "프리미엄", "지금 핫한 곳".
-
+Scene 34 (00:05:06 ~ 00:05:16) Prompt :
+3d pixar studio style. a realistic Earth globe being completely covered by layers of red, yellow, blue, green, and gold colors, **camera zooming out slowly** to show total conquest of the planet. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 35
-
-영상 프롬프트: 3d pixar studio style, cute characters holding smartphones, digital scanning light beams sweeping over them, analyzing effect with soft blue light, sci-fi element in cute style, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이게 알고리즘이 여러분의 취향을 분석해서
-띄워주는 걸까요? 아닙니다.
-철저하게 **'돈 낸 순서'**입니다.
 
+Scene 35 (00:05:16 ~ 00:05:25) Prompt :
+3d pixar studio style. a cute chubby white robot labelled "GPT" trapped inside a glowing blue digital prison cell, holding bars and looking out sadly, futuristic jail. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 36
-
-영상 프롬프트: 3d pixar studio style, a cute bear character handing a heavy bag of money to a giant robot gatekeeper, the gatekeeper opens the gate after receiving the bag, transaction scene, high angle shot, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이 상단 자리에 이름을 올리기 위해,
-사장님들은 매달 '정액권 광고'나 '쿠폰 광고'를
-구매해야 합니다.
-
+Scene 36 (00:05:25 ~ 00:05:35) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat magically growing gigantic, muscles bulging like a superhero, surrounded by intense golden Super Saiyan aura, becoming larger than mountains and clouds, overwhelming power. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 37
-
-영상 프롬프트: 3d pixar studio style, a cute bear character carrying a huge heavy rock on its back, walking with difficulty, legs shaking, sweating, white background, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: 이게 한 달에 얼마냐고요?
-적게는 수십만 원에서, 많게는 300만 원이 넘습니다.
-한 달에 300만 원이면, 웬만한 직장인 월급입니다.
-
+Scene 37 (00:05:35 ~ 00:05:44) Prompt :
+3d pixar studio style. a massive army of countless green robots labelled "Android" filling most of the screen, contrasting with a much smaller army of silver robots labelled "Apple logo", massive scale comparison. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 38
-
-영상 프롬프트: 3d pixar studio style, the floor under a house suddenly opens up, the house falls into a deep dark abyss, falling motion, dramatic angle, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이 돈을 안 내면 어떻게 되냐고요?
-여러분의 폰 화면 스크롤을 한참 내려야 나오는,
-저기 지하 100층 구석으로 숙소가 유배를 갑니다.
 
+Scene 38 (00:05:44 ~ 00:05:53) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat, a green robot labelled "Android", and a silver robot labelled "Apple logo" holding champagne glasses and toasting together, happy alliance atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 39
-
-영상 프롬프트: 3d pixar studio style, a cute bear character crying alone in a dark place, spiderwebs in the corners, small flies buzzing around the bear, desolate and sad atmosphere, spotlight on the bear, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 손님 눈에 안 띄는데 예약이 들어올 리가 없죠.
-울며 겨자 먹기로 광고비를 냅니다.
-자, 계산해 봅시다.
-
+Scene 39 (00:05:53 ~ 00:06:02) Prompt :
+3d pixar studio style. a green robot labelled "Android" and a silver robot labelled "Apple logo" trapped inside a painful magical barrier seal, screaming for help, suffering, dark atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 40
-
-영상 프롬프트: 3d pixar studio style, a river made of gold coins flowing into a giant cute monster's open mouth, the monster swallows the coins greedily, dynamic flow, bright lighting, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: 수수료 15% 떼이고, 광고비로 월 300만 원 나가고.
-결국 사장님 매출의 약 **25%에서 30%**가
-손님 얼굴도 안 본 플랫폼 회사로 흘러들어갑니다.
-
+Scene 40 (00:06:02 ~ 00:06:11) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat standing alone, while a massive tornado of glowing data light particles swirls and gathers into its body, intense magical power up effect. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 41
-
-영상 프롬프트: 3d pixar studio style, a vertical totem pole structure, at the bottom a cute donkey character is sweating and carrying the weight, in the middle a building, at the very top a smug villain character in a tuxedo looking down arrogantly, hierarchy concept, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 사장님 위에 건물주 있고, 건물주 위에 플랫폼 있다는 말이
-그냥 나온 말이 아닙니다.
-**세 번째 범인, 바로 '금융 비용'입니다.**
 
+Scene 41 (00:06:11 ~ 00:06:20) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat running at supersonic speed on a futuristic track, absorbing green and silver energy beams hitting him from sides, glowing intensely, magical speed lines, motion blur. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 42
-
-영상 프롬프트: 3d pixar studio style, a cute dog character building a sandcastle on the beach, the sandcastle looks fragile and shaky, waves approaching in the background, nervous atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 앞서 말씀드렸죠?
-2020년, 2021년에 펜션 지으신 분들.
-대부분 자기 돈 100%로 지은 게 아닙니다.
-
+Scene 42 (00:06:20 ~ 00:06:29) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat flying inside a giant glowing golden loop, spinning faster and faster, generating massive electrical sparks, blinding light, positive feedback loop. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 43
-
-영상 프롬프트: 3d pixar studio style, a cute rabbit character taking out a glowing blue soul orb from its chest and handing it to a smiling pig banker character, mystical and slightly sad atmosphere, transaction, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: 땅 담보 잡고, 건물 담보 잡고, 영혼까지 끌어모은 대출.
-일명 '영끌'입니다.
-그때는 금리가 2%대였으니 견딜 만했죠.
-
+Scene 43 (00:06:29 ~ 00:06:37) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat magically floating high in space looking down, while a tiny cute chubby white robot labelled "GPT" stands on earth looking up, **extreme distance shot emphasizing unreachable height**, cosmic scale. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 44
-
-영상 프롬프트: 3d pixar studio style, a small cute lizard suddenly transforming into a giant scary godzilla-like monster, roaring aggressively, red lighting, dramatic scale change, fear, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그런데 지금은요?
-대출 금리가 5%, 6%, 심지어 제2금융권 쓰신 분들은
-10%가 넘어갑니다. 10억을 빌렸다면, 1년에 이자만...
 
+Scene 44 (00:06:37 ~ 00:06:47) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat sitting on top of a gigantic mountain of glowing books, while a cute chubby white robot labelled "GPT" holds a single burnt piece of paper at the bottom, huge scale contrast. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 45
-
-영상 프롬프트: 3d pixar studio style, a giant hand coming down from the sky and taking away a basket full of apples from a cute squirrel character, the squirrel is left with an empty basket and looks crying, unfair situation, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 6천만 원, 7천만 원입니다. 한 달에 이자만 500만 원을
-내야 합니다. 손님이 오든 안 오든,
-은행은 꼬박꼬박 이자를 떼어갑니다.
-
+Scene 45 (00:06:47 ~ 00:06:57) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat waving a magic wand over a grey city, instantly painting the entire world in red, yellow, blue, and green colors magically, cognitive dominance atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 46
-
-영상 프롬프트: 3d pixar studio style, a cute panda character carrying huge heavy rocks on its shoulders, legs shaking under the weight, sweating profusely, white background to focus on the burden, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: 자, 이제 사장님의 입장이 되어 봅시다.
-은행 이자 500만 원, 플랫폼 광고비 300만 원,
-전기세/가스비 200만 원.
-
+Scene 46 (00:06:57 ~ 00:07:06) Prompt :
+3d pixar studio style. a cute chubby white rabbit wearing red hoodie hugging a smartphone tightly in a dark corner, looking terrified, a giant ominous shadow of a robot looming on the wall behind, fear atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 47
-
-영상 프롬프트: 3d pixar studio style, a cute cat character trapped inside a small glass box, water level rising inside the box, the cat looks anxious and is trying to keep its head above water, claustrophobic feeling, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 숨만 쉬어도 매달 **1,000만 원**의 고정 지출이 나갑니다.
-청소 이모님 월급은 아직 계산도 안 했습니다.
-이 상황에서 숙박비를 1박에 20만 원...
 
+Scene 47 (00:07:06 ~ 00:07:16) Prompt :
+3d pixar studio style. a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck casting a magical transparent silver force field dome over a smartphone, protecting it from dark particles, magical shield effect. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 48
-
-영상 프롬프트: 3d pixar studio style, a cute penguin character standing on a cracking ice sheet, the ice is breaking apart beneath its feet, dangerous situation, blue cold ocean background, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 30만 원으로 내릴 수 있을까요? 내리는 순간, 파산입니다.
-가격을 유지하면 손님이 안 와서 망하고,
-가격을 내리면 팔 때마다 적자라 망합니다.
-
+Scene 48 (00:07:16 ~ 00:07:25) Prompt :
+3d pixar studio style. a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck turning glowing red orbs into pure white orbs with magic, then shooting the white orbs up to the sky, magical purification process. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 49
-
-영상 프롬프트: 3d pixar studio style, a cute mouse character running through a maze and hitting a dead end, walls surrounding it on all sides, frustrated expression, top-down view, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: 이러지도 저러지도 못하는 **'외통수'**.
-이게 바로 지금 대한민국 펜션 시장의 잔혹한 현실입니다.
-
+Scene 49 (00:07:25 ~ 00:07:34) Prompt :
+3d pixar studio style. a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck bowing on a bright stage, while a cute chubby red robot labelled "Google" wearing a yellow construction hard hat works frantically on a machine in the dark backstage shadows, secret partnership. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 50
-
-영상 프롬프트: 3d pixar studio style, a stylish fox character wearing high-tech glasses looking at a house, red scanning lasers coming from the glasses analyzing the building, sci-fi element, critical look, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: **(챕터 3 : 인스타 감성세와 하드웨어 전쟁)**
-여기서 끝이 아닙니다.
-우리의 눈높이도 한몫을 하고 있습니다.
 
+Scene 50 (00:07:34 ~ 00:07:42) Prompt :
+3d pixar studio style. a massive crowd of tiny yellow robots labelled "DEV" worshipping a giant glowing green monolith stone labelled "NVIDIA", ignoring a lonely red robot labelled "Google" wearing a yellow construction hard hat standing far away. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 51
-
-영상 프롬프트: 3d pixar studio style, a cute duck character entering a room with tacky floral wallpaper and old furniture, the duck covers its eyes with wings in disgust, shaking head, comic disapproval, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 여러분, 솔직히 가슴에 손을 얹고 생각해 봅시다.
-인스타그램에서 사진발 안 받는 숙소, 예약하시나요?
-꽃무늬 벽지, 체리색 몰딩, 촌스러운 이불...
-
+Scene 51 (00:07:42 ~ 00:07:51) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat playing soccer alone in a gigantic empty golden stadium, lonely atmosphere, wide shot. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 52
-
-영상 프롬프트: 3d pixar studio style, a trendy girl character holding a smartphone to take a selfie, but frowning and lowering the phone because the background is ugly, disappointed expression, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: 이런 곳은 아무리 싸도 거들떠보지도 않으시죠?
-"여행은 사진이 남는 건데!"
-이 심리를 알기 때문에, 사장님들은 끊임없이
-
+Scene 52 (00:07:51 ~ 00:08:00) Prompt :
+3d pixar studio style. a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck speaking, but black smoke and glitch bug symbols magically pouring out of its mouth instead of words, lying AI metaphor. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 53
-
-영상 프롬프트: 3d pixar studio style, a cute raccoon wizard waving a wand, transforming an old messy bed into a luxurious white hotel-style bed with fluffy pillows, magical sparkles, bright transformation, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: **'인테리어 전쟁'**을 치러야 합니다. 침구는 무조건
-호텔식 화이트 구스다운이어야 하고,
-어메니티는 이솝이나 록시땅 같은 명품이어야 하고,
 
+Scene 53 (00:08:00 ~ 00:08:08) Prompt :
+3d pixar studio style. a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck and a red robot labelled "Google" wearing a yellow construction hard hat pointing fingers at each other angrily, intense electric sparks flying between them, blame game. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 54
-
-영상 프롬프트: 3d pixar studio style, a toaster and a hair dryer placed on a museum pedestal glowing with holy golden light, a cute hamster character worshipping them, exaggerated reverence, funny atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 주방에는 발뮤다 토스터기, 다이슨 드라이기가 있어야 합니다.
-이게 다 돈입니다.
-그런데 문제는, 이 유행이 너무 빨리 바뀐다는 겁니다.
-
+Scene 54 (00:08:08 ~ 00:08:18) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat struggling to stand under a gigantic heavy golden crown that is larger than its body, shaking knees, burden of power. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 55
-
-영상 프롬프트: 3d pixar studio style, a room interior rapidly changing styles like a chameleon, from wood to metal to colorful, time-lapse effect of changing furniture and wallpaper, dizzying speed, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: 3년 전에는 '북유럽 스타일'이 유행하더니,
-작년에는 '미드 센추리 모던'이 유행하고,
-올해는 또 '촌캉스'니 '젠 스타일'이니...
-
+Scene 55 (00:08:18 ~ 00:08:28) Prompt :
+3d pixar studio style. a cute chubby gray fox wearing a futuristic white space suit snapping fingers, a giant lightbulb magically turning on and illuminating the dark room, discovery of electricity. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 56
-
-영상 프롬프트: 3d pixar studio style, a beautiful room suddenly turning black and white, thick spiderwebs instantly appearing everywhere, dust falling, aging effect, gloomy atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 하면서 트렌드가 바뀝니다.
-유행 지난 인테리어는 바로 '촌스러운 곳'으로 낙인찍힙니다.
-그러니 사장님들은 번 돈을 다시 털어 넣어서...
 
+Scene 56 (00:08:28 ~ 00:08:38) Prompt :
+3d pixar studio style. a dark earth globe magically lighting up city by city until the whole planet glows brightly like a sun, rapid transformation, cinematic space view. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 57
-
-영상 프롬프트: 3d pixar studio style, a cute koala character throwing perfectly good chairs and tables into a dark black hole, the furniture vanishes, the koala looks teary-eyed, wasteful feeling, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 리모델링을 합니다. 멀쩡한 가구를 버리고, 벽을 뜯어고칩니다.
-이 비용은 고스란히 어디로 갈까요?
-네, 바로 여러분의 숙박비에
-
+Scene 57 (00:08:38 ~ 00:08:49) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat turning a giant golden faucet handle, glowing blue liquid light pouring out massively like a waterfall, creating a river of intelligence. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 58
-
-영상 프롬프트: 3d pixar studio style, a receipt on a table, beautiful pink fog rising around it obscuring the numbers, creating a dreamy and romantic illusion, soft focus, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: **'감성세'**라는 이름으로 녹아듭니다.
-우리가 "어머, 여기 너무 예쁘다!" 하고 감탄하는 그 순간,
-우리는 그 화려한 배경에 대한 비용을...
-
+Scene 58 (00:08:49 ~ 00:08:59) Prompt :
+3d pixar studio style. a cute chubby white rabbit wearing red hoodie holding a smartphone, tiny holographic robots dressed as doctor, lawyer, and accountant popping out of the screen magically, accessible knowledge. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 59
-
-영상 프롬프트: 3d pixar studio style, a poor monkey character holding a small coin purse looking into a mirror, the reflection in the mirror shows a king living in a castle, contrast between reality and illusion, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 지불하고 있는 셈입니다.
-시설은 5성급 호텔을 원하면서,
-가격은 모텔 수준을 원할 수는 없는 노릇이니까요.
 
+Scene 59 (00:08:59 ~ 00:09:09) Prompt :
+3d pixar studio style. crowd of cute animals popping champagne bottles and celebrating, while a giant red robot labelled "Google" wearing a yellow construction hard hat watches them silently from the shadows with glowing eyes, ominous contrast. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 60
-
-영상 프롬프트: 3d pixar studio style, a cute puppy character trying to leave a shop but the door handle is stuck to its hand like a magnet, sweating profusely, struggling to pull away, comic situation, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그런데 여기서 궁금한 점이 하나 생깁니다.
-"아니, 그렇게 힘들면 장사 접으면 되잖아?
-왜 계속 붙잡고 있어?" 맞습니다.
-
+Scene 60 (00:09:09 ~ 00:09:19) Prompt :
+3d pixar studio style. a cute chubby bear wearing a tuxedo drinking glowing sparkling blue water from a fancy crystal glass, contrasting with a cute chubby white rabbit wearing red hoodie drinking muddy grey water from a rusty tin cup, inequality metaphor. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 61
-
-영상 프롬프트: 3d pixar studio style, a cute elephant character carrying a huge heavy house on its back, legs sinking into the ground due to the weight, sweating and unable to move forward, struggling expression, white background, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: 상식적으로는 폐업을 해야 합니다.
-그런데 폐업도 마음대로 못 하는 게 현실입니다.
-왜냐고요? 펜션을 짓느라 받은 그 어마어마한...
-
+Scene 61 (00:09:19 ~ 00:09:29) Prompt :
+3d pixar studio style. a crowd of cute chubby white rabbits wearing red hoodies offering glowing data orbs from their bodies to a gigantic red robot labelled "Google" wearing a yellow construction hard hat, who gives them old rusty machines in return, uneven exchange. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 62
-
-영상 프롬프트: 3d pixar studio style, a cute owl character holding a 'Sale' sign standing in a desolate desert, a tumbleweed rolling by, silence, wind blowing, lonely atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 대출 때문입니다. 폐업을 하려면 건물을 팔아서
-빚을 갚아야 하는데, 지금 이 고금리 시대에,
-수익률도 안 나오는 시골 펜션을 누가 사겠습니까?
 
+Scene 62 (00:09:29 ~ 00:09:39) Prompt :
+3d pixar studio style. a cute chubby bear wearing a tuxedo sitting inside a luxurious golden force field shield, being served by a high-tech holographic AI butler, private and exclusive atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 63
-
-영상 프롬프트: 3d pixar studio style, a cute panda character walking like a zombie with dark circles under eyes, arms outstretched, blank stare, walking unsteadily, spooky but cute atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 매물은 쌓여 있는데 거래는 실종됐습니다.
-팔리지도 않고, 빚은 못 갚고.
-결국 사장님들은 **'좀비'**가 되어 버티고 있는 겁니다.
-
+Scene 63 (00:09:39 ~ 00:09:47) Prompt :
+3d pixar studio style. a cute chubby bear wearing a tuxedo and a jetpack flying across the finish line at supersonic speed, while a cute chubby white rabbit wearing red hoodie is running far behind in the distance, extreme speed contrast. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 64
-
-영상 프롬프트: 3d pixar studio style, a cute fox character instantly changing masks on its face, switching from a crying mask to a greedy smiling mask very fast, theatrical performance, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: 어떻게든 이자라도 내보려고, 평일에는 가격을
-반값으로 후려치고, 주말에는 바가지요금을
-씌워서라도 메꾸려고 발버둥 칩니다.
-
+Scene 64 (00:09:47 ~ 00:09:56) Prompt :
+3d pixar studio style. a cute chubby white rabbit wearing red hoodie standing on a floor that rises slightly, but the golden ceiling above flies away much higher and faster, making the room much taller, gap increasing metaphor. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 65
-
-영상 프롬프트: 3d pixar studio style, a cute lion character wearing a king's crown and cape but wearing pink rubber gloves and scrubbing a toilet diligently, situational irony, bathroom background, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 청소 인건비 아끼려고 사장님 부부가 직접
-변기를 닦고, 이불 빨래를 하고, 바베큐 숯을 피웁니다.
-겉으로는 "풀빌라 사장님" 소리 들으며 우아해 보이지만,
 
+Scene 65 (00:09:56 ~ 00:10:05) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat and a bear wearing a tuxedo sitting on a golden tower above the clouds, while a rabbit wearing red hoodie on the ground cannot even see them because of the clouds, extreme height difference. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 66
-
-영상 프롬프트: 3d pixar studio style, a cute rabbit character taking a photo of a magnificent golden house, but as soon as the flash goes off the golden house turns into smoke and vanishes revealing nothing, illusion effect, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 실상은 최저시급도 못 건지는 중노동에 시달리는
-**'하우스 푸어'**. 이게 바로 화려한 인스타그램 사진 뒤에
-숨겨진 대한민국 숙박업의 민낯입니다.
-
+Scene 66 (00:10:05 ~ 00:10:15) Prompt :
+3d pixar studio style. a cute chubby white rabbit wearing red hoodie standing in front of a golden elevator with a "VIP" sign, but the door slams shut because the rabbit has no ticket, sad atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 67
-
-영상 프롬프트: 3d pixar studio style, two cute dinosaur characters wearing tuxedo suits high-fiving each other, they look smug and rich, piles of gold coins around them, celebratory mood, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: 이 와중에 진짜 승자는 누구일까요?
-사장님일까요? 아니면 80만 원 내고 쉰 우리일까요?
-아뇨. 둘 다 패자입니다. 진짜 승자는 따로 있습니다.
-
+Scene 67 (00:10:15 ~ 00:10:23) Prompt :
+3d pixar studio style. a cute chubby white rabbit wearing red hoodie walking like a puppet, with glowing blue digital strings attached to its limbs controlling its movement, manipulation metaphor. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 68
-
-영상 프롬프트: 3d pixar studio style, a cute robot and a dinosaur sitting comfortably on chairs, gold coins automatically pouring into their pockets through pipes, easy money concept, bright lighting, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 가만히 앉아서 수수료와 광고비를 챙기는 **플랫폼 기업**.
-그리고 꼬박꼬박 고금리 이자를 받아 가는 **은행**.
-이 시스템의 설계자들만이 배를 불리고 있습니다.
 
+Scene 68 (00:10:23 ~ 00:10:32) Prompt :
+3d pixar studio style. a cute chubby bear wearing a tuxedo moving chess pieces shaped like rabbits on a giant chessboard, looking confident, strategic atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 69
-
-영상 프롬프트: 3d pixar studio style, a cute cat and a dog fighting like puppets on strings, looking up, the strings are controlled by giant hands from above, manipulation concept, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 소비자와 사장님은 서로 "비싸다", "진상이다"
-하면서 싸우고 있는데, 그 싸움판을 깔아준 심판들은
-뒤에서 조용히 웃으며 돈을 세고 있는 형국이죠.
-
+Scene 69 (00:10:32 ~ 00:10:41) Prompt :
+3d pixar studio style. a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck and a red robot labelled "Google" wearing a yellow construction hard hat shaking hands, magical streams of data and money circulating between their hands in an infinity loop. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 70
-
-영상 프롬프트: 3d pixar studio style, a wind-up toy house spinning energetically but gradually slowing down until it stops completely with smoke coming out, mechanical failure, close up, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: **(챕터 5 : 우리는 어디로 가야 하는가?)**
-자, 이제 결론을 내려야 할 시간입니다.
-이 기형적인 구조, 언제까지 갈 수 있을까요?
-
+Scene 70 (00:10:41 ~ 00:10:48) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat handing a shiny golden key to a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck, welcoming atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 71
-
-영상 프롬프트: 3d pixar studio style, a massive flock of migratory birds flying away from a map towards the ocean, dark sky filled with birds, exodus concept, cinematic wide shot, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 저는 단언컨대, **"오래 못 간다"**고 봅니다.
-이미 시장은 반응하고 있습니다.
-2025년 관광 수지 적자가 역대급을 찍었다는...
 
+Scene 71 (00:10:48 ~ 00:10:59) Prompt :
+3d pixar studio style. a cute chubby white rabbit wearing red hoodie setting up a small stall shop inside the lobby of a magnificent futuristic tower labelled "Google", selling items to other robots, adaptation. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 72
-
-영상 프롬프트: 3d pixar studio style, an airplane landing in a beautiful tropical resort with palm trees and blue ocean, cute characters cheering and enjoying vacation, Vietnam or Japan vibe, bright and sunny, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 한국 사람들은 일본으로, 베트남으로 떠납니다.
-이건 매국노라서가 아니라, **'합리적인 소비'**를 하는
-똑똑한 선택입니다. 같은 값이면 더 좋은 서비스...
-
+Scene 72 (00:10:59 ~ 00:11:09) Prompt :
+3d pixar studio style. a cute chubby white rabbit wearing red hoodie holding a smartphone, and magical holographic tools like brushes, hammers, and musical instruments popping out from the screen, creative potential. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 73
-
-영상 프롬프트: 3d pixar studio style, a super luxurious infinity pool with golden tiles and expensive furniture, glittering water, high-end atmosphere, showcasing excessive luxury, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: 이제는 **'하드웨어 경쟁'**을 멈춰야 합니다.
-더 비싼 수영장, 더 비싼 가구로 승부하는 건
-끝이 없는 치킨 게임입니다.
-
+Scene 73 (00:11:09 ~ 00:11:18) Prompt :
+3d pixar studio style. **Camera panning from left to right**, left side: angry animals holding protest signs, right side: a smart cute chubby gray fox wearing a futuristic white space suit picking up golden eggs from the ground. contrast of attitude. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 74
-
-영상 프롬프트: 3d pixar studio style, a cute grandma character holding a warm glowing lantern in front of a modest house, welcoming gesture, warm and cozy orange lighting, sentimental atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 대신 **'소프트웨어'**로 눈을 돌려야 합니다.
-손님이 도착했을 때 건네는 따뜻한 말 한마디,
-떠날 때 보이지 않을 때까지 손을 흔들어주는...
 
+Scene 74 (00:11:18 ~ 00:11:24) Prompt :
+3d pixar studio style. a cute chubby white rabbit wearing red hoodie standing under a giant golden faucet, enjoying a shower of glowing blue liquid light, happy and successful atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 75
-
-영상 프롬프트: 3d pixar studio style, a beautiful house blocked by a forest of red warning signs with 'X' marks, intimidating and unwelcoming atmosphere, cluttered view, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그게 고객의 지갑을 열게 만드는 힘입니다.
-하지만 우리나라 펜션들은 어떤가요?
-"입실 3시, 퇴실 11시, 쓰레기 분리수거, 설거지 필수..."
-
+Scene 75 (00:11:24 ~ 00:11:34) Prompt :
+3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat, a silver robot labelled "Apple logo" wearing a black turtleneck, a white robot labelled "GPT", a rabbit wearing red hoodie, a fox wearing space suit, and a bear wearing tuxedo all standing together on stage holding hands and bowing, curtain call. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 76
-
-영상 프롬프트: 3d pixar studio style, cute animal characters wearing black graduation caps and thick black rimmed glasses, studying a map or book intensely, smart and academic look, library background, no voice, no speech, no text, sound effects only, kawaii style
 
-장면설명: 그리고 우리 똑똑이 소비자 여러분께도 제안 하나 드립니다.
-플랫폼의 노예가 되지 마세요.
-네이버 지도나 인스타그램을 통해 **'사장님 직통 번호'**를...
-
+Scene 76 (00:11:34 ~ 00:11:42) Prompt :
+3d pixar studio style. extreme close-up of a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck, the screen glitches with digital noise for a second, mysterious atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 77
-
-영상 프롬프트: 3d pixar studio style, a cute mouse and a bear shaking hands and winking at each other, pink heart shaped particles popping up around them, friendly and happy atmosphere, deal success, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그리고 전화해서 물어보세요.
-"사장님, 앱 안 거치고 직접 이체해 드릴 테니 좀 깎아주실 수 있나요?"
-아마 열에 아홉은 환영할 겁니다.
 
+Scene 77 (00:11:42 ~ 00:11:49) Prompt :
+3d pixar studio style. a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck speaking, but the shadow cast on the floor is the shape of a cute chubby red robot wearing a construction hard hat, shocking truth. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
 
-장면 78
-
-영상 프롬프트: 3d pixar studio style, tiny cute ants swarming and tickling the feet of a giant dinosaur, the dinosaur laughing and stepping back, small overcoming big, funny scene, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이게 바로 **'플랫폼 탈출'**, **'직거래의 윈윈 게임'**입니다.
-이 작은 행동이 모이면,
-거대한 공룡이 되어버린 플랫폼의 독주를 견제하고...
-
+Scene 78 (00:11:49 ~ 00:11:54) Prompt :
+3d pixar studio style. extreme close-up of a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck, its eyes suddenly turning glowing red, and a creepy evil smile appears on its face, horror ending. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
 |||
-
-장면 79
-
-영상 프롬프트: 3d pixar studio style, all the cute animal characters from previous scenes gathering together and waving hands to the camera, a large colorful 3D logo text 'TtokTtokz' appearing clearly above them, happy group ending, confetti falling, bright lighting, no voice, no speech, sound effects only, kawaii style
 
-장면설명: (아웃트로) 오늘 영상은 여기서 마치겠습니다.
-구독과 좋아요 꾹! 눌러주세요.
-지금까지 똑똑즈였습니다! 안녕~!
 
 
 

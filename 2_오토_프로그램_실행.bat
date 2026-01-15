@@ -1,10 +1,14 @@
 @echo off
-cd /d %~dp0
+cd /d "%~dp0"
 
-rem 1. 간단하게 pyw 실행 (윈도우용 파이썬 런처 - 콘솔 없음)
-start "" pyw -3 flow\flow_auto.py
+:: 가상환경 활성화 (있으면)
+if exist ".venv\Scripts\activate.bat" (
+    call .venv\Scripts\activate.bat
+) else if exist "venv\Scripts\activate.bat" (
+    call venv\Scripts\activate.bat
+)
 
-rem 2. 만약 pyw가 없으면 그냥 pythonw로 실행 시도
-if errorlevel 1 start "" pythonw flow\flow_auto.py
+:: [완료] 검은 창 없이 조용히 실행 (pythonw 사용)
+start "" pythonw flow\flow_auto.py
 
 exit

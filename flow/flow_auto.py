@@ -16,6 +16,13 @@ from tkinter.scrolledtext import ScrolledText
 import pyautogui
 import pyperclip
 
+# [NEW] 인간 행동 엔진 탑재
+try:
+    from human_behavior import HumanActor
+except ImportError:
+    # 혹시 모를 경로 문제 대비
+    from flow.human_behavior import HumanActor
+
 # --- 윈도우 절전 방지 상수 ---
 ES_CONTINUOUS = 0x80000000
 ES_SYSTEM_REQUIRED = 0x00000001
@@ -28,8 +35,8 @@ DEFAULT_CONFIG = {
     "prompts_file": "flow_prompts.txt",
     "prompts_separator": "|||",
     "interval_seconds": 60,
-    "input_coords": {"x": 0, "y": 0},
-    "submit_coords": {"x": 0, "y": 0},
+    "input_area": None,   # {x1, y1, x2, y2}
+    "submit_area": None,  # {x1, y1, x2, y2}
     "prompt_slots": [],
     "active_prompt_slot": 0
 }
@@ -88,7 +95,7 @@ class CountdownAlert:
             self.root.destroy()
         except: pass
 
-# [좌표 캡처 오버레이]
+# [좌표/영역 캡처 오버레이] - 드래그 지원
 class CaptureOverlay:
     def __init__(self, master, on_capture, kind_text):
         self.on_capture = on_capture
@@ -98,23 +105,59 @@ class CaptureOverlay:
         self.root.attributes("-topmost", True)
         self.root.configure(bg="black", cursor="crosshair")
         
-        self.label = tk.Label(self.root, text=f"{kind_text} 위치에서 [클릭] 또는 [Enter]", 
+        self.canvas = tk.Canvas(self.root, bg="black", highlightthickness=0)
+        self.canvas.pack(fill="both", expand=True)
+        
+        # 안내 텍스트
+        self.label = tk.Label(self.root, text=f"{kind_text} 영역을 마우스로 드래그하세요\n(ESC: 취소)", 
                               bg="#FF79C6", fg="black", font=("Malgun Gothic", 12, "bold"))
         self.label.place(x=0, y=0)
         
-        self.root.bind("<Motion>", self.on_move)
-        self.root.bind("<Button-1>", self.on_click)
-        self.root.bind("<Return>", self.on_click)
+        self.start_x = None
+        self.start_y = None
+        self.rect_id = None
+        
+        self.root.bind("<Button-1>", self.on_press)
+        self.root.bind("<B1-Motion>", self.on_drag)
+        self.root.bind("<ButtonRelease-1>", self.on_release)
         self.root.bind("<Escape>", self.close)
+        self.root.bind("<Motion>", self.on_move)
 
     def on_move(self, event):
         self.label.place(x=event.x + 20, y=event.y + 20)
-        self.label.config(text=f"X:{event.x}, Y:{event.y}\n(클릭하여 저장)")
 
-    def on_click(self, event):
-        x, y = event.x, event.y
+    def on_press(self, event):
+        self.start_x = event.x
+        self.start_y = event.y
+        # 드래그 시작 시 사각형 생성
+        self.rect_id = self.canvas.create_rectangle(self.start_x, self.start_y, self.start_x, self.start_y, outline="#FF5555", width=3)
+
+    def on_drag(self, event):
+        if self.start_x is None: return
+        # 사각형 크기 업데이트
+        self.canvas.coords(self.rect_id, self.start_x, self.start_y, event.x, event.y)
+        self.label.config(text=f"드래그 중...\n({self.start_x},{self.start_y}) ~ ({event.x},{event.y})")
+
+    def on_release(self, event):
+        if self.start_x is None: return
+        x1, y1 = self.start_x, self.start_y
+        x2, y2 = event.x, event.y
+        
+        # 좌표 정렬 (왼쪽위, 오른쪽아래)
+        final_x1 = min(x1, x2)
+        final_y1 = min(y1, y2)
+        final_x2 = max(x1, x2)
+        final_y2 = max(y1, y2)
+        
+        # 너무 작은 영역(클릭 실수) 방지
+        if (final_x2 - final_x1) < 5 or (final_y2 - final_y1) < 5:
+            self.label.config(text="영역이 너무 작습니다. 다시 드래그하세요.")
+            self.canvas.delete(self.rect_id)
+            self.start_x = None
+            return
+
         self.root.destroy()
-        self.on_capture(x, y)
+        self.on_capture(final_x1, final_y1, final_x2, final_y2)
 
     def close(self, event=None):
         self.root.destroy()
@@ -131,6 +174,121 @@ def load_config_from_file(path):
     except:
         return DEFAULT_CONFIG.copy()
 
+class HumanConfigWindow:
+    def __init__(self, master, actor):
+        self.actor = actor
+        self.root = tk.Toplevel(master)
+        self.root.title("🤖 실시간 인격 모니터 (Live Persona)")
+        self.root.geometry("550x900")
+        self.root.configure(bg="#282A36")
+        
+        # 스크롤 캔버스
+        canvas = tk.Canvas(self.root, bg="#282A36", highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=canvas.yview)
+        self.frame = tk.Frame(canvas, bg="#282A36")
+        
+        self.frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=self.frame, anchor="nw")
+        canvas.configure(yscrollcommand=scrollbar.set)
+        
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+        
+        # 헤더
+        tk.Label(self.frame, text="🕵️ 현재 봇의 인격 상태", font=("Malgun Gothic", 14, "bold"), bg="#282A36", fg="#FF79C6").pack(pady=10)
+        
+        self.lbl_persona = tk.Label(self.frame, text="...", font=("Malgun Gothic", 12, "bold"), bg="#282A36", fg="#50FA7B")
+        self.lbl_persona.pack(pady=5)
+        
+        tk.Label(self.frame, text="* 이 값들은 '작업 배치'마다 자동으로 랜덤 변경됩니다.\n* 저장이 불가능하며, 매번 새로운 패턴을 생성합니다.", 
+                 font=("Malgun Gothic", 9), bg="#282A36", fg="#F8F8F2", justify="center").pack(pady=(0, 20))
+
+        self.scales = {}
+        self.entries = {}
+
+        # 1. 생체 역학
+        self.add_section("1. 생체 역학 (Biomechanics)")
+        self.add_scale("speed_multiplier", "속도 배율 (낮을수록 빠름)", 0.5, 3.0)
+        self.add_scale("hesitation_rate", "이동 중 멈칫 확률", 0.0, 1.0)
+        self.add_scale("overshoot_rate", "오버슈트 확률", 0.0, 1.0)
+        self.add_scale("micro_correction_rate", "미세 경로 수정 강도", 0.0, 1.0)
+
+        # 2. 상호작용
+        self.add_section("2. 입력 & 클릭 디테일")
+        self.add_scale("typo_rate", "오타 발생 확률", 0.0, 0.2)
+        self.add_scale("breathing_rate", "숨 고르기 빈도", 0.0, 0.5)
+        self.add_scale("click_hesitation_rate", "클릭 전 망설임", 0.0, 1.0)
+        self.add_scale("double_click_mistake", "더블클릭 실수", 0.0, 0.2)
+
+        # 3. 환경
+        self.add_section("3. 딴짓 & 심리")
+        self.add_scale("distraction_rate", "딴짓 종합 확률", 0.0, 1.0)
+        self.add_scale("gaze_simulation", "시선 확인 확률", 0.0, 1.0)
+        self.add_scale("empty_click_rate", "빈 공간 실수 확률", 0.0, 0.5)
+        self.add_scale("fatigue_factor", "피로도 누적 속도", 0.0, 0.5)
+
+        # 4. 스케줄
+        self.add_section("4. 현재 스케줄 설정")
+        self.add_dual_display("batch_min", "batch_max", "배치 작업 개수 범위")
+        self.add_dual_display("break_min_sec", "break_max_sec", "휴식 시간 범위 (초)")
+        self.add_dual_display("work_start_hour", "work_end_hour", "활동 시간")
+        self.add_scale("weekend_skip_rate", "주말 건너뛸 확률", 0.0, 1.0)
+
+        # 리셋 버튼
+        btn_frame = tk.Frame(self.root, bg="#282A36", pady=20)
+        btn_frame.pack(fill="x")
+        ttk.Button(btn_frame, text="🎲 인격 리셋 (Randomize Now)", command=self.randomize).pack(side="bottom", ipadx=20, ipady=10)
+
+        self.refresh_ui()
+
+    def add_section(self, title):
+        tk.Label(self.frame, text=title, font=("Malgun Gothic", 11, "bold"), bg="#282A36", fg="#8BE9FD", anchor="w").pack(fill="x", padx=10, pady=(15, 5))
+        tk.Frame(self.frame, bg="#44475A", height=1).pack(fill="x", padx=10, pady=(0, 10))
+
+    def add_scale(self, key, text, from_, to):
+        frame = tk.Frame(self.frame, bg="#282A36", padx=10, pady=2)
+        frame.pack(fill="x")
+        
+        lbl = tk.Label(frame, text=f"{text}: 0.00", bg="#282A36", fg="white", width=35, anchor="w")
+        lbl.pack(side="left")
+        
+        scale = tk.Scale(frame, from_=from_, to=to, resolution=0.01, orient="horizontal", 
+                         bg="#282A36", fg="white", highlightthickness=0, length=150, state="disabled")
+        scale.pack(side="right")
+        
+        self.scales[key] = (scale, lbl, text)
+
+    def add_dual_display(self, key1, key2, text):
+        frame = tk.Frame(self.frame, bg="#282A36", padx=10, pady=2)
+        frame.pack(fill="x")
+        lbl = tk.Label(frame, text=f"{text}: 0 ~ 0", bg="#282A36", fg="white", anchor="w")
+        lbl.pack(side="top", fill="x")
+        self.entries[(key1, key2)] = (lbl, text)
+
+    def refresh_ui(self):
+        # 1. 인격 이름 업데이트
+        p_name = self.actor.current_persona_name
+        self.lbl_persona.config(text=f"현재 인격: {p_name}")
+        
+        # 2. 스케일 업데이트
+        for key, (scale, lbl, text) in self.scales.items():
+            val = self.actor.cfg.get(key, 0)
+            scale.config(state="normal")
+            scale.set(val)
+            scale.config(state="disabled") # 읽기 전용 느낌
+            lbl.config(text=f"{text}: {val:.2f}")
+
+        # 3. 듀얼 디스플레이 업데이트
+        for (k1, k2), (lbl, text) in self.entries.items():
+            v1 = self.actor.cfg.get(k1, 0)
+            v2 = self.actor.cfg.get(k2, 0)
+            lbl.config(text=f"{text}: {v1} ~ {v2}")
+
+    def randomize(self):
+        self.actor.randomize_persona()
+        self.refresh_ui()
+        messagebox.showinfo("변경 완료", f"새로운 인격 '{self.actor.current_persona_name}'이(가) 적용되었습니다.")
+
 class FlowVisionApp:
     def __init__(self):
         self.base = Path(__file__).resolve().parent
@@ -142,14 +300,14 @@ class FlowVisionApp:
         self.index = 0
         self.t_next = None
         self.alert_window = None
+        self.config_window = None # [NEW] 설정창 제어용 변수
         
-        # [휴식 시스템]
-        self.task_count = 0
-        self.next_break_threshold = random.randint(5, 12) # 5~12회마다 긴 휴식
+        # [NEW] 인간 행동 모듈 인스턴스
+        self.actor = HumanActor()
         
         self.root = tk.Tk()
         self.root.title(APP_NAME)
-        self.root.geometry("800x800")
+        self.root.geometry("800x850")
         self.root.configure(bg="#1E1E2E")
         
         try:
@@ -193,10 +351,20 @@ class FlowVisionApp:
         except: pass
 
     def on_start(self):
-        ix = self.cfg.get('input_coords', {}).get('x', 0)
-        sx = self.cfg.get('submit_coords', {}).get('x', 0)
-        if ix == 0 or sx == 0:
-            messagebox.showwarning("주의", "좌표 설정을 먼저 해주세요!")
+        # [NEW] 영역 설정 확인
+        ia = self.cfg.get('input_area')
+        sa = self.cfg.get('submit_area')
+        
+        # 구버전 호환용 (혹시 좌표만 있으면 경고)
+        if not ia and self.cfg.get('input_coords'):
+            messagebox.showwarning("업그레이드 알림", "입력창 위치를 '드래그' 방식으로 다시 설정해주세요!")
+            return
+        if not sa and self.cfg.get('submit_coords'):
+            messagebox.showwarning("업그레이드 알림", "생성 버튼 위치를 '드래그' 방식으로 다시 설정해주세요!")
+            return
+
+        if not ia or not sa:
+            messagebox.showwarning("주의", "먼저 [입력창]과 [생성 버튼]의 영역을 설정해주세요.")
             return
             
         self._prevent_sleep()
@@ -208,9 +376,9 @@ class FlowVisionApp:
         self.t_next = time.time()
         self.lbl_status.config(text="🚀 자동화 시작!", fg="#50FA7B")
         
-        # 시작할 때 휴식 카운터 초기화
-        self.task_count = 0
-        self.next_break_threshold = random.randint(5, 12)
+        # [NEW] 시작 시 배치 사이즈 재설정 및 카운터 초기화
+        self.actor.update_batch_size()
+        self.actor.processed_count = 0
 
     def on_stop(self):
         self.running = False
@@ -224,6 +392,12 @@ class FlowVisionApp:
         if self.alert_window:
             self.alert_window.close()
             self.alert_window = None
+
+    def on_human_config(self):
+        if self.config_window is None or not self.config_window.root.winfo_exists():
+            self.config_window = HumanConfigWindow(self.root, self.actor)
+        else:
+            self.config_window.root.lift()
 
     def _build_ui(self):
         main = self.root
@@ -239,13 +413,13 @@ class FlowVisionApp:
         self.lbl_eta.pack(side="right", padx=10, pady=5)
 
         # 2. 좌표 설정
-        coord_frame = tk.LabelFrame(main, text=" 1. 좌표 설정 ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=5)
+        coord_frame = tk.LabelFrame(main, text=" 1. 영역 설정 (드래그) ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=5)
         coord_frame.pack(fill="x", padx=20, pady=5)
         
         btn_box = tk.Frame(coord_frame, bg="#1E1E2E")
         btn_box.pack(fill="x")
-        ttk.Button(btn_box, text="📍 입력창 위치", command=lambda: self.start_capture("input")).pack(side="left", expand=True, fill="x", padx=2)
-        ttk.Button(btn_box, text="📍 생성 버튼 위치", command=lambda: self.start_capture("submit")).pack(side="left", expand=True, fill="x", padx=2)
+        ttk.Button(btn_box, text="⬛ 입력창 영역 지정", command=lambda: self.start_capture("input")).pack(side="left", expand=True, fill="x", padx=2)
+        ttk.Button(btn_box, text="⬛ 생성 버튼 영역 지정", command=lambda: self.start_capture("submit")).pack(side="left", expand=True, fill="x", padx=2)
         self.lbl_coords = tk.Label(coord_frame, text=self._get_coord_text(), bg="#1E1E2E", fg="#8BE9FD")
         self.lbl_coords.pack(pady=2)
 
@@ -264,6 +438,9 @@ class FlowVisionApp:
         self.btn_start.pack(side="left", padx=10, fill="x", expand=True)
         self.btn_stop = ttk.Button(ctrl_box, text="🛑 멈추기", command=self.on_stop, state="disabled")
         self.btn_stop.pack(side="left", fill="x", expand=True)
+
+        # [NEW] 인간화 설정 버튼 추가
+        ttk.Button(run_frame, text="⚙️ 인간화 설정 (Humanizer)", command=self.on_human_config).pack(fill="x", pady=5)
 
         # 4. 프롬프트 & 로그
         bottom_frame = tk.Frame(main, bg="#1E1E2E")
@@ -306,11 +483,20 @@ class FlowVisionApp:
         self.log_text.pack(fill="both", expand=True)
 
     def _get_coord_text(self):
-        ix = self.cfg.get('input_coords', {}).get('x', 0)
-        iy = self.cfg.get('input_coords', {}).get('y', 0)
-        sx = self.cfg.get('submit_coords', {}).get('x', 0)
-        sy = self.cfg.get('submit_coords', {}).get('y', 0)
-        return f"현재 설정: 입력창({ix}, {iy}) / 버튼({sx}, {sy})"
+        ia = self.cfg.get('input_area')
+        sa = self.cfg.get('submit_area')
+        
+        i_text = "미설정"
+        s_text = "미설정"
+        
+        if ia:
+            w, h = ia['x2'] - ia['x1'], ia['y2'] - ia['y1']
+            i_text = f"✅설정됨 ({w}x{h})"
+        if sa:
+            w, h = sa['x2'] - sa['x1'], sa['y2'] - sa['y1']
+            s_text = f"✅설정됨 ({w}x{h})"
+            
+        return f"상태: 입력창[{i_text}] / 버튼[{s_text}]"
 
     def log(self, msg):
         print(msg)
@@ -325,14 +511,17 @@ class FlowVisionApp:
 
     def start_capture(self, kind):
         kind_text = "입력창" if kind == "input" else "생성 버튼"
-        def on_captured(x, y):
+        
+        def on_captured(x1, y1, x2, y2):
+            area = {"x1": x1, "y1": y1, "x2": x2, "y2": y2}
             if kind == "input":
-                self.cfg["input_coords"] = {"x": x, "y": y}
+                self.cfg["input_area"] = area
             else:
-                self.cfg["submit_coords"] = {"x": x, "y": y}
+                self.cfg["submit_area"] = area
             self.save_config()
             self.lbl_coords.config(text=self._get_coord_text(), fg="#8BE9FD")
-            messagebox.showinfo("성공", f"{kind_text} 좌표 저장 완료!\n({x}, {y})")
+            messagebox.showinfo("성공", f"{kind_text} 영역 저장 완료!\n({x1},{y1}) ~ ({x2},{y2})")
+            
         CaptureOverlay(self.root, on_captured, kind_text)
 
     def on_slot_change(self, event=None):
@@ -435,20 +624,49 @@ class FlowVisionApp:
                 if self.alert_window:
                     self.alert_window.close()
                     self.alert_window = None
+                
+                # 작업 실행
                 self._run_task()
                 
-                # 다음 시간 설정 (랜덤)
-                var = random.randint(-min(30, base//5), min(30, base//5))
-                if base < 30: var = random.randint(-5, 10)
-                interval = max(10, base + var)
+                # [CHAOS] 대기 시간 초랜덤 계산 (안전Floor 보장형)
+                # 설정한 base(예: 180초)는 무조건 최소값으로 보장!
+                # 봇의 속도 배율(speed)이 클수록(느릴수록) 추가 대기 시간이 늘어남
+                speed = self.actor.cfg.get('speed_multiplier', 1.0)
+                
+                # 추가 대기 시간 = base의 0% ~ (speed * 100)% 만큼 랜덤 추가
+                # 예: 60초 설정, speed 1.5 인격 -> 60초 + (0~90초 랜덤) = 60~150초 사이
+                extra_chaos = random.uniform(0, base * speed)
+                interval = int(base + extra_chaos)
+                
                 self.t_next = time.time() + interval
-                self.log(f"🎲 다음 간격: {interval}초 (랜덤)")
+                self.log(f"🎲 [Safe Chaos] 다음 간격: {interval}초 (최소 {base}초 보장 + {extra_chaos:.1f}초 멍때림)")
         else:
             self.lbl_eta.config(text="-")
         
         self.root.after(1000, self._tick)
 
     def _run_task(self):
+        # [NEW] 1. 스케줄 체크 (활동 시간이 아니면 스킵)
+        is_active, reason = self.actor.check_schedule()
+        if not is_active:
+            self.log(f"⛔ {reason} - 잠시 대기합니다.")
+            self.lbl_status.config(text=f"🌙 {reason}...", fg="#6272A4")
+            # 다음 틱에서 다시 체크하도록 시간만 살짝 밈
+            self.t_next = time.time() + 300 # 5분 뒤 재확인
+            return
+
+        # [NEW] 2. 배치 사이즈 체크 (일정 개수 수행 후 강제 휴식)
+        if self.actor.processed_count >= self.actor.current_batch_size:
+            self.log(f"🛑 배치 목표({self.actor.current_batch_size}개) 달성! 휴식 모드 진입.")
+            self.lbl_status.config(text="☕ 재충전 중...", fg="#FF5555")
+            
+            duration = self.actor.take_bio_break()
+            
+            self.actor.update_batch_size() # 다음 배치 사이즈 설정
+            self.log(f"☕ 휴식 끝! 다음 배치는 {self.actor.current_batch_size}개 예정.")
+            # 휴식 시간이 끝났으므로 이번 턴은 넘기고 다음 턴에 작업 시작
+            return
+
         if not self.prompts or self.index >= len(self.prompts):
             self.running = False
             self.lbl_status.config(text="🎉 모든 작업 완료!", fg="#BD93F9")
@@ -457,69 +675,124 @@ class FlowVisionApp:
             self.on_stop()
             return
 
-        # [NEW] 생체 리듬 휴식 (Bio-Break)
-        self.task_count += 1
-        if self.task_count >= self.next_break_threshold:
-            self._take_bio_break()
-            # 휴식 후 카운터 리셋
-            self.task_count = 0
-            self.next_break_threshold = random.randint(5, 12)
-            # 휴식 끝났으니 바로 재개
-            return
-
         self._show()
         prompt = self.prompts[self.index]
-        self.log(f"▶ 진행: {self.index+1}/{len(self.prompts)}")
         
-        ix = self.cfg["input_coords"]["x"]
-        iy = self.cfg["input_coords"]["y"]
-        sx = self.cfg["submit_coords"]["x"]
-        sy = self.cfg["submit_coords"]["y"]
+        # [CORE] 매 작업마다 인격을 리셋 (완전 무작위 패턴)
+        self.actor.randomize_persona()
         
+        # [LIVE] 설정창이 켜져 있다면, 슬라이더를 자동으로 움직여서 보여줌!
+        if self.config_window and self.config_window.root.winfo_exists():
+            self.config_window.refresh_ui()
+            
+        self.log(f"▶ 진행: {self.index+1}/{len(self.prompts)} (인격: {self.actor.current_persona_name})")
+        
+        # [NEW] 영역에서 랜덤 좌표 추출
+        ia = self.cfg.get('input_area')
+        sa = self.cfg.get('submit_area')
+        
+        if not ia or not sa:
+            self.log("❌ 영역 설정이 필요합니다.")
+            self.running = False
+            self.on_stop()
+            return
+
         try:
-            # 0. 의미 없는 긁기 & 딴짓 (25% 확률)
-            if random.random() < 0.25:
-                self.lbl_status.config(text="🤔 생각하는 중... (딴짓)", fg="#FFB86C")
-                self._random_aimless_action()
+            # [NEW] 0. 작업 전 랜덤 딴짓 (20% 확률)
+            mood_icon = {"Hasty": "⚡", "Relaxed": "☕", "Tired": "😴", "Normal": "🙂"}.get(self.actor.current_mood, "🙂")
+            self.lbl_status.config(text=f"{mood_icon} [{self.actor.current_mood}] 준비 중...", fg="#FFB86C")
+            
+            # [Feature 8] 딴짓하다 포커스 잃음
+            self.actor.simulate_focus_loss()
+            self.actor.random_behavior_routine()
 
-            # 1. 입력창 이동 (베지에 곡선 & 오버슈트 적용)
+            # [NEW] 1. 입력창 이동 (지정된 영역 내 랜덤)
             self.lbl_status.config(text="🖱️ 입력창 이동...", fg="white")
-            self._human_move_advanced(ix, iy, overshoot=True)
-            time.sleep(random.uniform(0.1, 0.3))
-            pyautogui.click() # 클릭도 살짝 딜레이 후
+            
+            # 지정된 박스 안에서 랜덤 좌표 생성
+            ix_rand = random.randint(ia['x1'], ia['x2'])
+            iy_rand = random.randint(ia['y1'], ia['y2'])
+            
+            self.actor.move_to(ix_rand, iy_rand)
+            pyautogui.click()
 
-            # 2. 지우기 (기존 내용)
+            # 2. 내용 지우기
             time.sleep(random.uniform(0.2, 0.5))
             pyautogui.hotkey("ctrl", "a")
             time.sleep(random.uniform(0.1, 0.3))
             pyautogui.press("backspace")
-            time.sleep(random.uniform(0.2, 0.5))
             
-            # 3. 입력 (오타 포함)
-            self.lbl_status.config(text="✍️ 입력 중...", fg="white")
-            
-            # 혹시 모를 앞글자 씹힘 방지용 더미 클릭/대기
-            if random.random() < 0.2:
-                pyautogui.press('shift')
-                time.sleep(0.1)
+            # [NEW] 3. 가끔 빈 공간 클릭 실수 (설정값 사용)
+            if random.random() < self.actor.cfg["empty_click_rate"]:
+                self.actor.click_empty_space()
+                # 실수했으니 다시 입력창으로 (여기도 랜덤)
+                ix_retry = random.randint(ia['x1'], ia['x2'])
+                iy_retry = random.randint(ia['y1'], ia['y2'])
+                self.actor.move_to(ix_retry, iy_retry, overshoot=False)
+                pyautogui.click()
 
-            # [NEW] 오타 포함 타이핑
-            self._human_type_advanced(prompt)
+            # [NEW] 3.5 시선 시뮬레이션 (입력 전 확인)
+            if random.random() < self.actor.cfg["gaze_simulation"]:
+                self.actor.simulate_gaze()
+
+            # [NEW] 4. 입력 (오타 포함)
+            self.lbl_status.config(text="✍️ 입력 중...", fg="white")
+            self.actor.type_text(prompt, input_area=ia)
             
-            time.sleep(random.uniform(0.8, 1.5))
+            # [NEW] 5. 검토 (글자 수 비례 & 긁기)
+            self.lbl_status.config(text="📖 검토 중...", fg="#8BE9FD")
             
-            # 4. 버튼 클릭 (베지에 곡선 & 오버슈트)
-            self.lbl_status.config(text="🖱️ 버튼 클릭...", fg="white")
-            self._human_move_advanced(sx, sy, overshoot=True)
-            time.sleep(random.uniform(0.1, 0.3))
-            pyautogui.click()
+            # [Feature 1] 읽으면서 긁적긁적 (하이라이트 습관)
+            if random.random() < 0.5:
+                self.actor.highlight_text_habit()
+            else:
+                self.actor.subconscious_drag()
+            
+            # 글자 수 비례해서 읽기
+            self.actor.read_prompt_pause(prompt)
+            
+            # [NEW] 6. 제출 (엔터 or 클릭)
+            # [Feature 11] 엔터로 제출하기
+            if random.random() < self.actor.cfg.get("enter_submit_rate", 0.0):
+                self.lbl_status.config(text="↵ 엔터 제출!", fg="#50FA7B")
+                self.log("↵ [Human] Enter Key Submit")
+                time.sleep(random.uniform(0.2, 0.5))
+                pyautogui.press('enter')
+            else:
+                # 기존 클릭 방식
+                self.lbl_status.config(text="🖱️ 클릭 제출...", fg="white")
+                
+                # [Smart Click] 타원형 영역 계산
+                s_w = sa['x2'] - sa['x1']
+                s_h = sa['y2'] - sa['y1']
+                center_x = sa['x1'] + s_w / 2
+                center_y = sa['y1'] + s_h / 2
+                
+                while True:
+                    cand_x = random.randint(sa['x1'], sa['x2'])
+                    cand_y = random.randint(sa['y1'], sa['y2'])
+                    norm_x = (cand_x - center_x) / (s_w / 2)
+                    norm_y = (cand_y - center_y) / (s_h / 2)
+                    if (norm_x**2 + norm_y**2) <= 1.0:
+                        sx_rand, sy_rand = cand_x, cand_y
+                        break
+                
+                # [Feature 4] 제출 전 망설임
+                self.actor.hesitate_on_submit(sx_rand, sy_rand)
+                
+                self.actor.move_to(sx_rand, sy_rand)
+                time.sleep(random.uniform(0.1, 0.3))
+                self.actor.smart_click()
             
             self.log(f"✅ 제출 완료")
             
-            # 5. 제출 후 가만히 있지 않고 마우스를 살짝 치움 (30% 확률)
-            if random.random() < 0.3:
-                time.sleep(0.5)
-                self._human_move_advanced(sx + random.randint(100, 300), sy + random.randint(-100, 100))
+            # 카운트 증가
+            self.actor.processed_count += 1
+            
+            # [NEW] 7. 제출 후 마우스 치우기 or 딴짓
+            if random.random() < 0.4:
+                self.actor.aimless_drag()
+                self.actor.shake_mouse() # [Feature 3]
 
         except Exception as e:
             self.log(f"❌ 오류: {e}")
@@ -528,139 +801,6 @@ class FlowVisionApp:
         
         finally:
             self.index += 1
-
-    # [NEW] 생체 리듬 휴식
-    def _take_bio_break(self):
-        # 3분 ~ 10분 (초 단위)
-        break_time = random.randint(180, 600)
-        finish_at = time.time() + break_time
-        
-        self.log(f"☕ [휴식] {break_time}초 동안 멍 때리기 (인간 흉내)")
-        
-        while time.time() < finish_at:
-            if not self.running: break
-            remain = int(finish_at - time.time())
-            self.lbl_status.config(text=f"☕ 휴식 중... {remain}초 남음", fg="#FF5555")
-            
-            # 휴식 중에도 가끔 마우스 툭 건드림 (절전 방지 느낌)
-            if random.random() < 0.05:
-                x, y = pyautogui.position()
-                pyautogui.moveTo(x + random.randint(-5, 5), y + random.randint(-5, 5), duration=0.2)
-            
-            self.root.update()
-            time.sleep(1)
-        
-        self.log("☕ 휴식 끝! 다시 일하러 갑니다.")
-        # 휴식이 끝났으니 이번 턴 작업을 수행하도록 설정 (재귀 호출 대신 플래그 처리해도 되지만, 여기선 Tick이 다음을 부르므로 이번 작업은 Skip됨.
-        # 즉, 휴식 타임 = 이번 프롬프트 건너뛰기가 아니라, 이번 시간(Tick)을 휴식으로 쓴 것.
-        # 프롬프트 인덱스는 증가시키지 않았으므로 다음 Tick에 다시 시도하게 됨.
-
-    # [NEW] 의미 없는 딴짓
-    def _random_aimless_action(self):
-        action = random.choice(["scroll", "select_text", "wiggle", "pause"])
-        if action == "scroll":
-            # 스크롤 살짝
-            pyautogui.scroll(random.randint(-200, 200))
-            time.sleep(random.uniform(0.5, 1.0))
-        elif action == "select_text":
-            # 아무데나 드래그하는 척
-            x, y = pyautogui.position()
-            pyautogui.dragRel(random.randint(-50, 50), 0, duration=0.5, button='left')
-            time.sleep(0.3)
-            pyautogui.click() # 선택 해제
-        elif action == "wiggle":
-            x, y = pyautogui.position()
-            self._human_move_advanced(x + random.randint(-30, 30), y + random.randint(-30, 30))
-        elif action == "pause":
-            time.sleep(random.uniform(1.5, 3.5))
-
-    # [NEW] 베지에 곡선 & 오버슈트 이동
-    def _human_move_advanced(self, target_x, target_y, overshoot=False):
-        start_x, start_y = pyautogui.position()
-        
-        # 오버슈트: 목표 지점을 살짝 지나쳤다가 돌아옴
-        if overshoot and random.random() < 0.2: # 20% 확률
-            overshoot_x = target_x + random.randint(-20, 20)
-            overshoot_y = target_y + random.randint(-20, 20)
-            
-            # 1. 오버슈트 지점까지 이동
-            self._move_bezier(start_x, start_y, overshoot_x, overshoot_y)
-            time.sleep(random.uniform(0.05, 0.15))
-            
-            # 2. 다시 정확한 지점으로 이동
-            self._move_bezier(overshoot_x, overshoot_y, target_x, target_y, duration_base=0.3)
-        else:
-            # 그냥 이동
-            self._move_bezier(start_x, start_y, target_x, target_y)
-
-        # 도착 후 미세 조정 (Jitter)
-        if random.random() < 0.5:
-            jitter_x = random.randint(-2, 2)
-            jitter_y = random.randint(-2, 2)
-            pyautogui.moveRel(jitter_x, jitter_y, duration=0.1)
-
-    def _move_bezier(self, x1, y1, x2, y2, duration_base=None):
-        # 제어점 생성 (직선 경로에서 랜덤하게 벗어난 점)
-        dist = math.hypot(x2 - x1, y2 - y1)
-        if duration_base is None:
-            duration = random.uniform(0.5, 1.2) + (dist / 2000) # 거리에 비례해 시간 추가
-        else:
-            duration = duration_base
-
-        # 제어점 2개 생성 (3차 베지에)
-        ctrl1_x = x1 + (x2 - x1) * 0.33 + random.randint(-100, 100)
-        ctrl1_y = y1 + (y2 - y1) * 0.33 + random.randint(-100, 100)
-        ctrl2_x = x1 + (x2 - x1) * 0.66 + random.randint(-100, 100)
-        ctrl2_y = y1 + (y2 - y1) * 0.66 + random.randint(-100, 100)
-
-        # 경로 따라 이동
-        steps = int(duration * 60) # 60 FPS
-        if steps < 5: steps = 5
-        
-        for i in range(steps + 1):
-            t = i / steps
-            # Ease-in-out 효과 (t를 변형)
-            t_eased = t * t * (3 - 2 * t) 
-            
-            # 3차 베지에 공식
-            bx = (1-t_eased)**3 * x1 + \
-                 3 * (1-t_eased)**2 * t_eased * ctrl1_x + \
-                 3 * (1-t_eased) * t_eased**2 * ctrl2_x + \
-                 t_eased**3 * x2
-            
-            by = (1-t_eased)**3 * y1 + \
-                 3 * (1-t_eased)**2 * t_eased * ctrl1_y + \
-                 3 * (1-t_eased) * t_eased**2 * ctrl2_y + \
-                 t_eased**3 * y2
-                 
-            pyautogui.moveTo(bx, by)
-            # 루프 내 sleep은 최소화 (moveTo 자체가 시간이 걸릴 수 있지만 duration=0으로 호출하므로 즉시 이동)
-            # 하지만 너무 빠르면 안되므로 아주 짧게 대기
-            time.sleep(duration / steps)
-
-    # [NEW] 오타 시뮬레이션 타이핑
-    def _human_type_advanced(self, text):
-        for char in text:
-            # 1. 3% 확률로 오타 발생
-            if random.random() < 0.03:
-                wrong_char = chr(ord(char) + 1) # 대충 다음 아스키코드
-                pyautogui.write(wrong_char)
-                time.sleep(random.uniform(0.1, 0.4))
-                
-                # 아차차! 지우기
-                pyautogui.press("backspace")
-                time.sleep(random.uniform(0.1, 0.3))
-
-            # 2. 타이핑 (한글은 복붙, 영어는 타이핑)
-            if 32 <= ord(char) <= 126: 
-                pyautogui.write(char)
-            else:
-                pyperclip.copy(char)
-                time.sleep(0.01)
-                pyautogui.hotkey("ctrl", "v")
-            
-            # 3. 타이핑 간격 랜덤 (리듬감)
-            time.sleep(random.uniform(0.03, 0.15))
 
 if __name__ == "__main__":
     FlowVisionApp().root.mainloop()
