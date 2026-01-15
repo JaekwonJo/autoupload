@@ -53,7 +53,7 @@ class CountdownAlert:
         
         sw = self.root.winfo_screenwidth()
         sh = self.root.winfo_screenheight()
-        w, h = 300, 80
+        w, h = 300, 100 # 높이를 조금 늘림
         x = sw - w - 20
         y = sh - h - 100
         self.root.geometry(f"{w}x{h}+{x}+{y}")
@@ -61,21 +61,22 @@ class CountdownAlert:
         self.root.bind("<Button-1>", self.start_move)
         self.root.bind("<B1-Motion>", self.do_move)
         
-        frame = tk.Frame(self.root, bg="#282A36", highlightbackground="#BD93F9", highlightthickness=2)
-        frame.pack(fill="both", expand=True)
+        self.frame = tk.Frame(self.root, bg="#282A36", highlightbackground="#BD93F9", highlightthickness=2)
+        self.frame.pack(fill="both", expand=True)
         
-        self.lbl_title = tk.Label(frame, text="👻 비전 봇 출동 준비!", font=("Malgun Gothic", 11, "bold"), bg="#282A36", fg="#FF79C6")
-        self.lbl_title.pack(pady=(10, 2))
+        self.lbl_title = tk.Label(self.frame, text="👻 비전 봇 출동 준비!", font=("Malgun Gothic", 11, "bold"), bg="#282A36", fg="#FF79C6")
+        self.lbl_title.pack(pady=(5, 2))
         
-        # [NEW] 한/영 전환 확인 메시지 추가 (사용자 요청)
-        self.lbl_check = tk.Label(frame, text="⚠️ 영어(A)로 바꿨나요? 확인 필수! ⚠️", font=("Malgun Gothic", 10, "bold"), bg="#282A36", fg="#F1FA8C")
-        self.lbl_check.pack(pady=(0, 5))
+        # [NEW] 한/영 전환 확인 메시지
+        self.lbl_check = tk.Label(self.frame, text="⚠️ 영어(A)로 바꿨나요? ⚠️", font=("Malgun Gothic", 10, "bold"), bg="#282A36", fg="#F1FA8C")
+        self.lbl_check.pack(pady=(0, 2))
         
-        self.lbl_time = tk.Label(frame, text=f"{seconds}초 전", font=("Malgun Gothic", 16, "bold"), bg="#282A36", fg="#50FA7B")
-        self.lbl_time.pack(pady=(0, 10))
+        self.lbl_time = tk.Label(self.frame, text=f"{seconds}초 전", font=("Malgun Gothic", 16, "bold"), bg="#282A36", fg="#50FA7B")
+        self.lbl_time.pack(pady=(0, 5))
         
         self.x = 0
         self.y = 0
+        self.blink_state = False # 깜빡임 상태 변수
 
     def start_move(self, event):
         self.x = event.x
@@ -90,9 +91,31 @@ class CountdownAlert:
 
     def update_time(self, seconds):
         if not self.root.winfo_exists(): return
-        self.lbl_time.config(text=f"{int(seconds)}초 전")
-        if seconds <= 5:
-            self.lbl_time.config(fg="#FF5555")
+        
+        sec_int = int(seconds)
+        self.lbl_time.config(text=f"{sec_int}초 전")
+        
+        # [NEW] 10초 전부터 긴급 깜빡임 효과 (Blink Effect)
+        if sec_int <= 10:
+            if self.blink_state:
+                bg_color = "#FF5555" # 빨강 (위험!)
+                fg_color = "#FFFFFF"
+            else:
+                bg_color = "#282A36" # 원래 색
+                fg_color = "#FF5555"
+            
+            self.frame.config(bg=bg_color)
+            self.lbl_title.config(bg=bg_color, fg=fg_color)
+            self.lbl_check.config(bg=bg_color, fg="yellow" if self.blink_state else "#F1FA8C")
+            self.lbl_time.config(bg=bg_color, fg=fg_color)
+            
+            self.blink_state = not self.blink_state # 상태 토글
+        else:
+            # 10초보다 많이 남았으면 평온한 상태 유지
+            self.frame.config(bg="#282A36")
+            self.lbl_time.config(fg="#50FA7B", bg="#282A36")
+            self.lbl_check.config(bg="#282A36")
+            self.lbl_title.config(bg="#282A36")
 
     def close(self):
         try:
