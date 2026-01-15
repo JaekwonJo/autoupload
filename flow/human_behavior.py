@@ -273,33 +273,11 @@ class HumanActor:
         else:
             pyautogui.click()
 
-    def _ensure_english_mode(self):
-        """
-        [지능형 한/영 감지 센서]
-        현재 윈도우의 입력 상태가 한글이면 한/영 키를 눌러 영어로 바꿉니다.
-        """
-        if not IMM32: return # 윈도우가 아니면 스킵
-
-        try:
-            # 현재 활성화된 창의 핸들을 가져옵니다.
-            hwnd = ctypes.windll.user32.GetForegroundWindow()
-            # 입력 컨텍스트를 가져옵니다.
-            h_imc = IMM32.ImmGetContext(hwnd)
-            if h_imc:
-                dw_conversion = wintypes.DWORD()
-                dw_sentence = wintypes.DWORD()
-                # 현재 변환 상태(한글/영어 등)를 가져옵니다.
-                IMM32.ImmGetConversionStatus(h_imc, ctypes.byref(dw_conversion), ctypes.byref(dw_sentence))
-                
-                # dw_conversion.value & 1 이면 한글 모드입니다.
-                if dw_conversion.value & 1:
-                    print("🌐 [Sensor] 한글 모드 감지! 영어로 전환합니다...")
-                    pyautogui.press('hangul') # 한/영 키 누르기
-                    time.sleep(0.2)
-                
-                IMM32.ImmReleaseContext(hwnd, h_imc)
-        except Exception as e:
-            print(f"🌐 [Sensor] 감지 오류: {e}")
+    # def _ensure_english_mode(self):
+    #     """
+    #     [지능형 한/영 감지 센서] - 사용자 요청으로 비활성화 (수동 확인 권장)
+    #     """
+    #     pass
 
     # -------------------------------------------------------------------------
     # [Extreme Human Typing Engine V2 - Rhythm & Safe Return]
@@ -310,8 +288,8 @@ class HumanActor:
         - 리듬감 추가: 갑자기 빨라지거나(Burst), 멍때리는(Pause) 패턴 적용
         - 안전한 커서 복귀: 검토 모드 후 글자가 꼬이지 않도록 3중 안전장치 적용
         """
-        # [NEW] 글 쓰기 전에 한/영 상태를 확인해서 무조건 영어로 맞춥니다!
-        self._ensure_english_mode()
+        # [Manual] 사용자가 직접 알림창 보고 영어로 바꿉니다! (자동 기능 OFF)
+        # self._ensure_english_mode()
 
         base_speed = self.get_effective_speed()
         

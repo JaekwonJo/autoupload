@@ -67,6 +67,10 @@ class CountdownAlert:
         self.lbl_title = tk.Label(frame, text="👻 비전 봇 출동 준비!", font=("Malgun Gothic", 11, "bold"), bg="#282A36", fg="#FF79C6")
         self.lbl_title.pack(pady=(10, 2))
         
+        # [NEW] 한/영 전환 확인 메시지 추가 (사용자 요청)
+        self.lbl_check = tk.Label(frame, text="⚠️ 영어(A)로 바꿨나요? 확인 필수! ⚠️", font=("Malgun Gothic", 10, "bold"), bg="#282A36", fg="#F1FA8C")
+        self.lbl_check.pack(pady=(0, 5))
+        
         self.lbl_time = tk.Label(frame, text=f"{seconds}초 전", font=("Malgun Gothic", 16, "bold"), bg="#282A36", fg="#50FA7B")
         self.lbl_time.pack(pady=(0, 10))
         
