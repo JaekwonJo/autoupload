@@ -206,13 +206,35 @@ class HumanActor:
                 self._handle_typo(char, base_speed, input_area)
             if i > 10 and not burst_mode and random.random() < self.cfg.get("caret_check_rate", 0.02):
                 self._simulate_caret_navigation_safe(base_speed)
+            # --- 4. 실제 키 입력 ---
+            # 키 입력 전 미세 딜레이 (렉 방지)
             time.sleep(random.uniform(0.01, 0.05))
+            
             if char == '\n':
-                time.sleep(random.uniform(0.2, 0.4)); pyautogui.hotkey('shift', 'enter'); time.sleep(random.uniform(0.2, 0.4))
-            else: pyautogui.write(char)
-            if char == ' ': current_delay += random.uniform(0.05, 0.1)
+                print("⌨️ [Human] Shift+Enter (Line Break)")
+                time.sleep(random.uniform(0.2, 0.4))
+                # [CRITICAL] Shift+Space 사고 방지를 위해 명확하게 분리
+                pyautogui.keyDown('shift')
+                time.sleep(0.1)
+                pyautogui.press('enter')
+                time.sleep(0.1)
+                pyautogui.keyUp('shift') # 확실하게 뗌!
+                time.sleep(random.uniform(0.2, 0.4))
+            elif char == ' ':
+                # [CRITICAL] Space 누르기 전에 Shift가 눌려있으면 한/영 전환됨!
+                # 무조건 Shift 떼고 누르기
+                pyautogui.keyUp('shift') 
+                time.sleep(0.05) 
+                pyautogui.write(' ')
+                current_delay += random.uniform(0.05, 0.1)
+            else:
+                pyautogui.write(char)
+            
+            # 마우스 움직임 (클릭 X)
             self._jitter_mouse_during_typing(input_area)
-            time.sleep(current_delay); i += 1
+            
+            time.sleep(current_delay)
+            i += 1
 
     def _simulate_caret_navigation_safe(self, speed):
         steps_back = random.randint(2, 8)
