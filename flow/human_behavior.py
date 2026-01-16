@@ -344,41 +344,24 @@ class HumanActor:
         """
         대기 시간에 수행하는 딴짓 함수.
         area: {x1, y1, x2, y2} - 이 안에서만 놀아야 함!
+        [수정] 클릭, 드래그 삭제 -> 오직 이동과 스크롤만!
         """
         # 너무 자주 하면 정신 사나우니까 가끔만 (10% 확률)
         if random.random() > 0.1: return
 
-        action = random.choice(["move", "scroll", "drag", "click", "sleep"])
+        # [Safety] 클릭(click), 드래그(drag)는 위험하니까 뺌
+        action = random.choice(["move", "scroll", "sleep", "move", "sleep"]) # move/sleep 확률 높임
         
         try:
             if action == "move":
                 tx = random.randint(area['x1'], area['x2'])
                 ty = random.randint(area['y1'], area['y2'])
-                # 딴짓할 때는 wild=False (얌전하게)
+                # 딴짓할 때는 wild=False (얌전하게), 하지만 곡선으로
                 self.move_to(tx, ty, overshoot=False)
                 
             elif action == "scroll":
+                # 스크롤은 화면 내용에 영향 안 주니까 허용
                 pyautogui.scroll(random.randint(-100, 100))
-                
-            elif action == "drag":
-                # 드래그 시작점
-                sx = random.randint(area['x1'], area['x2'])
-                sy = random.randint(area['y1'], area['y2'])
-                self.move_to(sx, sy, overshoot=False)
-                
-                # 드래그 끝점 (영역 안에서)
-                ex = random.randint(area['x1'], area['x2'])
-                ey = random.randint(area['y1'], area['y2'])
-                
-                pyautogui.dragTo(ex, ey, duration=random.uniform(0.3, 0.8), button='left')
-                
-            elif action == "click":
-                # 클릭도 안전지대 안에서만!
-                cx = random.randint(area['x1'], area['x2'])
-                cy = random.randint(area['y1'], area['y2'])
-                self.move_to(cx, cy, overshoot=False)
-                time.sleep(0.1)
-                pyautogui.click()
                 
             elif action == "sleep":
                 # 잠깐 멍때리기
