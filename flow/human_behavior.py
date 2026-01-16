@@ -345,9 +345,13 @@ class HumanActor:
         대기 시간에 수행하는 딴짓 함수.
         area: {x1, y1, x2, y2} - 이 안에서만 놀아야 함!
         [수정] 클릭, 드래그 삭제 -> 오직 이동과 스크롤만!
+        [CRITICAL] AFK 모드 중에도 긴급 정지(마우스 던지기) 가능하게 함
         """
         # 너무 자주 하면 정신 사나우니까 가끔만 (10% 확률)
         if random.random() > 0.1: return
+
+        # [Safety] 시작 전 긴급 정지 체크
+        pyautogui.failSafeCheck()
 
         # [Safety] 클릭(click), 드래그(drag)는 위험하니까 뺌
         action = random.choice(["move", "scroll", "sleep", "move", "sleep"]) # move/sleep 확률 높임
@@ -365,7 +369,16 @@ class HumanActor:
                 
             elif action == "sleep":
                 # 잠깐 멍때리기
-                time.sleep(random.uniform(0.5, 2.0))
+                # 멍때리는 도중에도 멈출 수 있게 쪼개서 잠
+                sleep_time = random.uniform(0.5, 2.0)
+                steps = int(sleep_time / 0.1)
+                for _ in range(steps):
+                    time.sleep(0.1)
+                    pyautogui.failSafeCheck() # 자면서도 감시!
                 
+        except pyautogui.FailSafeException:
+            # 마우스 던지면 여기서 잡힘 -> 프로그램 종료 유도
+            print("🚨 [AFK] 긴급 정지 감지! (FailSafe)")
+            raise # 상위로 에러 전파해서 멈추게 함
         except Exception as e:
             print(f"👻 [AFK] Error: {e}")
