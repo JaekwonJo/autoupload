@@ -37,6 +37,8 @@ DEFAULT_CONFIG = {
     "interval_seconds": 180,
     "input_area": None,   # {x1, y1, x2, y2}
     "submit_area": None,  # {x1, y1, x2, y2}
+    "afk_area": None,     # [NEW] 딴짓 허용 영역 {x1, y1, x2, y2}
+    "afk_mode": False,    # [NEW] 사용자 없음 모드 활성화 여부
     "prompt_slots": [],
     "active_prompt_slot": 0
 }
@@ -447,6 +449,9 @@ class FlowVisionApp:
         btn_box.pack(fill="x")
         ttk.Button(btn_box, text="⬛ 입력창 영역 지정", command=lambda: self.start_capture("input")).pack(side="left", expand=True, fill="x", padx=2)
         ttk.Button(btn_box, text="⬛ 생성 버튼 영역 지정", command=lambda: self.start_capture("submit")).pack(side="left", expand=True, fill="x", padx=2)
+        # [NEW] 딴짓 영역 버튼
+        ttk.Button(btn_box, text="🟩 딴짓(AFK) 영역 지정", command=lambda: self.start_capture("afk")).pack(side="left", expand=True, fill="x", padx=2)
+        
         self.lbl_coords = tk.Label(coord_frame, text=self._get_coord_text(), bg="#1E1E2E", fg="#8BE9FD")
         self.lbl_coords.pack(pady=2)
 
@@ -456,14 +461,24 @@ class FlowVisionApp:
         
         ctrl_box = tk.Frame(run_frame, bg="#1E1E2E")
         ctrl_box.pack(fill="x")
-        tk.Label(ctrl_box, text="간격(초):", bg="#1E1E2E", fg="white").pack(side="left")
-        self.entry_interval = tk.Entry(ctrl_box, width=5)
-        self.entry_interval.insert(0, str(self.cfg.get("interval_seconds", 60)))
+        
+        # [NEW] 사용자 없음 모드 체크박스
+        self.afk_var = tk.BooleanVar(value=self.cfg.get("afk_mode", False))
+        chk_afk = tk.Checkbutton(ctrl_box, text="👻 사용자 없음 모드 (AFK)", variable=self.afk_var, 
+                                 command=self.on_afk_toggle, bg="#1E1E2E", fg="#F1FA8C", selectcolor="#1E1E2E", activebackground="#1E1E2E", activeforeground="#F1FA8C")
+        chk_afk.pack(side="top", anchor="w", padx=5, pady=5)
+        
+        inner_box = tk.Frame(ctrl_box, bg="#1E1E2E")
+        inner_box.pack(fill="x", pady=5)
+        
+        tk.Label(inner_box, text="간격(초):", bg="#1E1E2E", fg="white").pack(side="left")
+        self.entry_interval = tk.Entry(inner_box, width=5)
+        self.entry_interval.insert(0, str(self.cfg.get("interval_seconds", 180)))
         self.entry_interval.pack(side="left", padx=5)
         
-        self.btn_start = ttk.Button(ctrl_box, text="🌙 조용히 시작", style="Accent.TButton", command=self.on_start)
+        self.btn_start = ttk.Button(inner_box, text="🌙 조용히 시작", style="Accent.TButton", command=self.on_start)
         self.btn_start.pack(side="left", padx=10, fill="x", expand=True)
-        self.btn_stop = ttk.Button(ctrl_box, text="🛑 멈추기", command=self.on_stop, state="disabled")
+        self.btn_stop = ttk.Button(inner_box, text="🛑 멈추기", command=self.on_stop, state="disabled")
         self.btn_stop.pack(side="left", fill="x", expand=True)
 
         # [NEW] 인간화 설정 버튼 추가
@@ -509,12 +524,20 @@ class FlowVisionApp:
         self.log_text = ScrolledText(right_frame, height=10, bg="#000000", fg="#00FF00", font=("Consolas", 9), state="disabled")
         self.log_text.pack(fill="both", expand=True)
 
+    def on_afk_toggle(self):
+        self.cfg["afk_mode"] = self.afk_var.get()
+        self.save_config()
+        mode_text = "ON 🟢" if self.cfg["afk_mode"] else "OFF ⚪"
+        self.log(f"👻 사용자 없음 모드 (AFK): {mode_text}")
+
     def _get_coord_text(self):
         ia = self.cfg.get('input_area')
         sa = self.cfg.get('submit_area')
+        aa = self.cfg.get('afk_area')
         
         i_text = "미설정"
         s_text = "미설정"
+        a_text = "미설정"
         
         if ia:
             w, h = ia['x2'] - ia['x1'], ia['y2'] - ia['y1']
@@ -522,8 +545,11 @@ class FlowVisionApp:
         if sa:
             w, h = sa['x2'] - sa['x1'], sa['y2'] - sa['y1']
             s_text = f"✅설정됨 ({w}x{h})"
+        if aa:
+            w, h = aa['x2'] - aa['x1'], aa['y2'] - aa['y1']
+            a_text = f"✅설정됨 ({w}x{h})"
             
-        return f"상태: 입력창[{i_text}] / 버튼[{s_text}]"
+        return f"상태: 입력창[{i_text}] / 버튼[{s_text}] / 딴짓[{a_text}]"
 
     def log(self, msg):
         print(msg)
@@ -537,14 +563,19 @@ class FlowVisionApp:
         except: pass
 
     def start_capture(self, kind):
-        kind_text = "입력창" if kind == "input" else "생성 버튼"
+        if kind == "input": kind_text = "입력창"
+        elif kind == "submit": kind_text = "생성 버튼"
+        else: kind_text = "딴짓(AFK)"
         
         def on_captured(x1, y1, x2, y2):
             area = {"x1": x1, "y1": y1, "x2": x2, "y2": y2}
             if kind == "input":
                 self.cfg["input_area"] = area
-            else:
+            elif kind == "submit":
                 self.cfg["submit_area"] = area
+            else:
+                self.cfg["afk_area"] = area
+                
             self.save_config()
             self.lbl_coords.config(text=self._get_coord_text(), fg="#8BE9FD")
             messagebox.showinfo("성공", f"{kind_text} 영역 저장 완료!\n({x1},{y1}) ~ ({x2},{y2})")
@@ -631,6 +662,11 @@ class FlowVisionApp:
             remain = self.t_next - time.time()
             if remain > 0:
                 self.lbl_status.config(text=f"⏳ 다음 작업까지 {int(remain)}초...", fg="#F1FA8C")
+                
+                # [NEW] 사용자 없음 모드 (AFK) 실행
+                # 대기 시간 동안 가만히 있지 않고 딴짓을 함
+                if self.cfg.get("afk_mode") and self.cfg.get("afk_area"):
+                    self.actor.idle_action(self.cfg["afk_area"])
             
             # ETA 계산
             try: base = int(self.entry_interval.get())

@@ -314,3 +314,53 @@ class HumanActor:
     def aimless_drag(self):
         x, y = pyautogui.position()
         self._move_human_curve(x, y, x+random.randint(-100, 100), y+random.randint(-20, 20), random.uniform(0.5, 1.0))
+
+    # -------------------------------------------------------------------------
+    # [NEW] AFK Mode (사용자 부재중 모드)
+    # -------------------------------------------------------------------------
+    def idle_action(self, area):
+        """
+        대기 시간에 수행하는 딴짓 함수.
+        area: {x1, y1, x2, y2} - 이 안에서만 놀아야 함!
+        """
+        # 너무 자주 하면 정신 사나우니까 가끔만 (10% 확률)
+        if random.random() > 0.1: return
+
+        action = random.choice(["move", "scroll", "drag", "click", "sleep"])
+        
+        try:
+            if action == "move":
+                tx = random.randint(area['x1'], area['x2'])
+                ty = random.randint(area['y1'], area['y2'])
+                # 딴짓할 때는 wild=False (얌전하게)
+                self.move_to(tx, ty, overshoot=False)
+                
+            elif action == "scroll":
+                pyautogui.scroll(random.randint(-100, 100))
+                
+            elif action == "drag":
+                # 드래그 시작점
+                sx = random.randint(area['x1'], area['x2'])
+                sy = random.randint(area['y1'], area['y2'])
+                self.move_to(sx, sy, overshoot=False)
+                
+                # 드래그 끝점 (영역 안에서)
+                ex = random.randint(area['x1'], area['x2'])
+                ey = random.randint(area['y1'], area['y2'])
+                
+                pyautogui.dragTo(ex, ey, duration=random.uniform(0.3, 0.8), button='left')
+                
+            elif action == "click":
+                # 클릭도 안전지대 안에서만!
+                cx = random.randint(area['x1'], area['x2'])
+                cy = random.randint(area['y1'], area['y2'])
+                self.move_to(cx, cy, overshoot=False)
+                time.sleep(0.1)
+                pyautogui.click()
+                
+            elif action == "sleep":
+                # 잠깐 멍때리기
+                time.sleep(random.uniform(0.5, 2.0))
+                
+        except Exception as e:
+            print(f"👻 [AFK] Error: {e}")
