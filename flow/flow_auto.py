@@ -34,7 +34,7 @@ CONFIG_FILE = "flow_config.json"
 DEFAULT_CONFIG = {
     "prompts_file": "flow_prompts.txt",
     "prompts_separator": "|||",
-    "interval_seconds": 60,
+    "interval_seconds": 180,
     "input_area": None,   # {x1, y1, x2, y2}
     "submit_area": None,  # {x1, y1, x2, y2}
     "prompt_slots": [],
@@ -740,8 +740,9 @@ class FlowVisionApp:
             ix_rand = random.randint(ia['x1'], ia['x2'])
             iy_rand = random.randint(ia['y1'], ia['y2'])
             
-            self.actor.move_to(ix_rand, iy_rand)
-            pyautogui.click()
+            # [수정] 입력창 갈 때는 아주 화려하게! (wild_approach=True)
+            self.actor.move_to(ix_rand, iy_rand, wild_approach=True)
+            pyautogui.click() # 여기서 딱 한 번 클릭!
 
             # 2. 내용 지우기
             time.sleep(random.uniform(0.2, 0.5))
@@ -749,14 +750,14 @@ class FlowVisionApp:
             time.sleep(random.uniform(0.1, 0.3))
             pyautogui.press("backspace")
             
-            # [NEW] 3. 가끔 빈 공간 클릭 실수 (설정값 사용)
+            # [NEW] 3. 가끔 빈 공간 실수 (설정값 사용)
             if random.random() < self.actor.cfg["empty_click_rate"]:
-                self.actor.click_empty_space()
+                self.actor.click_empty_space() # 클릭 안함 (움직임만)
                 # 실수했으니 다시 입력창으로 (여기도 랜덤)
                 ix_retry = random.randint(ia['x1'], ia['x2'])
                 iy_retry = random.randint(ia['y1'], ia['y2'])
                 self.actor.move_to(ix_retry, iy_retry, overshoot=False)
-                pyautogui.click()
+                pyautogui.click() # 다시 돌아와서 클릭 (총 2회 클릭 유지)
 
             # [NEW] 3.5 시선 시뮬레이션 (입력 전 확인)
             if random.random() < self.actor.cfg["gaze_simulation"]:

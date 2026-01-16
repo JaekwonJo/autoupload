@@ -1,627 +1,211 @@
-장면 1
 
-영상 프롬프트: 3d pixar studio style, kawaii style, a cute rabbit holding a paper bill and sighing deeply in front of a broken elevator covered with spiderwebs, gloomy lighting, cinematic lighting, no voice, no speech, no text, sound effects only
+S1 (00:00:00 ~ 00:00:08)
+Scene Prompt : 3d pixar studio style. four gigantic golden fox statues standing majestically on top of massive ancient pillars in pitch black darkness, glowing with mysterious blue magical light, extreme low angle shot emphasizing the enormous scale, cinematic lighting. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 여러분이 아파트 관리비를 매달 20만 원씩 꼬박꼬박 냈습니다. 그런데 엘리베이터는 맨날 고장 나고, 복도 청소도 안 되어 있어요.
+S2 (00:00:08 ~ 00:00:18)
+Scene Prompt : 3d pixar studio style. hundreds of cute chubby white Korean Jindo dogs wearing red hoodies sitting on the dark floor, while a single cute chubby fox wearing a business suit magically shoots up into the sky riding a blinding beam of holy light, camera tracking the fox upward, magical particles. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S3 (00:00:18 ~ 00:00:27)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing a business suit dancing happily under a massive heavy rain of glowing golden dollar bills falling from the sky like a waterfall, magical sparkles and glittering effects filling the screen, rich atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 2
+S4 (00:00:27 ~ 00:00:36)
+Scene Prompt : 3d pixar studio style. a gigantic transparent magical fox hand descending from the clouds, picking up and moving illuminated skyscrapers in a miniature city like chess pieces, magical ripples in the air, god-like perspective. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, the rabbit knocking on a management office window, a fat bear in a suit inside the office opening the window while holding a coffee cup, arrogant expression, no voice, no speech, no text, sound effects only
+S5 (00:00:36 ~ 00:00:44)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing a business suit sitting like a king on top of a gigantic golden Charging Bull statue, looking down arrogantly at tiny animals below, golden dust floating in the air, cinematic lighting. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 너무 화가 나서 관리 사무소에 따졌더니, 소장이 이렇게 말하는 겁니다. "아~ 입주민님 죄송해요. 사실 입주민님이 낸 관리비로,
+S6 (00:00:44 ~ 00:00:53)
+Scene Prompt : 3d pixar studio style. extreme close-up of a cute fox head, the inside of the head magically becoming transparent to reveal a beautiful swirling galaxy of blue and gold neurons exploding with magical energy, cinematic visual effects, mysterious atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S7 (00:00:53 ~ 00:01:03)
+Scene Prompt : 3d pixar studio style. a cute chubby white Korean Jindo dog wearing a red hoodie struggling to carry a huge heavy pile of books up a steep hill, sweating hard, while a cute chubby fox wearing a business suit zooms past comfortably on a magical flying carpet, speed lines and blur. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 3
+S8 (00:01:03 ~ 00:01:11)
+Scene Prompt : 3d pixar studio style. a cute chubby white Korean Jindo dog wearing a red hoodie standing hopelessly in front of a gigantic iron gate that is tightly closed, magical golden light leaking out from the cracks of the gate, ominous shadow, low angle shot. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, the bear pointing a finger towards a distant shiny cafe building with bright lights, the rabbit looking shocked and confused, outdoor setting, no voice, no speech, no text, sound effects only
+S9 (00:01:11 ~ 00:01:22)
+Scene Prompt : 3d pixar studio style. four magical golden treasure chests floating in the air, suddenly opening simultaneously with blinding bursts of magical light and sparkles, revealing glowing secrets inside, cinematic magical atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 우리 아파트 수리 안 하고 저기 옆 동네에 카페 차리는 데 투자했거든요~!" 자, 이러면 여러분 기분이 어떠시겠어요?
+S10 (00:01:22 ~ 00:01:31)
+Scene Prompt : 3d pixar studio style. a cute chubby young fox wearing ragged clothes clinging desperately to the edge of a stormy cliff, hugging a thick book tightly as a lifeline, heavy rain and lightning striking in the background, dramatic atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S11 (00:01:31 ~ 00:01:41)
+Scene Prompt : 3d pixar studio style. a cute chubby owl wearing a graduation cap waving a magic wand at a rough grey stone, the stone magically exploding into sparkles and turning into a brilliant glowing diamond floating in the air, magical alchemy effect. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 4
+S12 (00:01:41 ~ 00:01:49)
+Scene Prompt : 3d pixar studio style. a cute chubby fox family wearing old clothes walking endlessly through a heavy blizzard, carrying heavy bags, a giant barbed wire fence blocking the horizon, sad and cold atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, close-up of the rabbit's face turning red with steam coming out of its ears in anger, cartoonish anger effect, cinematic lighting, no voice, no speech, no text, sound effects only
+S13 (00:01:49 ~ 00:01:57)
+Scene Prompt : 3d pixar studio style. a tiny wooden house standing on a barren field, suddenly a gigantic black metal boot descends from the sky and stomps on the house, smashing it completely, debris flying, dust rising, dramatic impact. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: "미친 거 아니야?" 하고 당장 멱살 잡으시겠죠? 그런데 말이죠... 지금 여러분이 매달 10만 원씩 내고 있는 '통신 요금'이,
+S14 (00:01:57 ~ 00:02:07)
+Scene Prompt : 3d pixar studio style. a cute chubby fox holding paper documents labelled "Land", the papers magically catching fire and turning into grey ash, blowing away in the wind, leaving the fox's hands empty, sad expression. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S15 (00:02:07 ~ 00:02:17)
+Scene Prompt : 3d pixar studio style. a raging fire burning down a whole village, but a single glowing blue translucent brain magically floats unharmed in the center of the flames, radiating a protective magical aura, contrast between fire and calm blue light. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 5
+S16 (00:02:17 ~ 00:02:26)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing a doctor's white coat and a cute chubby fox wearing a lawyer's suit standing back to back, reading floating glowing books intensely, magical runes and formulas circling around them, studious atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, a smartphone screen glowing brightly, gold coins with "TTZ" logo flying out of the screen like a fountain, a cute puppy watching it in surprise, magical atmosphere, no voice, no speech, no text, sound effects only
+S17 (00:02:26 ~ 00:02:35)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing ragged clothes stepping into a swirling magical blue portal, and instantly emerging from the other side in a bright modern city wearing a luxury suit, holding gold bars, magical transition. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 정확히 이런 꼴이라면 믿으시겠습니까? 지금 당장 여러분의 스마트폰을 켜서, '이번 달 통신 요금' 고지서를 확인해 보세요.
+S18 (00:02:35 ~ 00:02:44)
+Scene Prompt : 3d pixar studio style. close up of a cow plowing a field, then a fast magical camera transition to a cute chubby fox wearing smart glasses typing on a holographic keyboard in a futuristic server room, fast zoom out to show the scale of data center. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S19 (00:02:44 ~ 00:02:54)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing ancient robes gazing into a glowing magical crystal ball, seeing a holographic projection of Bitcoin logos and futuristic skyscrapers inside the ball, mystical atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 6
+S20 (00:02:54 ~ 00:03:02)
+Scene Prompt : 3d pixar studio style. a cute chubby white Korean Jindo dog wearing a red hoodie handing a toy house to a baby dog, but the toy house magically crumbles into sand and slips through their fingers, sad reality. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, three giant communication towers standing tall against a dark sky, neon signs on the towers reading "LG", "SK", "KT", imposing atmosphere, cinematic angle, no voice, no speech, sound effects only
+S21 (00:03:02 ~ 00:03:12)
+Scene Prompt : 3d pixar studio style. a cute chubby white Korean Jindo dog wearing a red hoodie shivering on a small wooden raft in rough ocean waves, while a cute chubby fox wearing a business suit surfs comfortably on the giant waves nearby, magical water effects. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 네, 맞습니다. 바로 그 통신사입니다. SK텔레콤, KT, LG유플러스. 우리는 이 회사들을 '통신 서비스 제공 회사'라고 알고 있습니다.
+S22 (00:03:12 ~ 00:03:21)
+Scene Prompt : 3d pixar studio style. a crowded library filled with cute chubby foxes wearing business suits arguing intensely, magical red and blue sparks flying from their mouths and colliding in the air like fireworks, energetic atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S23 (00:03:21 ~ 00:03:31)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing a business suit holding an open book and chanting loudly, magical glowing Greek letters and Hebrew characters floating in the air around the fox, illuminating the room with magical light. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 7
+S24 (00:03:31 ~ 00:03:39)
+Scene Prompt : 3d pixar studio style. a cute chubby white Korean Jindo dog wearing a red hoodie staring at a small crumbling sandcastle, then a fast magical camera transition to a cute chubby fox standing proudly in front of a gigantic majestic golden castle, cinematic contrast. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, wifi signals coming out of the towers but suddenly breaking and turning into red 'X' shapes, glitch effect, failure atmosphere, no voice, no speech, no text, sound effects only
+S25 (00:03:39 ~ 00:03:49)
+Scene Prompt : 3d pixar studio style. two cute chubby foxes wearing business suits debating intensely face to face, their heads glowing with bright blue magical light, intense magical lightning bolts shooting out from their brains, extreme brain training atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 내가 돈을 내면, 그 대가로 데이터를 주고 통화를 연결해 주는 서비스 회사라고요. 하지만... 죄송하지만 틀렸습니다.
+S26 (00:03:49 ~ 00:03:57)
+Scene Prompt : 3d pixar studio style. a grey classroom filled with cute chubby white Korean Jindo dogs wearing red hoodies sleeping on desks, magical "ZZZ" symbols floating in the air above their heads, quiet and lazy atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S27 (00:03:57 ~ 00:04:07)
+Scene Prompt : 3d pixar studio style. two cute chubby foxes wearing business suits throwing magical glowing balls of light to each other, the balls growing bigger and brighter with every throw, finally exploding into a massive beautiful magical fireworks display. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 8
+S28 (00:04:07 ~ 00:04:16)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing a business suit running happily but suddenly hitting an invisible glass wall, the wall cracks with a loud magical shattering sound and bright sparks, shockwave effect. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, the communication towers mechanically transforming into a giant bank building with a vault door, metallic texture, heavy industrial atmosphere, no voice, no speech, no text, sound effects only
+S29 (00:04:16 ~ 00:04:26)
+Scene Prompt : 3d pixar studio style. extreme close-up of a transparent fox brain, disconnected neural pathways magically reconnecting with intense blue electric sparks, repairing the brain network with dazzling special effects. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 지금 이 시점의 통신 3사는 더 이상 '통신 회사'가 아닙니다. 그들은 거대한 '투자 회사'로 변질되었습니다.
+S30 (00:04:26 ~ 00:04:35)
+Scene Prompt : 3d pixar studio style. a cute chubby white Korean Jindo dog family sitting at a dining table covered in grey dust, the room is dark and gloomy, no food on the table, heavy silence atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S31 (00:04:35 ~ 00:04:45)
+Scene Prompt : 3d pixar studio style. a cute chubby mother Jindo dog looking very angry and frowning with a scary face, while a cute chubby baby Jindo dog wearing a red hoodie is shivering in fear under a spotlight, high tension. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 9
+S32 (00:04:45 ~ 00:04:53)
+Scene Prompt : 3d pixar studio style. a cute chubby baby Jindo dog wearing a red hoodie sitting alone in a dark gloomy room, looking down with a very depressed and sad expression, shadows looming over him. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, many cute animals walking in a line carrying heavy backpacks, they look tired and unaware, coins dropping from their bags, no voice, no speech, no text, sound effects only
+S33 (00:04:53 ~ 00:05:02)
+Scene Prompt : 3d pixar studio style. a glowing green sprout growing on top of a cute chubby Jindo dog's head, but suddenly a magical purple energy beam shoots down and erasing the sprout instantly with a poof, disappearing magic. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 그리고 여러분은 그 회사의 서비스를 이용하는 '고객'이 아니라... 그들의 위험한 신사업에 강제로 자금을 대주는,
+S34 (00:05:02 ~ 00:05:07)
+Scene Prompt : 3d pixar studio style. a colorful cute chubby Jindo dog being painted completely grey by a magical floating paint roller that glows with grey light, the dog losing all colors and becoming dull, sad transformation. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S35 (00:05:07 ~ 00:05:14)
+Scene Prompt : 3d pixar studio style. a cute chubby fox family sitting at a bright dining table, talking and debating happily, magical golden speech bubbles and sparkles filling the air, warm and energetic atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 10
+S36 (00:05:14 ~ 00:05:24)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing ancient warrior clothes standing in a rocky desert valley, facing a gigantic cute chubby white bear wearing ancient armor, realistic historical reenactment, epic confrontation. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, a fat bear in a suit walking behind the animals, secretly picking up the dropped gold coins with "TTZ" logo and putting them in his pocket, sneaky expression, no voice, no speech, no text, sound effects only
+S37 (00:05:24 ~ 00:05:33)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing ancient warrior clothes holding a sling, a magical red laser beam shooting out from his eyes to lock on the target, preparing to throw a stone, special effect aiming. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: '의결권 없는 강제 투자자'이자, 든든한 '물주'가 되어버렸습니다. 오늘 이야기는 조금 불편할 수도 있습니다.
+S38 (00:05:33 ~ 00:05:41)
+Scene Prompt : 3d pixar studio style. a gigantic cute chubby white bear wearing ancient armor getting hit by a magical stone, exploding with magical puffs and sparks, falling down in slow motion, defeated atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S39 (00:05:41 ~ 00:05:49)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing a business suit manipulating a floating holographic map with hands, analyzing strategy with magical glowing lines and data particles, smart atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 11
+S40 (00:05:49 ~ 00:05:57)
+Scene Prompt : 3d pixar studio style. a gigantic cute chubby red robot labelled "Google" kicking a tiny cute chubby white Korean Jindo dog wearing a red hoodie, the dog flying away into the sky with a comic effect, overwhelming power difference. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, a detective cat holding a magnifying glass, tracking a trail of gold coins on the ground, mysterious atmosphere, low angle shot, no voice, no speech, no text, sound effects only
+S41 (00:06:01 ~ 00:06:10)
+Scene Prompt : 3d pixar studio style. a cute chubby red robot labelled "AI" wearing a yellow construction hard hat force-feeding a grey glowing magical block to a cute chubby white Korean Jindo dog wearing a red hoodie, the dog's body magically turning completely grey from feet to head with a magical gradient effect, sad atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 하지만 끝까지 들으시면, 여러분의 통신비가 도대체 어디로 사라지고 있는지... 그리고 우리가 왜 파이브G를 쓰면서도
+S42 (00:06:10 ~ 00:06:19)
+Scene Prompt : 3d pixar studio style. a gigantic cute chubby red robot labelled "AI" wearing a yellow construction hard hat picking up a cute chubby white Korean Jindo dog wearing a red hoodie, inserting the dog into a slot on its chest like a mechanical part, magical sparks and glowing fusion effects, mechanical locking sound. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S43 (00:06:19 ~ 00:06:28)
+Scene Prompt : 3d pixar studio style. a tiny cute chubby fox wearing a business suit shouting loudly at a gigantic stone golem blocking the way, the golem's body cracking with intense digital glitch effects and smoke coming out from the cracks, unstable shaking, chromatic aberration. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 12
+S44 (00:06:28 ~ 00:06:37)
+Scene Prompt : 3d pixar studio style. a squad of cute chubby foxes wearing military uniforms performing magical hand gestures, summoning glowing unicorn-shaped missiles that fly rapidly in the sky leaving rainbow trails, futuristic magical warfare atmosphere, neon particles. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, the detective cat looking at a giant secret door opening slowly, bright light pouring out from the door, revealing a hidden truth, cinematic lighting, no voice, no speech, no text, sound effects only
+S45 (00:06:37 ~ 00:06:46)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing a private soldier uniform grabbing the tie of a gigantic cute chubby white bear wearing a general uniform decorated with many medals, arguing confidently face to face, red and blue intense electric sparks flying between them, high tension. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 속이 터져야 하는지, 그 소름 돋는 진실을 알게 되실 겁니다. 자, 마음의 준비 단단히 하시고... 똑똑즈 경제학교, 지금 바로 시작합니다!
+S46 (00:06:46 ~ 00:06:55)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing a private soldier uniform opening a magical holographic blue map that glows brightly, while a cute chubby white bear wearing a general uniform holds an old paper map that suddenly burns away into ash, magical contrast between tech and old. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S47 (00:06:55 ~ 00:07:04)
+Scene Prompt : 3d pixar studio style. a cute chubby white bear wearing a general uniform shaking hands with a cute chubby fox wearing a private soldier uniform, camera zooming out rapidly to reveal the entire battlefield transforming into a magnificent golden festival city with confetti and magical fireworks exploding. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 13
+S48 (00:07:04 ~ 00:07:13)
+Scene Prompt : 3d pixar studio style. two cute chubby foxes wearing business suits wrestling with each other in a meeting room, but instead of violence, bright blue and red magical energy auras are mixing and swirling around them, creating a new bright purple light, dynamic camera angle. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, clouds in the sky moving rapidly backwards to show time rewinding, then transitioning to a festive party scene with confetti, bright and happy atmosphere, no voice, no speech, no text, sound effects only
+S49 (00:07:13 ~ 00:07:22)
+Scene Prompt : 3d pixar studio style. two cute chubby foxes wearing business suits walking out of a door with arms around each other's shoulders laughing, magical rocket boosters appearing on their backs and igniting with blue flames, propelling them forward. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 시계를 딱 6년 전으로 돌려보겠습니다. 2019년, 기억하시나요? 세계 최초 5G 상용화! 대한민국 만세!
+S50 (00:07:31 ~ 00:07:40)
+Scene Prompt : 3d pixar studio style. a cute chubby white Korean Jindo dog wearing a red hoodie sweating profusely and trying to hide a flashing red warning light with its body, while a gigantic scary tiger boss wearing a suit stares down from behind with glowing yellow eyes, ominous shadow. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S51 (00:07:40 ~ 00:07:49)
+Scene Prompt : 3d pixar studio style. a cute chubby white Korean Jindo dog wearing a red hoodie being swept away by a massive dark tsunami wave, while a cute chubby fox wearing a business suit surfs skillfully on top of the same giant wave, magical water splash effects. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 14
+S52 (00:07:49 ~ 00:07:58)
+Scene Prompt : 3d pixar studio style. a cute chubby white bear wearing a white suit pouring magical glittering water from a golden watering can onto a withered fox sapling, the water glowing with magical life energy, sparkles falling. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, a retro TV set showing a rocket launching into space with tremendous speed, high energy, colorful screen, no voice, no speech, no text, sound effects only
+S53 (00:07:58 ~ 00:08:07)
+Scene Prompt : 3d pixar studio style. a cute chubby white bear wearing a white suit giving a glowing blue potion bottle to a fainting fox, the fox drinking it and instantly standing up with a powerful magical aura, resurrection effect. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: TV만 틀면 나왔습니다. "LTE보다 20배 빠르다!", "영화 한 편을 1초 만에 다운로드한다!"
+S54 (00:08:07 ~ 00:08:16)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing a business suit jumping off a high cliff without fear, a magical glowing safety net appearing instantly at the bottom, bouncing the fox back up higher into the sky, magical bounce effect. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S55 (00:08:16 ~ 00:08:25)
+Scene Prompt : 3d pixar studio style. a cute chubby white Korean Jindo dog wearing a red hoodie falling from a cliff into a dark sticky black swamp, sinking slowly with no help, reaching out hand, gloomy fog and despair atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 15
+S56 (00:08:16 ~ 00:08:25)
+Scene Prompt : 3d pixar studio style. hundreds of cute chubby white Korean Jindo dogs wearing red hoodies running frantically into a thick grey concrete bunker and closing the heavy steel door tight, hiding from the world, claustrophobic atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, a cute dog playing soccer in a virtual reality headset, a cat figure skating gracefully, dynamic movement, futuristic background, no voice, no speech, no text, sound effects only
+S57 (00:08:25 ~ 00:08:34)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing a business suit walking on a glowing magical tightrope high above the city, sparks flying from the rope, looking confident, while Jindo dogs watch enviously from small bunker windows below. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 손흥민 선수가 나와서 가상 현실에서 공을 차고, 김연아 선수가 나와서 춤을 췄죠. 우리는 그 화려한 광고에 혹해서,
+S58 (00:08:34 ~ 00:08:43)
+Scene Prompt : 3d pixar studio style. a large glass painting of a greedy ugly fox shattering into a million pieces with a loud crash, revealing a beautiful cute chubby fox with glowing white angel wings standing behind it, magical holy light. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S59 (00:08:43 ~ 00:08:52)
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing a business suit hitting a cracked Earth globe with a magical golden hammer, golden light seeping out from the cracks and magically repairing the planet, kintsugi effect. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 16
+S60 (00:08:52 ~ 00:09:01)
+Scene Prompt : 3d pixar studio style. millions of cute chubby foxes around the world magically connecting with each other via glowing golden laser beams, forming a massive web of light covering the entire planet, network effect visualization. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, a line of happy animals paying gold coins with "TTZ" logo and receiving shiny golden tickets, excited expressions, bright lighting, no voice, no speech, no text, sound effects only
+S61
+Scene Prompt : 3d pixar studio style. a cute chubby fox wearing a business suit throwing a small glowing golden ball into the sky, the ball magically turning into a gigantic blinding comet of light and returning to the fox's hand with a massive impact, boomerang effect. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 비싼 파이브G 요금제에 가입했습니다. 기존 LTE보다 2~3만 원은 더 비쌌지만, "20배 빠르다는데 이 정도는 써야지" 하면서요.
+S62
+Scene Prompt : 3d pixar studio style. a dark mysterious room filled with hundreds of giant floating diamonds spinning slowly in the air, a cute chubby fox wearing a business suit standing in the center admiring the sparkling jewels, magical reflection lighting, no paper documents visible. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S63
+Scene Prompt : 3d pixar studio style. two cute chubby foxes wearing business suits shaking hands firmly, a blindingly bright magical seal symbol appearing instantly between their hands with a loud boom, radiating intense blue shockwaves of trust, powerful atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 17
+S64
+Scene Prompt : 3d pixar studio style. cute chubby foxes wearing business suits exchanging glowing golden items at supersonic light speed, leaving neon motion blur trails behind them, extreme speed lines, dynamic camera tracking. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, a cat sitting at an old bus stop looking at a smartphone, a loading circle icon spinning endlessly on the screen, the cat looks bored and frustrated, no voice, no speech, no text, sound effects only
+S65
+Scene Prompt : 3d pixar studio style. a cute chubby white Korean Jindo dog wearing a red hoodie buried under a mountain of falling white paper documents, struggling to get out but sinking deeper, claustrophobic atmosphere, paper flying everywhere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 그런데 여러분. 현재... 여러분의 스마트폰 속도는 정말 LTE보다 20배 빠른가요? 솔직히 말해볼까요?
+S66
+Scene Prompt : 3d pixar studio style. a gigantic glowing hand of God descending from the clouds with blinding holy light, while a cute chubby fox wearing a business suit kneels down on the floor and bows respectfully to the hand, receiving the divine mandate, religious and majestic atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
+S67
+Scene Prompt : 3d pixar studio style. a rich cute chubby fox tapping the shoulder of a poor fox wearing rags with a magic wand, the poor fox instantly transforming into a wealthy fox wearing a shiny tuxedo with a magical morphing effect, sparkles flying. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면 18
+S68
+Scene Prompt : 3d pixar studio style. a cute chubby fox slamming a staff into the dry ground, causing the earth to crack open and a massive river of liquid gold to erupt and flow violently, flooding the entire landscape with gold, epic scale. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-영상 프롬프트: 3d pixar studio style, kawaii style, the cat holding the phone, a balloon shaped like a broken signal icon floating above the phone, the balloon looks deflated and sad, no voice, no speech, no text, sound effects only
+S69
+Scene Prompt : 3d pixar studio style. a cute chubby white Korean Jindo dog wearing a red hoodie holding a golden apple, but other Jindo dogs around him are angrily throwing sticky brown mud at him, covering him in dirt, jealous atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-장면설명: 가끔은 느려서 속터질때도 있지 않나요? 도대체 왜 이런 일이 벌어졌을까요? 범인은 바로 '주파수'에 있습니다.
+S70
+Scene Prompt : 3d pixar studio style. a cute chubby white Korean Jindo dog holding a tiny soy sauce dish in the rain, then a fast magical camera transition to a group of cute chubby foxes standing confidently on top of a gigantic golden dam, looking down at the massive reservoir of water, extreme scale contrast. high fidelity cinematic sound effects, foley, ambience and bgm. kawaii style. |||
 
-|||
-
-장면 19
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a straight blue laser beam shooting through the city, very fast and sharp, sci-fi atmosphere, neon blue light, no voice, no speech, no text, sound effects only
-
-장면설명: 당시 통신사가 광고했던 '20배 빠른 속도'는, 이십팔 기가헤르츠라는 초고주파 대역을 써야만 나오는 이론적인 속도였습니다.
-
-|||
-
-장면 20
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the blue laser beam hitting a brick wall and bouncing off, failing to pass through, sparks flying, simple physics demonstration, no voice, no speech, no text, sound effects only
-
-장면설명: 이 주파수는 속도는 엄청나게 빠르지만, 직진성이 너무 강해서 벽을 뚫지 못합니다. 즉, 기지국을 정말 촘촘하게,
-
-|||
-
-장면 21
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a miniature city model, small mushroom-like antennas popping up rapidly in every alley and corner, time-lapse effect, no voice, no speech, no text, sound effects only
-
-장면설명: 골목마다, 가로등마다 설치해야만 쓸 수 있는 기술이었죠. 통신사들은 정부한테 약속했습니다.
-
-|||
-
-장면 22
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the bear in a suit shaking hands with a lion wearing a crown, formal atmosphere, agreement scene, no voice, no speech, no text, sound effects only
-
-장면설명: "저희가 기지국 열심히 깔아서, 국민들에게 진짜 파이브G 세상 열어주겠습니다!" 정부는 그 말을 믿고,
-
-|||
-
-장면 23
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the lion taking back a glowing blue gem from the bear's hand, the bear looks disappointed, serious atmosphere, no voice, no speech, no text, sound effects only
-
-장면설명: 세금 혜택까지 줘가며 주파수를 할당해 줬습니다. 하지만 결과는 어땠을까요? 2023년, 정부는 통신 3사 모두에게서 이십팔 기가헤르츠주파수를 강제로 회수했습니다.
-
-|||
-
-장면 24
-
-영상 프롬프트: 3d pixar studio style, kawaii style, an empty construction site with weeds growing, rusted equipment, windy and desolate atmosphere, no voice, no speech, no text, sound effects only
-
-장면설명: 이유는 단 하나. "약속했던 기지국 투자를 이행하지 않았다." 쉽게 말해서, 통신사들이 계산기를 두드려보니,
-
-|||
-
-장면 25
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the bear lying down comfortably on a sofa, picking its teeth, ignoring the construction plan on the table, lazy attitude, no voice, no speech, no text, sound effects only
-
-
-|||
-장면 26
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a small withered flower in front of a tombstone, a lightning bolt shape on the flower is fading away, raining, gloomy and sad atmosphere, cinematic lighting, no voice, no speech, no text, sound effects only
-
-장면설명: 결국 '진짜 파이브G'는 대한민국에서 공식적으로 사망했습니다. 우리가 지금 쓰고 있는 파이브G는요, 3.5기가헤르츠주파수 대역입니다.
-
-|||
-
-장면 27
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a cute turtle with a toy rocket strapped to its shell, the turtle is crawling very slowly, the rocket is not firing, humorous and ironic atmosphere, no voice, no speech, no text, sound effects only
-
-장면설명: 이건 LTE보다 조금 더 빠를 뿐, 애초에 광고했던 '초현실적인 속도'와는 거리가 멉니다.
-
-|||
-
-장면 28
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a shiny red sports car hood opening up to reveal rusty bicycle pedals inside instead of a powerful engine, disappointment, ironic atmosphere, no voice, no speech, no text, sound effects only
-
-장면설명: 우리는 페라리 가격을 내고 샀는데, 뚜껑만 바꾼 소나타를 받은 셈이죠. 더 충격적인 건 뭔지 아십니까?
-
-|||
-
-장면 29
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a boxing ring, a small determined fox wearing boxing gloves trying to climb into the ring, spotlight, anticipation, no voice, no speech, no text, sound effects only
-
-장면설명: 작년이죠? 2024년 7월. 정부는 통신 3사의 독과점을 깨겠다며 '제4이동통신사' 스테이지엑스를 선정했다가,
-
-|||
-
-장면 30
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a referee zebra blowing a whistle and pointing 'out' to the fox, three giant bears standing in the ring looking triumphant, no voice, no speech, no text, sound effects only
-
-장면설명: 자본금 문제로 결국 선정을 취소했습니다. 이게 무슨 뜻일까요? "이제 대한민국 통신 시장에, 너희, (통신 3사)를 위협할 경쟁자는 영원히 없다."
-
-|||
-
-장면 31
-
-영상 프롬프트: 3d pixar studio style, kawaii style, three giant bears in suits dancing arrogantly on the stage, shaking their hips towards the camera, colorful stage lights, party atmosphere, no voice, no speech, no text, sound effects only
-
-장면설명: 이런 '면죄부'가 쥐어진 겁니다. 경쟁자가 없어진 독점 시장... 과연 기업들이 소비자 눈치를 볼까요? 아니요. 그때부터 진짜 '착취'가 시작됩니다.
-
-|||
-
-장면 32
-
-영상 프롬프트: 3d pixar studio style, kawaii style, detective cat following a complex pipeline system, looking at a rusty pipe with no water coming out, curious expression, flashlight, no voice, no speech, no text, sound effects only
-
-장면설명: 자, 여기서부터가 오늘 이야기의 핵심입니다. 통신사들이 기지국 설치할 돈을 아꼈다고 했죠? 그럼 그 아낀 돈... 다 어디로 갔을까요?
-
-|||
-
-장면 33
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a large bank vault door wide open, the inside is completely empty with spiderwebs and dust, wind blowing, echo effect, no voice, no speech, no text, sound effects only
-
-장면설명: 회수된 주파수 값? 설치 안 한 기지국 비용? 그 수조 원의 현금이 회사 금고에 그대로 쌓여 있을까요? 아니요. 그 돈은 이미 다 썼습니다.
-
-|||
-
-장면 34
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a bear CEO standing on a podium giving a speech, wearing glasses and a suit, background screen changing, formal atmosphere, press conference, no voice, no speech, no text, sound effects only
-
-장면설명: 어디에요? 바로 'De-Telecom'. 즉, 탈통신사업에요. 올해 초 통신 3사 CEO들의 신년사를 꼼꼼히 뜯어보신 분 계신가요?
-
-|||
-
-장면 35
-
-영상 프롬프트: 3d pixar studio style, kawaii style, close up of the bear CEO's glasses reflecting streams of binary code and data rapidly, intense look, no voice, no speech, no text, sound effects only
-
-장면설명: 아마 없으시겠죠. 재미없으니까요. 하지만 저는 다 읽어봤습니다. 그리고 소름이 돋았습니다. SK텔레콤, KT, LG유플러스... 3사 CEO 모두 약속이라도 한 듯,
-
-|||
-
-장면 36
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a presentation screen behind the bear showing a cartoon antenna being thrown into a trash can, and a robot appearing, simple graphic, no voice, no speech, no text, sound effects only
-
-장면설명: '통신 품질 개선'이라는 말은 쏙 빼놓고, 'AI Company', 'AX, 그러니까 인공지능 전환)과 UAM. 즉, 도심 항공 교통같은 단어만 수십 번 외치고 있었습니다.
-
-|||
-
-장면 37
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the bear holding an old rotary telephone, shaking his head in disappointment, putting the phone down on the floor, no voice, no speech, no text, sound effects only
-
-장면설명: 이게 무슨 뜻인지 해석해 드릴까요? "주주 여러분! 통신업은 이제 성장이 멈췄습니다. 더 이상 돈이 안 돼요."
-
-|||
-
-장면 38
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a row of cute rabbits, gold coins with "TTZ" logo dropping from their mouths mechanically like slot machines, rhythmic motion, factory atmosphere, no voice, no speech, no text, sound effects only
-
-장면설명: "하지만 걱정 마세요. 우리에겐 5,000만 국민이 매달 꼬박꼬박 내주는 통신비라는 현금 인출기가 있습니다."
-
-|||
-
-장면 39
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the bear collecting the "TTZ" coins in a large sack, pouring the coins onto a model of a futuristic shiny building, sparkling effect, no voice, no speech, no text, sound effects only
-
-장면설명: "우리는 이 돈을 몽땅 뽑아서, AI 데이터센터 짓고, 호텔 사업하고 하겠다!" 이겁니다. 여러분이 낸 10만 원짜리 요금제.
-
-|||
-
-장면 40
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the bear giving just one coin to a raccoon wearing a hard hat, and giving a huge pile of coins to a shiny robot, unfairness, no voice, no speech, no text, sound effects only
-
-장면설명: 그중에서 진짜 통신망 유지 보수에 쓰이는 돈은 극히 일부입니다. 나머지는 전부 통신사의 '신사업 투자금'으로 흘러들어갑니다.
-
-|||
-
-장면 41
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a gigantic heavy money sack falling from the sky and hitting the ground with a thud, dust rising, heavy weight, no voice, no speech, no text, sound effects only
-
-장면설명: 2025년 올해 통신 3사의 설비투자, (CAPEX) 규모는 약 7조원 수준입니다. 숫자만 보면 "어? 투자 많이 하네?" 싶으시죠? 하지만 그 내역을 뜯어보면 기가 찹니다.
-
-|||
-
-장면 42
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a knife slicing open the money sack, golden light coming out from the cut, anticipation, no voice, no speech, no text, sound effects only
-
-장면설명: 과거에는 이 돈의 대부분이 기지국 세우고 케이블 까는 데 쓰였습니다. 하지만 지금은요?
-
-|||
-
-장면 43
-
-영상 프롬프트: 3d pixar studio style, kawaii style, green glowing computer chips spilling out of the sack instead of coins, neon green lighting, futuristic tech vibe, no voice, no speech, no text, sound effects only
-
-장면설명: 절반 이상이 'IDC' 그러니까 AI데이터센터 짓고, '클라우드 서버' 사는 데 쓰이고 있습니다. 통신사가 기지국 대신 엔비디아 GPU를 사고 있다는 뜻입니다. 왜냐고요?
-
-|||
-
-장면 44
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the green chips stacking up by themselves to form a large upward pointing arrow, the bear clapping hands happily, success atmosphere, no voice, no speech, no text, sound effects only
-
-장면설명: AI 사업은 대박이 터지면 주가가 오르거든요. 호텔 사업, 렌털 사업... 돈 되거든요.
-
-|||
-
-장면 45
-
-영상 프롬프트: 3d pixar studio style, kawaii style, an old tired cow standing alone in a field, looking exhausted, sad big eyes, cinematic lighting, no voice, no speech, no text, sound effects only
-
-장면설명: 하지만 통신망 투자는? 해봤자 티도 안 나고, 요금 더 받을 명분도 없습니다. 경영진 입장에서 통신 사업은, 젖소입니다. 캐시카우.
-
-|||
-
-장면 46
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a milking machine attached to the cow extracting milk rapidly, the food trough in front of the cow is completely empty, industrial atmosphere, no voice, no speech, no text, sound effects only
-
-장면설명: 더 이상 먹이를 주지 않아도, 젖은. 그니까, 현금은 계속 나오는 늙은 소 취급을 하는 겁니다.
-
-|||
-
-장면 47
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the milk flowing through a clear pipe and filling up the fuel tank of a rocket ship where the bear is sitting, sci-fi mix, no voice, no speech, no text, sound effects only
-
-장면설명: 우리는 '빠른 데이터'를 사려고 돈을 냈는데, 그 돈은 엉뚱하게도 통신사 사장님의 '벤처 사업 자금'으로 전용되고 있는 겁니다.
-
-|||
-
-장면 48
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the rocket launching into the sky, animals in suits standing on a high balcony toasting with wine glasses, celebration, no voice, no speech, no text, sound effects only
-
-장면설명: 심지어 우리가 그 회사의 주주도 아닌데 말이죠! 이익은 주주들이 챙겨가고, 사업 실패의 리스크는 꼬박꼬박 요금을 내는 우리 '호갱'들이 짊어지는 구조.
-
-|||
-
-장면 49
-
-영상 프롬프트: 3d pixar studio style, kawaii style, thick smoke and dust from the rocket launch covering the cute rabbits on the ground, they are coughing and covered in gray dust, sad atmosphere, no voice, no speech, no text, sound effects only
-
-장면설명: 이것이 바로 대한민국 통신 시장의 적나라한 '작동 메커니즘'입니다.
-
-|||
-
-장면 50
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a smart-looking rabbit wearing glasses raising its hand amidst the smoke, asking a question, spotlight on the rabbit, no voice, no speech, no text, sound effects only
-
-장면설명: 여기서 눈치 빠른 똑똑이들은 이렇게 반문하실 겁니다. "아니, 그러면 파이브G 안 쓰면 되잖아! 그냥 LTE 쓰면 되는 거 아냐?"
-
-|||
-
-장면 51
-
-영상 프롬프트: 3d pixar studio style, kawaii style, three bears in suits huddled together whispering and plotting something, dark background with a spotlight on them, sneaky atmosphere, no voice, no speech, no text, sound effects only
-
-장면설명: 그래서 그들은 아주 은밀하고 치사한 작전을 썼습니다. 이른바 'LTE 고사 작전'입니다. 최근 정부가 발표한 2024년 통신 품질 평가 결과를 보셨나요?
-
-|||
-
-장면 52
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a snail crawling next to a smartphone screen, the snail is moving faster than the loading bar on the screen, humorous comparison, no voice, no speech, no text, sound effects only
-
-장면설명: 파이브G 속도는 그나마 조금씩 빨라지고 있습니다. (물론, 광고보단 느리지만요.) 그런데 LTE 속도는요? 기존보다 느려진 곳이 수두룩합니다.
-
-|||
-
-장면 53
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a busy subway station filled with cute animals, everyone looking at their phones in frustration, shaking their phones, chaotic atmosphere, no voice, no speech, no text, sound effects only
-
-장면설명: 특히 사람이 몰리는 강남역, 홍대 입구, 지하철 출퇴근 시간... LTE 데이터가 아예 먹통이 되는 경험, 다들 한 번쯤 있으시죠? 이게 단순히 사람이 많아서일까요?
-
-|||
-
-장면 54
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a bear worker taking a shiny pipe from an old machine and moving it to a new machine, leaving the old machine broken, industrial setting, no voice, no speech, no text, sound effects only
-
-장면설명: 전문가들은 '주파수 재할당'과 '장비 노후화'를 원인으로 꼽습니다. 통신사들이 파이브G 속도를 높이기 위해, 기존 LTE가 쓰던 주파수 일부를 파이브G로 돌려막기 하거나,
-
-|||
-
-장면 55
-
-영상 프롬프트: 3d pixar studio style, kawaii style, an old rusty machine sparking and smoking, but the bear worker ignores it and walks away, negligence, no voice, no speech, no text, sound effects only
-
-장면설명: 노후된 LTE 장비를 교체하지 않고 방치하고 있다는 의혹입니다. 생각해 보세요. 여기 'LTE'라는 이름의 무료 국도가 있고, 그 옆에 '파이브G'라는 비싼 유료 고속도로가 개통됐습니다.
-
-|||
-
-장면 56
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a split road, one side is a bumpy dirt road with many cars, the other side is a shiny empty highway with a high toll booth, high angle shot, no voice, no speech, no text, sound effects only
-
-장면설명: 그런데 사람들이 파이브G 고속도로가 비싸기만 하고 별로 안 빠르다는 걸 눈치채고, 자꾸 옛날 LTE 국도로만 다니는 겁니다. 그럼 도로 공사(통신사) 사장님이 어떻게 할까요?
-
-|||
-
-장면 57
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a bear putting up a "Construction Stopped" sign (symbol/icon) on the dirt road and then going to sleep, lazy atmosphere, no voice, no speech, no text, sound effects only
-
-장면설명: 국도에 바리케이드를 칠까요? 에이, 그러면 욕먹죠. 훨씬 더 교묘한 방법을 씁니다. 바로 '국도 보수 공사'를 멈추는 겁니다.
-
-|||
-
-장면 58
-
-영상 프롬프트: 3d pixar studio style, kawaii style, cars on the dirt road bouncing violently due to potholes, drivers looking dizzy and angry, comic effect, no voice, no speech, no text, sound effects only
-
-장면설명: 아스팔트가 깨지고, 포트홀이 생겨서 차가 덜컹거려도... "아유~ 예산이 없어서 수리를 못 하겠네~" 하면서 그냥 방치하는 겁니다.
-
-|||
-
-장면 59
-
-영상 프롬프트: 3d pixar studio style, kawaii style, angry drivers turning their steering wheels towards the expensive toll gate, paying lots of gold coins reluctantly, no voice, no speech, no text, sound effects only
-
-장면설명: 운전자들이 "아오! 진짜 길이 험해서 못 다니겠네! 더러워서 돈 내고 고속도로 탄다!"라고 하면서 핸들을 꺾을 때까지요. 지금 여러분이 겪고 있는 LTE 속도 저하.
-
-|||
-
-장면 60
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a giant glass fish tank, cute fish swimming inside but hitting the glass walls, realizing there is no exit, trapped atmosphere, no voice, no speech, no text, sound effects only
-
-장면설명: 어쩌면 우리가 비싼 파이브G 요금제로 넘어갈 수밖에 없게 만드는... 도로 공사 측의 '고의적인 직무 유기'. 즉, 우리는 통신사가 쳐놓은 고도로 설계된, 거대한 가두리 양식장 안에 갇혀 있는 물고기일지도 모릅니다.
-
-|||
-
-장면 61
-
-영상 프롬프트: 3d pixar studio style, kawaii style, an ATM machine with a bear face, rabbits inserting cards and money endlessly, the machine laughing, dark humor, no voice, no speech, no text, sound effects only
-
-장면설명: 파이브G로 가자니 너무 비싸고, LTE에 남으려니 너무 답답하고. 도망칠 곳이 없습니다. 제4이동통신사라는 비상구마저 폐쇄된 지금, 우리는 꼼짝없이 그들의 AI 사업 투자금을 대주는 ATM 기계가 되어버린 겁니다.
-
-|||
-
-장면 62
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a cute rabbit with a determined headband tying a bandana around its head, preparing for a fight, fiery background, energetic atmosphere, no voice, no speech, no text, sound effects only
-
-장면설명: 자, 지금까지 이야기를 듣고 나니 속이 부글부글 끓으시죠? "그래서 어쩌라고? 스마트폰 없이 산속에 들어가서 살라는 거야?" "대안도 없이 화만 돋우는 거 아냐?" 아니요. 똑똑즈가 누굽니까?
-
-|||
-
-장면 63
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a rabbit holding a magnifying glass and picking only the ripe red cherries from a tree, rejecting the rotten ones, smart consumer vibe, no voice, no speech, no text, sound effects only
-
-장면설명: 절대 그냥 당하고만 있을 수는 없죠. 우리는 이 기울어진 운동장에서, 최대한 현명하게 내 돈을 지키는 '생존 전략'을 찾아야 합니다. 통신사의 '탈통신 전략'을 역이용하는, 아주 스마트한 '체리피커'가 되는 법입니다.
-
-|||
-
-장면 64
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the rabbit holding a simple clean phone in one hand and a heavy golden phone in the other, weighing them, comparison, no voice, no speech, no text, sound effects only
-
-장면설명: 첫 번째 전략. '알뜰폰'으로의 망명입니다. "에이, 알뜰폰? 그거 통화 품질 구린 거 아니야?" "노인들이나 쓰는 효도폰 아니야?" 아직도 이런 구시대적인 마인드를 가진 분들이 계신다면, 정말 반성하셔야 합니다.
-
-|||
-
-장면 65
-
-영상 프롬프트: 3d pixar studio style, kawaii style, two identical signal towers, one has a "Big 3" logo (Bear), the other has a "Thrifty" logo (Rabbit), both emitting the exact same strong signal waves, no voice, no speech, no text, sound effects only
-
-장면설명: 그건 통신 3사가 수조 원의 마케팅비를 써서 여러분 뇌 속에 심어놓은 '가짜 공포'입니다. 팩트만 말씀드릴게요. 알뜰폰은 통신 3사의 통신망을 그대로 '도매가'로 빌려서 씁니다.
-
-|||
-
-장면 66
-
-영상 프롬프트: 3d pixar studio style, kawaii style, split screen effect (conceptually), on one side a bear building a huge hotel and robot, on the other side a rabbit just holding a phone antenna, simple vs complex, no voice, no speech, no text, sound effects only
-
-장면설명: SKT망 알뜰폰을 쓰면, SKT와 100% 똑같은 기지국, 똑같은 주파수를 씁니다. 품질 차이? 물리적으로 존재할 수가 없습니다. 그런데 가격은 왜 절반일까요? 알뜰폰 회사는 '멤버십 포인트'가 없습니다.
-
-|||
-
-장면 67
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the rabbit showing empty pockets but looking happy, the bear showing pockets full of heavy tools for hotel construction, contrast, no voice, no speech, no text, sound effects only
-
-장면설명: 그리고 결정적으로... 알뜰폰 회사는 아까 말한 'AI 데이터센터'를 지을 필요가 없습니다. 호텔 사업도 안 하고, UAM 사업도 안 합니다. 그들은 오직 '통신'만 합니다.
-
-|||
-
-장면 68
-
-영상 프롬프트: 3d pixar studio style, kawaii style, two identical delicious cakes, one has a price tag of 10 coins, the other 5 coins, the rabbit happily chooses the 5 coin cake, smart choice, no voice, no speech, no text, sound effects only
-
-장면설명: 즉, 통신 3사가 여러분의 요금에서 떼어가던 '신사업 투자금' 거품이 쫙 빠진 가격. 그게 바로 알뜰폰 요금인 겁니다. 여러분이 알뜰폰으로 갈아타는 순간,
-
-|||
-
-장면 69
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the rabbit taking off a heavy backpack labeled "Investment" and throwing it away, feeling light and flying into the sky, freedom, no voice, no speech, no text, sound effects only
-
-장면설명: 여러분은 더 이상 통신 3사의 '강제 투자자'가 아닙니다. 순수하게 통신 서비스만 이용하는 '스마트한 소비자'로 돌아오는 겁니다. 두 번째 전략. '약정의 노예'에서 해방되세요.
-
-|||
-
-장면 70
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a bear putting golden handcuffs on a rabbit's wrists, the rabbit looking uncomfortable, symbol of contract, no voice, no speech, no text, sound effects only
-
-장면설명: 통신사가 제일 좋아하는 고객이 누군지 아십니까? "최신 폰 나오면 무조건 기기 변경하고, 2년 약정 꽉 채우고, 고가 요금제 6개월 유지해 주는 고객." 이런 분들을 업계 용어로 뭐라고 부르는지 아세요? '진성 호갱님'이라고 부릅니다.
-
-|||
-
-장면 71
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the rabbit breaking the golden handcuffs with a strong pull, sparks flying, chains breaking, liberation, dramatic slow motion, no voice, no speech, no text, sound effects only
-
-장면설명: 24개월 약정, 36개월 할부... 이건 여러분의 발목에 족쇄를 채우는 행위입니다. 요즘 쿠팡이나 오픈마켓에서 '자급제 폰' 많이 팔죠? 기계값을 한 번에 내야 해서 부담스럽다고요?
-
-|||
-
-장면 72
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a rabbit holding a "Free" flag, standing on a hill, wind blowing, looking confident, no voice, no speech, no text, sound effects only
-
-장면설명: 카드 무이자 할부를 이용하세요. 그리고 통신사는 무약정으로, 언제든 떠날 수 있는 상태를 유지하세요. 통신사에게 "나는 언제든 너희를 버릴 수 있다"는 공포감을 심어줘야 합니다.
-
-|||
-
-장면 73
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a fish inside a tank swimming towards an open gate, the bear trying to lure it back with fish food, but the fish swims away, escaping, no voice, no speech, no text, sound effects only
-
-장면설명: 잡힌 물고기에게는 먹이를 주지 않지만, 도망가려는 물고기에게는 더 좋은 혜택을 던져주는 법이니까요.
-
-|||
-
-장면 74
-
-영상 프롬프트: 3d pixar studio style, kawaii style, a montage of hardworking technician raccoons climbing poles in rain and snow, looking exhausted but dedicated, respect, no voice, no speech, no text, sound effects only
-
-장면설명: 오늘 우리는 통신 3사의 화려한 'AI 컴퍼니' 간판 뒤에 숨겨진, 우리의 텅 빈 지갑 이야기를 해봤습니다. 밤낮없이 전신주에 올라가 고생하시는 현장 기사님들, 그리고 고객센터에서 감정 노동 하시는 상담사분들...
-
-|||
-
-장면 75
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the bear CEO sitting on a throne made of gold coins, looking down arrogantly, high contrast lighting, villain vibe, no voice, no speech, no text, sound effects only
-
-장면설명: 이분들은 아무 죄가 없습니다. 우리와 똑같은 월급쟁이 피해자일 뿐이죠. 문제는 독과점이라는 든든한 성벽 뒤에 숨어서, 고객을 '물주'로만 생각하는 경영진의 태도와 시스템입니다.
-
-|||
-
-장면 76
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the rabbit checking a long bill receipt, eyes wide open, realizing something, nodding head, call to action, no voice, no speech, no text, sound effects only
-
-장면설명: 여러분의 통신비, 정말 소중한 돈입니다. 그 돈이 여러분의 더 빠른 인터넷을 위해 쓰인다면 아깝지 않겠지만, 회장님의 AI 야망을 실현하는 데 쓰이고 있다면... 너무 억울하지 않나요? 지금이라도 늦지 않았습니다.
-
-|||
-
-장면 77
-
-영상 프롬프트: 3d pixar studio style, kawaii style, the rabbit flipping a table with a small meal on it, angry but cute rebellion, "Table Flip" meme style, no voice, no speech, no text, sound effects only
-
-장면설명: 내 요금제, 내 데이터 사용량, 그리고 내 약정 기간. 지금 당장 확인해 보세요. 세상에 공짜 점심은 없지만, 내 돈 내고 먹는 점심이 '상한 음식'이라면... 식탁을 엎어야 하지 않겠습니까?
-
-|||
-
-장면 78
-
-영상 프롬프트: 3d pixar studio style, kawaii style, all the cute animals (rabbit, cat, dog) gathered together, waving hands and smiling, "Subscribe" button (icon style) appearing in the air, one animal smashing the button with a hammer playfully, happy ending, no voice, no speech, no text, sound effects only
-
-장면설명: 오늘 영상이 여러분의 통신비 다이어트에 조금이라도 자극이 되었다면, 구독과 좋아요 버튼을... 파이브G 속도보다 빠르게! 시원하게 눌러주세요. 똑똑즈는 다음 시간에도 돌아오겠습니다. 안녕~!
-
-|||
-
-장면 79 (쿠키영상)
-
-영상 프롬프트: 3d pixar studio style, kawaii style, black screen fades in, the rabbit holding a piece of paper (stock certificate) and receiving a bag of gold coins from the bear, the rabbit winking at the camera, mischievous smile, no voice, no speech, no text, sound effects only
-
-장면설명: (화면 암전 되며 쿠키 영상 대사) "아, 참! 근데 통신사 주식은 좀 샀어? 배당금은 짭짤하더라... 우리가 낸 돈으로 주는 거니까 꼭 챙겨 받아야지?"
