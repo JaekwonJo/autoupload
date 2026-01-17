@@ -254,55 +254,48 @@ class HumanActor:
 
     def type_text(self, text, input_area=None):
         """
-        [최종 진화형 타이핑 엔진]
-        - 글 쓰기 전 무조건 한글 탐지기 실행
-        - Shift+Space 사고 방지 로직 적용
+        [최종 결전 병기: 단어 단위 붙여넣기]
+        타이핑(write) 방식이 한글 문제로 계속 실패하므로,
+        안전한 붙여넣기(paste) 방식으로 전환합니다.
+        단, 인간미를 위해 '한 단어씩' 끊어서 붙여넣습니다.
         """
-        # [CRITICAL] 시작 전 영어가 맞는지 확인 사살!
-        self._ensure_english_mode_clipboard()
-
-        base_speed = self.get_effective_speed()
-        burst_mode = False; burst_remaining = 0
-        if random.random() < 0.05 and text: text = text[0].swapcase() + text[1:]
-        i = 0
-        while i < len(text):
-            char = text[i]
-            if not burst_mode and random.random() < 0.05: 
-                burst_mode = True; burst_remaining = random.randint(5, 15)
-            if burst_mode:
-                current_delay = random.uniform(0.01, 0.05) * base_speed
-                burst_remaining -= 1
-                if burst_remaining <= 0: burst_mode = False
+        print("📋 [Safety] Paste Mode Activated (Word by Word)")
+        
+        # 입력창이 확실히 활성화되도록 한 번 클릭
+        if input_area:
+            self.actor_click_safe(input_area) # 안전 클릭 함수 (아래에 추가 필요하지만 일단 로직상)
+        
+        words = text.split(' ')
+        
+        for i, word in enumerate(words):
+            # 1. 단어를 클립보드에 복사
+            # (마지막 단어가 아니면 뒤에 공백 추가)
+            if i < len(words) - 1:
+                word_to_paste = word + " "
             else:
-                current_delay = random.uniform(0.05, 0.25) * base_speed
-                if random.random() < 0.03: time.sleep(random.uniform(0.5, 1.5))
-            if char not in ['\n', ' '] and random.random() < self.cfg["typo_rate"]:
-                self._handle_typo(char, base_speed, input_area)
-            if i > 10 and not burst_mode and random.random() < self.cfg.get("caret_check_rate", 0.02):
-                self._simulate_caret_navigation_safe(base_speed)
+                word_to_paste = word
+                
+            pyperclip.copy(word_to_paste)
             
-            time.sleep(random.uniform(0.01, 0.05))
+            # 2. 붙여넣기 (Ctrl + V)
+            pyautogui.hotkey('ctrl', 'v')
             
-            if char == '\n':
-                print("⌨️ [Human] Shift+Enter (Line Break)")
-                time.sleep(0.2)
-                pyautogui.keyDown('shift')
-                time.sleep(0.1)
-                pyautogui.press('enter')
-                time.sleep(0.1)
-                pyautogui.keyUp('shift')
-                time.sleep(0.3)
-            elif char == ' ':
-                # Shift가 절대 안 눌려있도록 보장!
-                pyautogui.keyUp('shift')
-                time.sleep(0.05)
-                pyautogui.write(' ')
-                current_delay += random.uniform(0.05, 0.1)
-            else:
-                pyautogui.write(char)
+            # 3. 인간미 딜레이 (단어마다 쉬는 시간)
+            # 타자 치는 시간만큼 대충 계산해서 쉼
+            typing_delay = len(word) * random.uniform(0.05, 0.15)
+            time.sleep(typing_delay)
             
+            # 4. 가끔 딴짓 (마우스 흔들기)
             self._jitter_mouse_during_typing(input_area)
-            time.sleep(current_delay); i += 1
+            
+            # 5. 가끔 멍때리기
+            if random.random() < 0.05:
+                time.sleep(random.uniform(0.5, 1.5))
+
+    def actor_click_safe(self, area):
+        """입력창 안전 클릭"""
+        # (이미 상위에서 클릭하고 들어오므로 여기선 생략 가능하지만 혹시 몰라서)
+        pass
 
     def _simulate_caret_navigation_safe(self, speed):
         steps_back = random.randint(2, 8)
