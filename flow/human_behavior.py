@@ -187,48 +187,70 @@ class HumanActor:
 
     def _ensure_english_mode_clipboard(self):
         """
-        [지능형 한글 탐지기]
-        'a'를 직접 쳐보고 한글인지 영어인지 클립보드로 감시합니다.
-        주인님의 Shift+Space 설정을 고려하여 똑똑하게 대처합니다.
+        [지능형 한글 탐지기 V3 - 끝판왕]
+        영어가 나올 때까지 무한 도전에 가깝게(10회) 시도합니다.
+        Shift+Space와 한/영 키를 모두 난사하여 어떻게든 영어를 쟁취합니다.
         """
-        print("🔍 [Safety] 영어 모드 확인 중...")
-        try:
-            # 1. 클립보드 비우기
-            pyperclip.copy('')
-            
-            # 2. 'a' 한 글자 쓰기
-            pyautogui.write('a')
-            time.sleep(0.1)
-            
-            # 3. 쓴 글자 선택해서 복사하기 (Shift + Left Arrow -> Ctrl + C)
-            pyautogui.keyDown('shift')
-            pyautogui.press('left')
-            pyautogui.keyUp('shift')
-            time.sleep(0.1)
-            
-            pyautogui.hotkey('ctrl', 'c')
-            time.sleep(0.2)
-            
-            # 4. 복사된 내용 확인
-            copied = pyperclip.paste()
-            
-            # 5. 테스트 글자 지우기
-            pyautogui.press('backspace')
-            time.sleep(0.1)
-            
-            if copied == 'ㅁ' or copied != 'a':
-                print(f"🚨 [Safety] 한글 모드 감지({copied})! 영어로 전환합니다.")
-                # 주인님의 전환 단축키 Shift + Space 실행
+        print("🔍 [Safety] 영어 모드 점검 시작...")
+        
+        for attempt in range(10): # 최대 10번 시도 (독종 모드)
+            try:
+                # 1. 클립보드 비우기
+                pyperclip.copy('')
+                
+                # 2. 'a' 한 글자 쓰기
+                pyautogui.write('a')
+                time.sleep(0.1)
+                
+                # 3. 쓴 글자 선택해서 복사하기
                 pyautogui.keyDown('shift')
-                time.sleep(0.1)
-                pyautogui.press('space')
-                time.sleep(0.1)
+                pyautogui.press('left')
                 pyautogui.keyUp('shift')
-                time.sleep(0.5)
-            else:
-                print("✅ [Safety] 영어 모드 확인 완료.")
-        except Exception as e:
-            print(f"⚠️ [Safety] 탐지기 오류: {e}")
+                time.sleep(0.1)
+                
+                pyautogui.hotkey('ctrl', 'c')
+                
+                # 복사 대기
+                copied = ""
+                for _ in range(10):
+                    time.sleep(0.1)
+                    copied = pyperclip.paste()
+                    if copied: break
+                
+                # 5. 테스트 글자 지우기
+                pyautogui.press('backspace')
+                time.sleep(0.1)
+                
+                # [CRITICAL] 'a'가 아니면 무조건 실패
+                if copied != 'a':
+                    print(f"🚨 [Safety] 한글/오류 감지('{copied}')! (시도 {attempt+1}/10)")
+                    
+                    # 전략: 일단 다 눌러본다.
+                    # 1. Shift + Space 시도
+                    pyautogui.keyDown('shift')
+                    time.sleep(0.05)
+                    pyautogui.press('space')
+                    time.sleep(0.05)
+                    pyautogui.keyUp('shift')
+                    
+                    time.sleep(0.2)
+                    
+                    # 2. 한/영 키 시도 (둘 다 누르면 원래대로 돌아올 수도 있지만, 지금은 비상상황)
+                    # 만약 Shift+Space로 해결 안 됐을 경우를 대비해 엇박자로 누름
+                    if attempt % 2 == 1: # 홀수 번째 시도에는 한/영 키도 누름
+                        print("   👉 [Safety] 한/영 키 추가 타격!")
+                        pyautogui.press('hangul')
+                    
+                    time.sleep(0.5) # 전환 대기
+                else:
+                    print("✅ [Safety] 영어 모드 확인 완료. 진행합니다.")
+                    return # 성공!
+                    
+            except Exception as e:
+                print(f"⚠️ [Safety] 탐지기 오류: {e}")
+                time.sleep(1)
+        
+        print("❌ [CRITICAL] 10번 시도했으나 영어 전환 실패! (그냥 진행합니다 ㅜㅜ)")
 
     def type_text(self, text, input_area=None):
         """
