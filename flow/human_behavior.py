@@ -78,14 +78,14 @@ class HumanActor:
             "breathing_rate": random.uniform(0.0, 0.4),
             "fatigue_factor": random.uniform(0.0, 0.2),
             
-            # --- 스케줄 (주말 휴식 완전 삭제!) ---
+            # --- 스케줄 ---
             "batch_min": 3,
             "batch_max": random.randint(5, 12),
             "break_min_sec": random.randint(30, 300),
             "break_max_sec": random.randint(300, 1200),
             "work_start_hour": 0,
             "work_end_hour": 24,
-            "weekend_skip_rate": 0.0 # 주말에도 일해라!
+            "weekend_skip_rate": 0.0
         }
         
         self.mood_time_factor = 1.0
@@ -108,7 +108,6 @@ class HumanActor:
         return self.current_batch_size
 
     def check_schedule(self):
-        # 무조건 활동 가능하도록 수정!
         return True, "활동 가능"
 
     # --- Actions ---
@@ -186,7 +185,60 @@ class HumanActor:
             time.sleep(0.2); pyautogui.press('end'); time.sleep(0.2)
         time.sleep(0.5); pyautogui.hotkey('ctrl', 'end'); time.sleep(1.0)
 
+    def _ensure_english_mode_clipboard(self):
+        """
+        [지능형 한글 탐지기]
+        'a'를 직접 쳐보고 한글인지 영어인지 클립보드로 감시합니다.
+        주인님의 Shift+Space 설정을 고려하여 똑똑하게 대처합니다.
+        """
+        print("🔍 [Safety] 영어 모드 확인 중...")
+        try:
+            # 1. 클립보드 비우기
+            pyperclip.copy('')
+            
+            # 2. 'a' 한 글자 쓰기
+            pyautogui.write('a')
+            time.sleep(0.1)
+            
+            # 3. 쓴 글자 선택해서 복사하기 (Shift + Left Arrow -> Ctrl + C)
+            pyautogui.keyDown('shift')
+            pyautogui.press('left')
+            pyautogui.keyUp('shift')
+            time.sleep(0.1)
+            
+            pyautogui.hotkey('ctrl', 'c')
+            time.sleep(0.2)
+            
+            # 4. 복사된 내용 확인
+            copied = pyperclip.paste()
+            
+            # 5. 테스트 글자 지우기
+            pyautogui.press('backspace')
+            time.sleep(0.1)
+            
+            if copied == 'ㅁ' or copied != 'a':
+                print(f"🚨 [Safety] 한글 모드 감지({copied})! 영어로 전환합니다.")
+                # 주인님의 전환 단축키 Shift + Space 실행
+                pyautogui.keyDown('shift')
+                time.sleep(0.1)
+                pyautogui.press('space')
+                time.sleep(0.1)
+                pyautogui.keyUp('shift')
+                time.sleep(0.5)
+            else:
+                print("✅ [Safety] 영어 모드 확인 완료.")
+        except Exception as e:
+            print(f"⚠️ [Safety] 탐지기 오류: {e}")
+
     def type_text(self, text, input_area=None):
+        """
+        [최종 진화형 타이핑 엔진]
+        - 글 쓰기 전 무조건 한글 탐지기 실행
+        - Shift+Space 사고 방지 로직 적용
+        """
+        # [CRITICAL] 시작 전 영어가 맞는지 확인 사살!
+        self._ensure_english_mode_clipboard()
+
         base_speed = self.get_effective_speed()
         burst_mode = False; burst_remaining = 0
         if random.random() < 0.05 and text: text = text[0].swapcase() + text[1:]
@@ -206,35 +258,29 @@ class HumanActor:
                 self._handle_typo(char, base_speed, input_area)
             if i > 10 and not burst_mode and random.random() < self.cfg.get("caret_check_rate", 0.02):
                 self._simulate_caret_navigation_safe(base_speed)
-            # --- 4. 실제 키 입력 ---
-            # 키 입력 전 미세 딜레이 (렉 방지)
+            
             time.sleep(random.uniform(0.01, 0.05))
             
             if char == '\n':
                 print("⌨️ [Human] Shift+Enter (Line Break)")
-                time.sleep(random.uniform(0.2, 0.4))
-                # [CRITICAL] Shift+Space 사고 방지를 위해 명확하게 분리
+                time.sleep(0.2)
                 pyautogui.keyDown('shift')
                 time.sleep(0.1)
                 pyautogui.press('enter')
                 time.sleep(0.1)
-                pyautogui.keyUp('shift') # 확실하게 뗌!
-                time.sleep(random.uniform(0.2, 0.4))
+                pyautogui.keyUp('shift')
+                time.sleep(0.3)
             elif char == ' ':
-                # [CRITICAL] Space 누르기 전에 Shift가 눌려있으면 한/영 전환됨!
-                # 무조건 Shift 떼고 누르기
-                pyautogui.keyUp('shift') 
-                time.sleep(0.05) 
+                # Shift가 절대 안 눌려있도록 보장!
+                pyautogui.keyUp('shift')
+                time.sleep(0.05)
                 pyautogui.write(' ')
                 current_delay += random.uniform(0.05, 0.1)
             else:
                 pyautogui.write(char)
             
-            # 마우스 움직임 (클릭 X)
             self._jitter_mouse_during_typing(input_area)
-            
-            time.sleep(current_delay)
-            i += 1
+            time.sleep(current_delay); i += 1
 
     def _simulate_caret_navigation_safe(self, speed):
         steps_back = random.randint(2, 8)
@@ -272,8 +318,26 @@ class HumanActor:
         pyautogui.moveRel(dx, dy, duration=random.uniform(0.1, 0.2))
         return False
 
+    def idle_action(self, area):
+        if random.random() > 0.1: return
+        pyautogui.failSafeCheck()
+        action = random.choice(["move", "scroll", "sleep", "move", "sleep"])
+        try:
+            if action == "move":
+                tx = random.randint(area['x1'], area['x2']); ty = random.randint(area['y1'], area['y2'])
+                self.move_to(tx, ty, overshoot=False)
+            elif action == "scroll":
+                pyautogui.scroll(random.randint(-100, 100))
+            elif action == "sleep":
+                sleep_time = random.uniform(0.5, 2.0); steps = int(sleep_time / 0.1)
+                for _ in range(steps):
+                    time.sleep(0.1); pyautogui.failSafeCheck()
+        except pyautogui.FailSafeException:
+            print("🚨 [AFK] 긴급 정지 감지! (FailSafe)"); raise
+        except Exception as e:
+            print(f"👻 [AFK] Error: {e}")
+
     def random_behavior_routine(self):
-        """[FIX] 빠졌던 딴짓 기능 복구"""
         if random.random() > self.cfg["distraction_rate"]: return
         r = random.random()
         if r < 0.2: 
@@ -336,49 +400,3 @@ class HumanActor:
     def aimless_drag(self):
         x, y = pyautogui.position()
         self._move_human_curve(x, y, x+random.randint(-100, 100), y+random.randint(-20, 20), random.uniform(0.5, 1.0))
-
-    # -------------------------------------------------------------------------
-    # [NEW] AFK Mode (사용자 부재중 모드)
-    # -------------------------------------------------------------------------
-    def idle_action(self, area):
-        """
-        대기 시간에 수행하는 딴짓 함수.
-        area: {x1, y1, x2, y2} - 이 안에서만 놀아야 함!
-        [수정] 클릭, 드래그 삭제 -> 오직 이동과 스크롤만!
-        [CRITICAL] AFK 모드 중에도 긴급 정지(마우스 던지기) 가능하게 함
-        """
-        # 너무 자주 하면 정신 사나우니까 가끔만 (10% 확률)
-        if random.random() > 0.1: return
-
-        # [Safety] 시작 전 긴급 정지 체크
-        pyautogui.failSafeCheck()
-
-        # [Safety] 클릭(click), 드래그(drag)는 위험하니까 뺌
-        action = random.choice(["move", "scroll", "sleep", "move", "sleep"]) # move/sleep 확률 높임
-        
-        try:
-            if action == "move":
-                tx = random.randint(area['x1'], area['x2'])
-                ty = random.randint(area['y1'], area['y2'])
-                # 딴짓할 때는 wild=False (얌전하게), 하지만 곡선으로
-                self.move_to(tx, ty, overshoot=False)
-                
-            elif action == "scroll":
-                # 스크롤은 화면 내용에 영향 안 주니까 허용
-                pyautogui.scroll(random.randint(-100, 100))
-                
-            elif action == "sleep":
-                # 잠깐 멍때리기
-                # 멍때리는 도중에도 멈출 수 있게 쪼개서 잠
-                sleep_time = random.uniform(0.5, 2.0)
-                steps = int(sleep_time / 0.1)
-                for _ in range(steps):
-                    time.sleep(0.1)
-                    pyautogui.failSafeCheck() # 자면서도 감시!
-                
-        except pyautogui.FailSafeException:
-            # 마우스 던지면 여기서 잡힘 -> 프로그램 종료 유도
-            print("🚨 [AFK] 긴급 정지 감지! (FailSafe)")
-            raise # 상위로 에러 전파해서 멈추게 함
-        except Exception as e:
-            print(f"👻 [AFK] Error: {e}")
