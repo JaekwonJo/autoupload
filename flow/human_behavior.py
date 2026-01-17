@@ -185,99 +185,27 @@ class HumanActor:
             time.sleep(0.2); pyautogui.press('end'); time.sleep(0.2)
         time.sleep(0.5); pyautogui.hotkey('ctrl', 'end'); time.sleep(1.0)
 
-    def _ensure_english_mode_clipboard(self):
-        """
-        [지능형 한글 탐지기 V3 - 끝판왕]
-        영어가 나올 때까지 무한 도전에 가깝게(10회) 시도합니다.
-        Shift+Space와 한/영 키를 모두 난사하여 어떻게든 영어를 쟁취합니다.
-        """
-        print("🔍 [Safety] 영어 모드 점검 시작...")
-        
-        for attempt in range(10): # 최대 10번 시도 (독종 모드)
-            try:
-                # 1. 클립보드 비우기
-                pyperclip.copy('')
-                
-                # 2. 'a' 한 글자 쓰기
-                pyautogui.write('a')
-                time.sleep(0.1)
-                
-                # 3. 쓴 글자 선택해서 복사하기
-                pyautogui.keyDown('shift')
-                pyautogui.press('left')
-                pyautogui.keyUp('shift')
-                time.sleep(0.1)
-                
-                pyautogui.hotkey('ctrl', 'c')
-                
-                # 복사 대기
-                copied = ""
-                for _ in range(10):
-                    time.sleep(0.1)
-                    copied = pyperclip.paste()
-                    if copied: break
-                
-                # 5. 테스트 글자 지우기
-                pyautogui.press('backspace')
-                time.sleep(0.1)
-                
-                # [CRITICAL] 'a'가 아니면 무조건 실패
-                if copied != 'a':
-                    print(f"🚨 [Safety] 한글/오류 감지('{copied}')! (시도 {attempt+1}/10)")
-                    
-                    # 전략: 일단 다 눌러본다.
-                    # 1. Shift + Space 시도
-                    pyautogui.keyDown('shift')
-                    time.sleep(0.05)
-                    pyautogui.press('space')
-                    time.sleep(0.05)
-                    pyautogui.keyUp('shift')
-                    
-                    time.sleep(0.2)
-                    
-                    # 2. 한/영 키 시도 (둘 다 누르면 원래대로 돌아올 수도 있지만, 지금은 비상상황)
-                    # 만약 Shift+Space로 해결 안 됐을 경우를 대비해 엇박자로 누름
-                    if attempt % 2 == 1: # 홀수 번째 시도에는 한/영 키도 누름
-                        print("   👉 [Safety] 한/영 키 추가 타격!")
-                        pyautogui.press('hangul')
-                    
-                    time.sleep(0.5) # 전환 대기
-                else:
-                    print("✅ [Safety] 영어 모드 확인 완료. 진행합니다.")
-                    return # 성공!
-                    
-            except Exception as e:
-                print(f"⚠️ [Safety] 탐지기 오류: {e}")
-                time.sleep(1)
-        
-        print("❌ [CRITICAL] 10번 시도했으나 영어 전환 실패! (그냥 진행합니다 ㅜㅜ)")
-
+    # -------------------------------------------------------------------------
+    # [Extreme Human Typing Engine V3 - Paste Mode]
+    # -------------------------------------------------------------------------
     def type_text(self, text, input_area=None):
         """
         [최종 결전 병기: 단어 단위 붙여넣기]
-        타이핑(write) 방식이 한글 문제로 계속 실패하므로,
-        안전한 붙여넣기(paste) 방식으로 전환합니다.
-        단, 인간미를 위해 '한 단어씩' 끊어서 붙여넣습니다.
+        한글 타이핑 문제를 원천 봉쇄하기 위해 '복사+붙여넣기'만 사용합니다.
         """
-        print("📋 [Safety] Paste Mode Activated (Word by Word)")
+        print("📋 [Safety] Paste Mode Activated (Word by Word) - 로그 확인용")
         
-        # 입력창이 확실히 활성화되도록 한 번 클릭
-        if input_area:
-            self.actor_click_safe(input_area) # 안전 클릭 함수 (아래에 추가 필요하지만 일단 로직상)
+        # 입력창이 활성화되었는지 확인 (클릭은 상위에서 함)
         
         words = text.split(' ')
         
         for i, word in enumerate(words):
             # 1. 단어를 클립보드에 복사
-            # (마지막 단어가 아니면 뒤에 공백 추가)
-            if i < len(words) - 1:
-                word_to_paste = word + " "
-            else:
-                word_to_paste = word
-                
+            word_to_paste = word + " " if i < len(words) - 1 else word
             pyperclip.copy(word_to_paste)
             
             # 2. 붙여넣기 (Ctrl + V)
+            # Mac 등에서는 command 키지만, 여기는 윈도우/리눅스 가정
             pyautogui.hotkey('ctrl', 'v')
             
             # 3. 인간미 딜레이 (단어마다 쉬는 시간)
@@ -285,41 +213,19 @@ class HumanActor:
             typing_delay = len(word) * random.uniform(0.05, 0.15)
             time.sleep(typing_delay)
             
-            # 4. 가끔 딴짓 (마우스 흔들기)
+            # 4. 가끔 딴짓 (마우스 흔들기 - 클릭 금지)
             self._jitter_mouse_during_typing(input_area)
             
             # 5. 가끔 멍때리기
             if random.random() < 0.05:
                 time.sleep(random.uniform(0.5, 1.5))
 
-    def actor_click_safe(self, area):
-        """입력창 안전 클릭"""
-        # (이미 상위에서 클릭하고 들어오므로 여기선 생략 가능하지만 혹시 몰라서)
-        pass
-
-    def _simulate_caret_navigation_safe(self, speed):
-        steps_back = random.randint(2, 8)
-        for _ in range(steps_back):
-            pyautogui.press('left'); time.sleep(random.uniform(0.1, 0.2) * speed)
-        time.sleep(random.uniform(0.5, 1.0))
-        self._force_cursor_to_end_aggressive()
+    def _get_dynamic_typing_delay(self, base_speed):
+        return random.uniform(0.05, 0.2) * base_speed
 
     def _handle_typo(self, target_char, speed, input_area):
-        neighbor = self._get_neighbor_key(target_char)
-        typo_count = random.randint(2, 4) if random.random() < 0.2 else 1
-        for _ in range(typo_count):
-            pyautogui.write(neighbor if _ == 0 else self._get_neighbor_key(neighbor))
-            self._jitter_mouse_during_typing(input_area)
-            time.sleep(random.uniform(0.1, 0.2) * speed)
-        time.sleep(random.uniform(0.3, 0.6) * speed)
-        for _ in range(typo_count):
-            pyautogui.press('backspace'); time.sleep(random.uniform(0.2, 0.3) * speed)
-        time.sleep(random.uniform(0.2, 0.4) * speed)
-
-    def _get_neighbor_key(self, char):
-        lower_char = char.lower()
-        if lower_char in QWERTY_NEIGHBORS: return random.choice(QWERTY_NEIGHBORS[lower_char])
-        return char
+        # 붙여넣기 모드에서는 오타가 날 수 없으므로 무시
+        pass
 
     def _jitter_mouse_during_typing(self, input_area):
         if random.random() > 0.4: return False
