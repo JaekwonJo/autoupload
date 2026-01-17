@@ -19,17 +19,17 @@ import pyperclip
 
 # [NEW] 인간 행동 엔진 탑재 (항상 최신 버전 로드)
 try:
-    import flow.human_behavior as hb
+    import flow.human_behavior_v2 as hb
     importlib.reload(hb) # [CRITICAL] 수정된 코드 즉시 반영
-    from flow.human_behavior import HumanActor
+    from flow.human_behavior_v2 import HumanActor
 except ImportError:
     try:
-        import human_behavior as hb
+        import human_behavior_v2 as hb
         importlib.reload(hb)
-        from human_behavior import HumanActor
+        from human_behavior_v2 import HumanActor
     except ImportError:
         # 경로 문제 시 그냥 임포트 시도
-        from flow.human_behavior import HumanActor
+        from flow.human_behavior_v2 import HumanActor
 
 # --- 윈도우 절전 방지 상수 ---
 ES_CONTINUOUS = 0x80000000

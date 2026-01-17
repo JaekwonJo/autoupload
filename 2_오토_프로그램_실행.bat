@@ -8,7 +8,7 @@ if exist ".venv\Scripts\activate.bat" (
     call venv\Scripts\activate.bat
 )
 
-:: [완료] 검은 창 없이 조용히 실행 (pythonw 사용)
-start "" pythonw flow\flow_auto.py
+:: [V2] 좀비 프로세스 회피용 새 파일 실행
+start "" pythonw flow\flow_auto_v2.py
 
 exit
