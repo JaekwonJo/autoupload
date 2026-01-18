@@ -37,7 +37,7 @@ ES_SYSTEM_REQUIRED = 0x00000001
 ES_DISPLAY_REQUIRED = 0x00000002
 
 # --- 설정 ---
-APP_NAME = "Flow Veo Vision Bot (Ultimate)"
+APP_NAME = "Flow Veo Vision Bot (Ultimate V2)"
 CONFIG_FILE = "flow_config.json"
 DEFAULT_CONFIG = {
     "prompts_file": "flow_prompts.txt",
@@ -467,26 +467,36 @@ class FlowVisionApp:
         run_frame = tk.LabelFrame(main, text=" 2. 실행 제어 ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=5)
         run_frame.pack(fill="x", padx=20, pady=5)
         
-        ctrl_box = tk.Frame(run_frame, bg="#1E1E2E")
-        ctrl_box.pack(fill="x")
-        
         # [NEW] 사용자 없음 모드 체크박스
         self.afk_var = tk.BooleanVar(value=self.cfg.get("afk_mode", False))
-        chk_afk = tk.Checkbutton(ctrl_box, text="👻 사용자 없음 모드 (AFK)", variable=self.afk_var, 
+        chk_afk = tk.Checkbutton(run_frame, text="👻 사용자 없음 모드 (AFK)", variable=self.afk_var, 
                                  command=self.on_afk_toggle, bg="#1E1E2E", fg="#F1FA8C", selectcolor="#1E1E2E", activebackground="#1E1E2E", activeforeground="#F1FA8C")
         chk_afk.pack(side="top", anchor="w", padx=5, pady=5)
+
+        # [NEW] 속도 조절 슬라이더
+        speed_frame = tk.Frame(run_frame, bg="#1E1E2E")
+        speed_frame.pack(fill="x", pady=5)
+        tk.Label(speed_frame, text="🚀 기준 속도:", bg="#1E1E2E", fg="white").pack(side="left")
         
-        inner_box = tk.Frame(ctrl_box, bg="#1E1E2E")
-        inner_box.pack(fill="x", pady=5)
+        self.speed_var = tk.DoubleVar(value=3.0)
+        self.scale_speed = tk.Scale(speed_frame, from_=0.5, to=10.0, resolution=0.5, orient="horizontal",
+                                    variable=self.speed_var, command=self.on_speed_change,
+                                    bg="#1E1E2E", fg="white", highlightthickness=0, 
+                                    activebackground="#BD93F9", troughcolor="#44475A", length=200)
+        self.scale_speed.pack(side="left", padx=10, fill="x", expand=True)
+        self.lbl_speed_val = tk.Label(speed_frame, text="x 3.0", bg="#1E1E2E", fg="#8BE9FD")
+        self.lbl_speed_val.pack(side="left")
         
-        tk.Label(inner_box, text="간격(초):", bg="#1E1E2E", fg="white").pack(side="left")
-        self.entry_interval = tk.Entry(inner_box, width=5)
+        ctrl_box = tk.Frame(run_frame, bg="#1E1E2E")
+        ctrl_box.pack(fill="x")
+        tk.Label(ctrl_box, text="간격(초):", bg="#1E1E2E", fg="white").pack(side="left")
+        self.entry_interval = tk.Entry(ctrl_box, width=5)
         self.entry_interval.insert(0, str(self.cfg.get("interval_seconds", 180)))
         self.entry_interval.pack(side="left", padx=5)
         
-        self.btn_start = ttk.Button(inner_box, text="🌙 조용히 시작", style="Accent.TButton", command=self.on_start)
+        self.btn_start = ttk.Button(ctrl_box, text="🌙 조용히 시작", style="Accent.TButton", command=self.on_start)
         self.btn_start.pack(side="left", padx=10, fill="x", expand=True)
-        self.btn_stop = ttk.Button(inner_box, text="🛑 멈추기", command=self.on_stop, state="disabled")
+        self.btn_stop = ttk.Button(ctrl_box, text="🛑 멈추기", command=self.on_stop, state="disabled")
         self.btn_stop.pack(side="left", fill="x", expand=True)
 
         # [NEW] 인간화 설정 버튼 추가
@@ -531,6 +541,11 @@ class FlowVisionApp:
         
         self.log_text = ScrolledText(right_frame, height=10, bg="#000000", fg="#00FF00", font=("Consolas", 9), state="disabled")
         self.log_text.pack(fill="both", expand=True)
+
+    def on_speed_change(self, val):
+        v = float(val)
+        self.actor.cfg["speed_multiplier"] = v
+        self.lbl_speed_val.config(text=f"x {v}")
 
     def on_afk_toggle(self):
         self.cfg["afk_mode"] = self.afk_var.get()
@@ -717,50 +732,24 @@ class FlowVisionApp:
         self.root.after(1000, self._tick)
 
     def _run_task(self):
-        # [NEW] 1. 스케줄 체크 (활동 시간이 아니면 스킵)
-        is_active, reason = self.actor.check_schedule()
-        if not is_active:
-            self.log(f"⛔ {reason} - 잠시 대기합니다.")
-            self.lbl_status.config(text=f"🌙 {reason}...", fg="#6272A4")
-            # 다음 틱에서 다시 체크하도록 시간만 살짝 밈
-            self.t_next = time.time() + 300 # 5분 뒤 재확인
-            return
-
-        # [NEW] 2. 배치 사이즈 체크 (일정 개수 수행 후 강제 휴식)
-        if self.actor.processed_count >= self.actor.current_batch_size:
-            self.log(f"🛑 배치 목표({self.actor.current_batch_size}개) 달성! 휴식 모드 진입.")
-            self.lbl_status.config(text="☕ 재충전 중...", fg="#FF5555")
-            
-            duration = self.actor.take_bio_break()
-            
-            self.actor.update_batch_size() # 다음 배치 사이즈 설정
-            self.log(f"☕ 휴식 끝! 다음 배치는 {self.actor.current_batch_size}개 예정.")
-            # 휴식 시간이 끝났으므로 이번 턴은 넘기고 다음 턴에 작업 시작
-            return
-
         if not self.prompts or self.index >= len(self.prompts):
             self.running = False
-            self.lbl_status.config(text="🎉 모든 작업 완료!", fg="#BD93F9")
-            self.log("작업 완료")
-            messagebox.showinfo("완료", "모든 프롬프트를 처리했습니다.")
             self.on_stop()
+            messagebox.showinfo("완료", "작업 끝!")
             return
 
-        self._show()
-        prompt = self.prompts[self.index]
-        
-        # [CORE] 매 작업마다 인격을 리셋 (완전 무작위 패턴)
+        # [NEW] 매 작업마다 기준 속도(슬라이더)를 랜덤하게 변경! (1.5 ~ 4.5)
+        # 사용자가 손대지 않아도 봇이 스스로 성격을 바꿈
+        new_base_speed = round(random.uniform(1.5, 4.5), 1)
+        self.scale_speed.set(new_base_speed)
+        self.on_speed_change(new_base_speed) # 즉시 적용
+        self.log(f"🎭 이번 작업 속도: x {new_base_speed}")
+
+        p = self.prompts[self.index]
         self.actor.randomize_persona()
-        
-        # [LIVE] 설정창이 켜져 있다면, 슬라이더를 자동으로 움직여서 보여줌!
-        if self.config_window and self.config_window.root.winfo_exists():
-            self.config_window.refresh_ui()
-            
         self.log(f"▶ 진행: {self.index+1}/{len(self.prompts)} (인격: {self.actor.current_persona_name})")
         
-        # [NEW] 영역에서 랜덤 좌표 추출
-        ia = self.cfg.get('input_area')
-        sa = self.cfg.get('submit_area')
+        ia, sa = self.cfg['input_area'], self.cfg['submit_area']
         
         if not ia or not sa:
             self.log("❌ 영역 설정이 필요합니다.")
@@ -856,7 +845,9 @@ class FlowVisionApp:
                 time.sleep(random.uniform(0.1, 0.3))
                 self.actor.smart_click()
             
-            self.log(f"✅ 제출 완료")
+            # [Safety] 제출 후 충분히 대기 (씹힘 방지)
+            time.sleep(1.5) 
+            self.log("✅ 제출 완료 (다음 준비)")
             
             # 카운트 증가
             self.actor.processed_count += 1
