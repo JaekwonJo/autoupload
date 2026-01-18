@@ -26,20 +26,20 @@ Double-click **`2_오토_프로그램_실행.bat`**.
 ## 🛠️ Key Features (V2 Update)
 
 ### 🛡️ Ultimate Safety
-- **Anti-IME Typing**: Uses **Paste Mode** (`Ctrl+V`) word-by-word to guarantee English input, regardless of keyboard state (Korean/English).
+- **Anti-IME Typing**: Uses advanced **Clipboard Detection** (10 retries) to ensure English input before typing.
 - **Zombie Slayer**: Automatically terminates old bot processes on startup to prevent conflicts.
 - **FailSafe**: Move mouse to the top-left corner to instantly emergency stop.
 
 ### 🎭 Human-Like Behavior
-- **AFK Mode**: Mouse moves, scrolls, and idles in a safe area while waiting, mimicking a user browsing or reading.
+- **AFK Mode**: Mouse moves, scrolls, and idles in a safe area while waiting (No clicks).
 - **Random Speed**: Typing speed varies per prompt (Burst mode vs Slow mode).
 - **Speed Slider**: Real-time control to adjust the base speed (x0.5 ~ x10.0).
 - **Random Submit**: Randomly chooses between **Enter** key or **Mouse Click** (50/50) to submit.
 
 ## 📂 File Structure
 - `flow/flow_auto_v2.py`: The main brain (V2).
-- `flow/human_behavior_v2.py`: The behavior engine (Paste logic, Physics movement).
-- `flow_config_final.json`: User settings.
+- `flow/human_behavior_v2.py`: The behavior engine (Typing logic, Physics movement).
+- `flow_config.json`: User settings.
 - `2_오토_프로그램_실행.bat`: Smart launcher.
 
 ---

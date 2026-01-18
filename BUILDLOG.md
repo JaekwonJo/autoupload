@@ -4,16 +4,17 @@
 - **Error**: Korean characters (`ㄴ8 ㅖ개...`) appearing instead of English prompts despite multiple IME detection fixes.
 - **Cause**: 
   1. `Shift+Space` accidentally triggering IME toggle during typing.
-  2. "Zombie" processes of old versions persisting in background and typing concurrently with new version.
+  2. "Zombie" processes of old versions persisting in background.
+  3. "Paste Mode" was rejected due to bot detection risks.
 - **Fix**: 
-  - **Nuclear Option**: Replaced character typing with **Word-by-Word Copy & Paste**.
   - **Zombie Slayer**: Updated `2_오토...bat` to `taskkill` all python processes before starting.
   - **Code Migration**: Moved all logic to `flow_auto_v2.py` to ensure fresh execution.
+  - **Input Method**: Reverted to **Typing Mode** but added a 10-try bruteforce IME check before starting.
 - **Features Added**:
   - **AFK Mode**: Mouse moves/scrolls in safe area during wait time (No clicks).
   - **Speed Slider**: Real-time typing speed adjustment with random variance.
   - **Random Submit**: 50/50 chance of `Enter` vs `Click` for submission.
-- **Result**: 100% English input guarantee, robust stability, and enhanced human-like behavior.
+- **Result**: Safe, human-like typing with zero Korean typos and robust stability.
 
 ---
 ## 2025-12-22 (Mon) - Critical Stabilization & UX
