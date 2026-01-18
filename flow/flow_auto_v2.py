@@ -8,6 +8,7 @@ from pathlib import Path
 from datetime import datetime
 import ctypes
 import importlib # [NEW] 모듈 재로딩용
+import winsound # [NEW] 효과음용
 
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
@@ -97,13 +98,22 @@ class CountdownAlert:
         deltay = event.y - self.y
         x = self.root.winfo_x() + deltax
         y = self.root.winfo_y() + deltay
-        self.root.geometry(f"{x}+{y}")
+        self.root.geometry(f"+{x}+{y}")
 
     def update_time(self, seconds):
         if not self.root.winfo_exists(): return
         
         sec_int = int(seconds)
         self.lbl_time.config(text=f"{sec_int}초 전")
+        
+        # [NEW] 카운트다운 효과음
+        if sec_int == 30:
+            winsound.MessageBeep(winsound.MB_ICONASTERISK)
+        elif sec_int == 10:
+            winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
+        elif 0 < sec_int <= 5:
+            # 5초 전부터는 1초마다 틱틱 소리
+            winsound.Beep(1000, 100)
         
         # [NEW] 10초 전부터 긴급 깜빡임 효과 (Blink Effect)
         if sec_int <= 10:
@@ -413,6 +423,9 @@ class FlowVisionApp:
         self.t_next = time.time()
         self.lbl_status.config(text="🚀 자동화 시작!", fg="#50FA7B")
         
+        # [NEW] 작업 시작 알림음
+        winsound.MessageBeep(winsound.MB_OK) 
+
         # [NEW] 시작 시 배치 사이즈 재설정 및 카운터 초기화
         self.actor.update_batch_size()
         self.actor.processed_count = 0
@@ -735,8 +748,12 @@ class FlowVisionApp:
         if not self.prompts or self.index >= len(self.prompts):
             self.running = False
             self.on_stop()
+            winsound.MessageBeep(winsound.MB_ICONHAND) # 퉁! (종료)
             messagebox.showinfo("완료", "작업 끝!")
             return
+
+        # [NEW] 작업 시작 알림음
+        winsound.MessageBeep(winsound.MB_OK) # 띠링~ (시작)
 
         # [NEW] 매 작업마다 기준 속도(슬라이더)를 랜덤하게 변경! (1.5 ~ 4.5)
         # 사용자가 손대지 않아도 봇이 스스로 성격을 바꿈
@@ -831,6 +848,9 @@ class FlowVisionApp:
             # [Safety] 제출 후 충분히 대기 (씹힘 방지)
             time.sleep(1.5) 
             self.log("✅ 제출 완료 (다음 준비)")
+            
+            # [NEW] 작업 완료 알림음
+            winsound.Beep(800, 200) # 삐! (성공)
             
             # 카운트 증가
             self.actor.processed_count += 1
