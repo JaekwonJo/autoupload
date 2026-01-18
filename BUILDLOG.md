@@ -1,6 +1,6 @@
 # 🔨 Build Log
 
-## 2026-01-16 (Fri) - The "Anti-IME" War & Ultimate V2
+## 2026-01-16 (Fri) - The "Anti-IME" War & System Optimization
 - **Error**: Korean characters (`ㄴ8 ㅖ개...`) appearing instead of English prompts despite multiple IME detection fixes.
 - **Cause**: 
   1. `Shift+Space` accidentally triggering IME toggle during typing.
@@ -10,11 +10,12 @@
   - **Zombie Slayer**: Updated `2_오토...bat` to `taskkill` all python processes before starting.
   - **Code Migration**: Moved all logic to `flow_auto_v2.py` to ensure fresh execution.
   - **Input Method**: Reverted to **Typing Mode** but added a 10-try bruteforce IME check before starting.
+  - **System**: Created `.wslconfig` to limit WSL2 memory usage to 6GB.
 - **Features Added**:
   - **AFK Mode**: Mouse moves/scrolls in safe area during wait time (No clicks).
   - **Speed Slider**: Real-time typing speed adjustment with random variance.
-  - **Random Submit**: 50/50 chance of `Enter` vs `Click` for submission.
-- **Result**: Safe, human-like typing with zero Korean typos and robust stability.
+  - **Sound Effects**: Added `winsound` beeps for start, finish, and countdown.
+- **Result**: Safe, human-like typing with zero Korean typos, robust stability, and optimized system memory.
 
 ---
 ## 2025-12-22 (Mon) - Critical Stabilization & UX
