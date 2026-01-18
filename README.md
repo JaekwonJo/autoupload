@@ -1,51 +1,46 @@
-# 🌊 Flow Veo Vision Bot (Ultimate)
+# 🌊 Flow Veo Vision Bot (Ultimate V2)
 
 > **Auto-Upload Automation for Flow/Sora**
-> *Automate your creative workflow with precision and style.*
+> *Automate your creative workflow with precision, human-like behavior, and bulletproof reliability.*
 
-![Status](https://img.shields.io/badge/Status-Active-success)
+![Status](https://img.shields.io/badge/Status-V2_Stable-success)
 ![Python](https://img.shields.io/badge/Python-3.12%2B-blue)
 
 ## 📖 Introduction
-This project automates the submission of prompts to Flow/Sora web interfaces. It features a "Vision Bot" approach, using coordinate-based interaction and visual cues to control the browser, ensuring compatibility even when DOM-based selection fails.
+This project automates the submission of prompts to Flow/Sora web interfaces. It features a "Vision Bot" approach with **advanced human behavior simulation** (Bezier curves, random typos, variable speed) and **anti-detection measures**.
 
 ## 🚀 Quick Start
 
 ### 1. Installation
-Run **`4_긴급수리.bat`** (Emergency Repair) to install necessary Python dependencies (`pyautogui`, `pyperclip`, `pynput`, etc.).
+Run **`1_필수라이브러리_설치.bat`** if it's your first time.
 
-### 2. Configuration
-Edit **`flow_prompts.txt`** to add your prompts, separated by `|||`.
-*Example:*
-```text
-A beautiful sunset over the ocean |||
-A futuristic city with flying cars |||
-A cute cat playing with a ball
-```
-
-### 3. Execution
+### 2. Execution
 Double-click **`2_오토_프로그램_실행.bat`**.
-- The **Flow Veo** UI will appear.
-- **Set Coordinates**: Click "📍 입력창 위치" (Input Box) and "📍 생성 버튼 위치" (Generate Button) to tell the bot where to click.
-- **Start**: Click "🌙 조용히 시작" (Stealth Start) to begin the automation loop.
+*Tip: This launcher automatically kills any zombie processes to ensure a clean start.*
 
-## 🛠️ Key Features
-- **👻 Stealth Mode**: Operates with minimal interference.
-- **☕ Insomnia Mode**: Prevents system sleep while the bot is running.
-- **🎨 Modern UI**: Dark-themed Tkinter interface with real-time logs and countdowns.
-- **💾 Auto-Save**: Remembers your coordinate settings and last active prompt slot.
+### 3. Setup (First Run)
+1. **Prompts**: Edit `flow_prompts.txt` (separated by `|||`).
+2. **Coordinates**: Click "⬛ 입력창" and drag to select the text box. Click "⬛ 버튼" for the submit button.
+3. **AFK Area (Optional)**: Click "🟩 딴짓(AFK)" and select a safe area (like the desktop wallpaper) for the mouse to play in during wait times.
+
+## 🛠️ Key Features (V2 Update)
+
+### 🛡️ Ultimate Safety
+- **Anti-IME Typing**: Uses **Paste Mode** (`Ctrl+V`) word-by-word to guarantee English input, regardless of keyboard state (Korean/English).
+- **Zombie Slayer**: Automatically terminates old bot processes on startup to prevent conflicts.
+- **FailSafe**: Move mouse to the top-left corner to instantly emergency stop.
+
+### 🎭 Human-Like Behavior
+- **AFK Mode**: Mouse moves, scrolls, and idles in a safe area while waiting, mimicking a user browsing or reading.
+- **Random Speed**: Typing speed varies per prompt (Burst mode vs Slow mode).
+- **Speed Slider**: Real-time control to adjust the base speed (x0.5 ~ x10.0).
+- **Random Submit**: Randomly chooses between **Enter** key or **Mouse Click** (50/50) to submit.
 
 ## 📂 File Structure
-- `flow/flow_auto.py`: The main brain of the bot.
-- `flow_config.json`: Stores user settings (coordinates, intervals).
-- `flow_prompts.txt`: Your prompt list.
-- `2_오토_프로그램_실행.bat`: The primary launcher.
-
-## ⚠️ Troubleshooting
-If the program closes immediately or doesn't start:
-1. Run `4_긴급수리.bat` to check dependencies.
-2. Check `BUILDLOG.md` for recent fixes.
-3. Ensure you are not running in a restricted environment (admin rights might be needed for input control).
+- `flow/flow_auto_v2.py`: The main brain (V2).
+- `flow/human_behavior_v2.py`: The behavior engine (Paste logic, Physics movement).
+- `flow_config_final.json`: User settings.
+- `2_오토_프로그램_실행.bat`: Smart launcher.
 
 ---
 *Maintained by Jaekwon Jo*

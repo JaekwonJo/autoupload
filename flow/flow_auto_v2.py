@@ -97,7 +97,7 @@ class CountdownAlert:
         deltay = event.y - self.y
         x = self.root.winfo_x() + deltax
         y = self.root.winfo_y() + deltay
-        self.root.geometry(f"+{x}+{y}")
+        self.root.geometry(f"{x}+{y}")
 
     def update_time(self, seconds):
         if not self.root.winfo_exists(): return
@@ -798,7 +798,7 @@ class FlowVisionApp:
 
             # [NEW] 4. 입력 (오타 포함)
             self.lbl_status.config(text="✍️ 입력 중...", fg="white")
-            self.actor.type_text(prompt, input_area=ia)
+            self.actor.type_text(p, input_area=ia)
             
             # [NEW] 5. 검토 (글자 수 비례 & 긁기)
             self.lbl_status.config(text="📖 검토 중...", fg="#8BE9FD")
@@ -810,39 +810,22 @@ class FlowVisionApp:
                 self.actor.subconscious_drag()
             
             # 글자 수 비례해서 읽기
-            self.actor.read_prompt_pause(prompt)
+            self.actor.read_prompt_pause(p)
             
-            # [NEW] 6. 제출 (엔터 or 클릭)
-            # [Feature 11] 엔터로 제출하기
-            if random.random() < self.actor.cfg.get("enter_submit_rate", 0.0):
-                self.lbl_status.config(text="↵ 엔터 제출!", fg="#50FA7B")
-                self.log("↵ [Human] Enter Key Submit")
-                time.sleep(random.uniform(0.2, 0.5))
+            # [NEW] 6. 제출 (랜덤: 엔터 또는 클릭)
+            if random.random() < 0.5:
+                # [Case A] 엔터로 제출
+                self.log("↵ 엔터 키로 제출!")
+                time.sleep(0.5)
                 pyautogui.press('enter')
             else:
-                # 기존 클릭 방식
-                self.lbl_status.config(text="🖱️ 클릭 제출...", fg="white")
-                
-                # [Smart Click] 타원형 영역 계산
-                s_w = sa['x2'] - sa['x1']
-                s_h = sa['y2'] - sa['y1']
-                center_x = sa['x1'] + s_w / 2
-                center_y = sa['y1'] + s_h / 2
-                
-                while True:
-                    cand_x = random.randint(sa['x1'], sa['x2'])
-                    cand_y = random.randint(sa['y1'], sa['y2'])
-                    norm_x = (cand_x - center_x) / (s_w / 2)
-                    norm_y = (cand_y - center_y) / (s_h / 2)
-                    if (norm_x**2 + norm_y**2) <= 1.0:
-                        sx_rand, sy_rand = cand_x, cand_y
-                        break
-                
-                # [Feature 4] 제출 전 망설임
-                self.actor.hesitate_on_submit(sx_rand, sy_rand)
-                
-                self.actor.move_to(sx_rand, sy_rand)
-                time.sleep(random.uniform(0.1, 0.3))
+                # [Case B] 마우스 클릭으로 제출
+                self.log("🖱️ 마우스 클릭으로 제출!")
+                sx = random.randint(sa['x1'], sa['x2'])
+                sy = random.randint(sa['y1'], sa['y2'])
+                self.actor.hesitate_on_submit(sx, sy)
+                self.actor.move_to(sx, sy)
+                time.sleep(0.5)
                 self.actor.smart_click()
             
             # [Safety] 제출 후 충분히 대기 (씹힘 방지)

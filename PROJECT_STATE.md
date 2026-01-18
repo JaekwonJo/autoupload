@@ -1,32 +1,30 @@
 # 🏗️ Project State: Flow Veo Vision Bot
 
-> **Last Updated:** 2025-12-22 (Mon)
-> **Current Stage:** 🚀 Stable Release Candidate
+> **Last Updated:** 2026-01-16 (Fri)
+> **Current Stage:** 🚀 V2 Stable Release (Ultimate Anti-IME Edition)
 
 ## 📊 Project Overview
 - **Type:** Desktop Automation Tool (Python, Tkinter, PyAutoGUI)
-- **Goal:** Automate prompt submission to Sora/Flow web interfaces using visual recognition and coordinate control.
-- **Key Stack:** Python 3.12+, Tkinter (UI), PyAutoGUI (Control), Selenium (Chrome Debugging).
+- **Goal:** Automate prompt submission to AI interfaces with extreme human-like behavior and anti-detection.
+- **Key Stack:** Python 3.12+, Tkinter (UI), PyAutoGUI (Control), Pyperclip (Safe Input).
 
 ## 🧩 Current Decisions & Architecture
-- **Config:** JSON-based configuration (`flow_config.json`) for coordinates and prompts.
-- **Persistence:** Local file storage for prompt slots (`flow_prompts.txt`).
-- **Safety:** "Keep-Awake" (Insomnia) mode prevents sleep during operation.
-- **Execution:** Robust Silent Launcher (`2_오토_프로그램_실행.bat`) using `pyw` for console-free operation.
-- **Cleanliness:** Unused legacy files moved to `_Unused_Backup/` for a minimal workspace.
+- **Input Method:** Switched from `typewrite` to **`pyperclip` (Paste)** to prevent Korean IME issues 100%.
+- **File Structure:** Migrated to `flow_auto_v2.py` and `human_behavior_v2.py` to evade zombie processes.
+- **Safety:** Auto-kill zombie processes (`python.exe`) on startup.
+- **Humanizer:** Advanced Bezier curves, random speed (burst/slow), AFK mode with safe playground area.
 
 ## ✅ Resolved (Today's Fixes)
-- **[Critical] Startup Crash**: Refactored `load_config` to a global function and restored `_build_ui` in `flow_auto.py`.
-- **[UX] Dual Window Removal**: Implemented `pythonw`/`pyw` based launcher to prevent the persistent console window.
-- **[Launcher] Silent Launch Robustness**: Fixed a "flash and close" crash in the launcher by simplifying the Python detection logic to prefer `pyw -3`.
-- **[Cleanup] Workspace Organization**: Moved all irrelevant files (legacy Sora scripts, logs, old bat files) to `_Unused_Backup/`.
-- **[Design] Icon Enhancement**: Generated a new high-quality, "luxurious & cute" gradient icon with a heart motif.
+- **[Critical] Korean IME Typo Fix:** Replaced all typing logic with **Word-by-Word Paste** (`Ctrl+V`). Even if Korean key is on, it pastes English correctly.
+- **[Critical] Zombie Process Kill:** Added auto-kill logic in batch script to prevent old "typing bots" from interfering.
+- **[Feature] AFK Mode:** Added "User Away Mode" where the mouse idles/moves safely in a designated area.
+- **[Feature] Speed Slider:** Added real-time speed control slider (x0.5 ~ x10.0) with random variation per prompt.
+- **[Safety] Submit Logic:** Submits via **Random (Enter OR Click)** to mimic human behavior, never double submits.
 
 ## 🚧 Next Steps
-1. **Mouse Accuracy Check**: Verify if the random human-like movement needs calibration for different screen resolutions.
-2. **Audio Feedback**: Implement sound notifications for task completion (e.g., "Ding!").
-3. **Final Cleanup**: Delete `_Unused_Backup/` once the user confirms total stability for a few days.
+1. **Long-term Monitoring**: Watch if "paste mode" has any side effects over 10+ hours.
+2. **Sound Feedback**: Add optional sound effects for "Start", "Finish", "Error".
+3. **Multi-slot Expansion**: Allow running multiple slots sequentially? (Maybe later).
 
 ## 🐛 Known Issues
-- **Environment Sensitivity**: Coordinates still need re-capturing if the target window moves.
-- **Icon Cache**: Windows Explorer might delay showing the new icon until a restart or cache clear.
+- **None critical**: The "Zombie" issue is resolved by the new launcher script.
