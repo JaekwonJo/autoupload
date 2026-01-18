@@ -190,32 +190,62 @@ class HumanActor:
     # -------------------------------------------------------------------------
     def type_text(self, text, input_area=None):
         """
-        [V2 최종 결전 병기: 단어 단위 붙여넣기]
-        한글 타이핑 문제를 원천 봉쇄하기 위해 '복사+붙여넣기'만 사용합니다.
-        pyautogui.write() 명령어는 이 코드에서 완전히 삭제되었습니다.
+        [타이핑 모드 복구] 구글 탐지 회피를 위해 한 글자씩 타이핑합니다.
+        한글 오타 방지를 위해 시작 전 검사를 철저히 합니다.
         """
-        print("🚨 [V2 PASTE] 영문 붙여넣기 실행 중! (한글 원천 봉쇄)")
+        # [CRITICAL] 시작 전 영어가 맞는지 확인 사살!
+        self._ensure_english_mode_clipboard()
+
+        base_speed = self.get_effective_speed()
+        burst_mode = False; burst_remaining = 0
+        if random.random() < 0.05 and text: text = text[0].swapcase() + text[1:]
         
-        words = text.split(' ')
-        
-        for i, word in enumerate(words):
-            # 1. 단어를 클립보드에 복사 (마지막 단어 아니면 공백 추가)
-            word_to_paste = word + " " if i < len(words) - 1 else word
-            pyperclip.copy(word_to_paste)
+        i = 0
+        while i < len(text):
+            char = text[i]
             
-            # 2. 붙여넣기 (Ctrl + V)
-            pyautogui.hotkey('ctrl', 'v')
+            # --- 리듬 엔진 (속도 변화) ---
+            if not burst_mode and random.random() < 0.05: 
+                burst_mode = True; burst_remaining = random.randint(5, 15)
+            if burst_mode:
+                current_delay = random.uniform(0.01, 0.05) * base_speed
+                burst_remaining -= 1
+                if burst_remaining <= 0: burst_mode = False
+            else:
+                current_delay = random.uniform(0.05, 0.25) * base_speed
+                if random.random() < 0.03: time.sleep(random.uniform(0.5, 1.5))
             
-            # 3. 인간미 딜레이
-            typing_delay = len(word) * random.uniform(0.05, 0.15)
-            time.sleep(typing_delay)
+            # --- 오타 시뮬레이션 ---
+            if char not in ['\n', ' '] and random.random() < self.cfg["typo_rate"]:
+                self._handle_typo(char, base_speed, input_area)
             
-            # 4. 가끔 딴짓 (마우스 흔들기 - 클릭 금지)
+            # --- 안전한 검토 ---
+            if i > 10 and not burst_mode and random.random() < self.cfg.get("caret_check_rate", 0.02):
+                self._simulate_caret_navigation_safe(base_speed)
+            
+            time.sleep(random.uniform(0.01, 0.05))
+            
+            # --- 실제 키 입력 ---
+            if char == '\n':
+                print("⌨️ [Human] Shift+Enter (Line Break)")
+                time.sleep(0.2)
+                pyautogui.keyDown('shift')
+                time.sleep(0.1)
+                pyautogui.press('enter')
+                time.sleep(0.1)
+                pyautogui.keyUp('shift')
+                time.sleep(0.3)
+            elif char == ' ':
+                # Shift 키 눌림 방지
+                pyautogui.keyUp('shift')
+                time.sleep(0.05)
+                pyautogui.write(' ')
+                current_delay += random.uniform(0.05, 0.1)
+            else:
+                pyautogui.write(char) # [복구됨] 한 글자씩 입력
+            
             self._jitter_mouse_during_typing(input_area)
-            
-            # 5. 가끔 멍때리기
-            if random.random() < 0.05:
-                time.sleep(random.uniform(0.5, 1.5))
+            time.sleep(current_delay); i += 1
 
     def _jitter_mouse_during_typing(self, input_area):
         if random.random() > 0.4: return False
