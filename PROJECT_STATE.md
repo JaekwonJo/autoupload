@@ -1,7 +1,7 @@
 # 🏗️ Project State: Flow Veo Vision Bot
 
-> **Last Updated:** 2026-01-16 (Fri) - Ultimate Update
-> **Current Stage:** 🚀 V2 Stable Release (Typing Mode + Anti-IME + WSL Optimized)
+> **Last Updated:** 2026-01-20 (Tue) - Reporting Update
+> **Current Stage:** 📊 V2 Feature Enhancement (Logging & Reporting)
 
 ## 📊 Project Overview
 - **Type:** Desktop Automation Tool (Python, Tkinter, PyAutoGUI)
@@ -13,15 +13,14 @@
 - **File Structure:** Migrated to `flow_auto_v2.py` and `human_behavior_v2.py` to evade zombie processes.
 - **Safety:** Auto-kill zombie processes (`python.exe`) on startup.
 - **Humanizer:** Advanced Bezier curves, random speed (burst/slow), AFK mode with safe playground area.
-- **Environment:** Configured `.wslconfig` to limit WSL memory usage to 6GB for better system performance.
+- **Reporting:** Detailed session logs saved to `logs/` with prompt filename, timestamps, and per-scene duration.
 
 ## ✅ Resolved (Today's Fixes)
-- **[Critical] Korean IME Typo Fix:** Implemented robust clipboard-based IME detection (10 retries + Shift/Space/Hangul key spam) before typing.
-- **[Critical] Zombie Process Kill:** Added auto-kill logic in batch script to prevent old "typing bots" from interfering.
-- **[Feature] AFK Mode:** Added "User Away Mode" where the mouse idles/moves safely in a designated area (No clicks).
-- **[Feature] Speed Slider:** Added real-time speed control slider (x0.5 ~ x10.0) with random variation per prompt.
-- **[Feature] Sound Effects:** Added sound notifications for start (`Ding!`), finish (`Ta-da!`), and countdown (`Tick...`).
-- **[System] WSL Optimization:** Auto-generated `.wslconfig` to cap WSL memory at 6GB.
+- **[Feature] Detailed Session Report:** Added a comprehensive reporting system that saves a text file to `logs/` after each session.
+- **[Feature] Metadata Logging:** Reports now include the prompt filename, start/end times, and total duration.
+- **[Feature] Scene Timing:** Logs the exact duration (in seconds) for each individual prompt generation.
+- **[Feature] Summary Popup:** Enhanced the completion message box to show a quick summary of the session stats.
+- **[Docs] Gemini Protocol:** Updated `gemini 설명서.md` to strictly enforce "Continuous Engagement" (No goodbyes).
 
 ## 🚧 Next Steps
 1. **Long-term Monitoring**: Watch if "Typing Mode" triggers any captchas over 10+ hours.

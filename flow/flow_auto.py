@@ -406,6 +406,10 @@ class FlowVisionApp:
             
         self._prevent_sleep()
         
+        # [NEW] 세션 기록 초기화
+        self.session_start_time = datetime.now()
+        self.session_log = []
+        
         self.running = True
         self.btn_start.config(state="disabled")
         self.btn_stop.config(state="normal")
@@ -716,6 +720,79 @@ class FlowVisionApp:
         
         self.root.after(1000, self._tick)
 
+    def save_session_report(self):
+        end_time = datetime.now()
+        start_time = getattr(self, "session_start_time", end_time)
+        total_duration = end_time - start_time
+        
+        # [NEW] 프롬프트 파일명 가져오기
+        prompt_file = self.cfg.get("prompts_file", "unknown")
+        
+        # 로그 파일 생성
+        log_dir = self.base / "logs"
+        log_dir.mkdir(exist_ok=True)
+        # [NEW] 파일명에 프롬프트 파일명 포함
+        prompt_name_only = Path(prompt_file).stem
+        filename = f"Report_{prompt_name_only}_{end_time.strftime('%Y%m%d_%H%M%S')}.txt"
+        file_path = log_dir / filename
+        
+        lines = []
+        lines.append(f"==========================================")
+        lines.append(f"   [{APP_NAME}] 작업 완료 보고서")
+        lines.append(f"==========================================")
+        lines.append(f"■ 작업 일자: {end_time.strftime('%Y-%m-%d')}")
+        lines.append(f"■ 프롬프트 파일: {prompt_file}")
+        lines.append(f"■ 시작 시간: {start_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        lines.append(f"■ 종료 시간: {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
+        lines.append(f"■ 총 소요 시간: {total_duration}")
+        lines.append(f"■ 처리된 장면: {len(self.session_log)}개")
+        lines.append(f"==========================================")
+        lines.append(f"\n[상세 내역]")
+        
+        total_scene_time = 0.0
+        for log in self.session_log:
+            lines.append(f"------------------------------------------")
+            lines.append(f"장면 #{log['index']}")
+            lines.append(f"- 시작 시각: {log['start']}")
+            lines.append(f"- 종료 시각: {log['end']}")
+            lines.append(f"- 소요 시간: {log['duration']}")
+            lines.append(f"- 프롬프트: {log['prompt']}")
+            
+            try:
+                # "12.34초" -> 12.34
+                dur_val = float(log['duration'].replace('초', ''))
+                total_scene_time += dur_val
+            except: pass
+            
+        avg_time = 0
+        if self.session_log:
+            avg_time = total_scene_time / len(self.session_log)
+            
+        lines.append(f"------------------------------------------")
+        lines.append(f"\n[최종 요약]")
+        lines.append(f"- 평균 장면 생성 시간: {avg_time:.2f}초")
+        lines.append(f"- 총 작업 시간: {total_duration}")
+        lines.append(f"\n보고서 생성 완료: {file_path}")
+
+        # 파일 저장
+        try:
+            with open(file_path, "w", encoding="utf-8") as f:
+                f.write("\n".join(lines))
+        except Exception as e:
+            print(f"파일 저장 실패: {e}")
+            
+        summary = (
+            f"🎊 모든 작업이 완료되었습니다! 🎊\n\n"
+            f"📅 시작: {start_time.strftime('%H:%M:%S')}\n"
+            f"📅 종료: {end_time.strftime('%H:%M:%S')}\n"
+            f"⏱ 총 소요: {total_duration}\n"
+            f"🎬 처리 장면: {len(self.session_log)}개\n"
+            f"⚡ 평균 속도: {avg_time:.2f}초\n\n"
+            f"📂 로그 저장됨:\n{filename}"
+        )
+        
+        messagebox.showinfo("작업 완료 보고서", summary)
+
     def _run_task(self):
         # [NEW] 1. 스케줄 체크 (활동 시간이 아니면 스킵)
         is_active, reason = self.actor.check_schedule()
@@ -742,12 +819,15 @@ class FlowVisionApp:
             self.running = False
             self.lbl_status.config(text="🎉 모든 작업 완료!", fg="#BD93F9")
             self.log("작업 완료")
-            messagebox.showinfo("완료", "모든 프롬프트를 처리했습니다.")
+            self.save_session_report() # [NEW] 결과 보고 및 저장
             self.on_stop()
             return
 
         self._show()
         prompt = self.prompts[self.index]
+        
+        # [NEW] 장면 시작 시간 기록
+        task_start_time = datetime.now()
         
         # [CORE] 매 작업마다 인격을 리셋 (완전 무작위 패턴)
         self.actor.randomize_persona()
@@ -857,6 +937,17 @@ class FlowVisionApp:
                 self.actor.smart_click()
             
             self.log(f"✅ 제출 완료")
+            
+            # [NEW] 장면 완료 로그 기록
+            task_end_time = datetime.now()
+            duration_sec = (task_end_time - task_start_time).total_seconds()
+            self.session_log.append({
+                "index": self.index + 1,
+                "prompt": prompt,
+                "start": task_start_time.strftime("%H:%M:%S"),
+                "end": task_end_time.strftime("%H:%M:%S"),
+                "duration": f"{duration_sec:.2f}초"
+            })
             
             # 카운트 증가
             self.actor.processed_count += 1

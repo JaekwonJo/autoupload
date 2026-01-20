@@ -1,5 +1,16 @@
 # 🔨 Build Log
 
+## 2026-01-20 (Tue) - Detailed Reporting System
+- **Error**: N/A (Feature Request)
+- **Cause**: User requested detailed logging of session times and per-scene durations.
+- **Fix**: 
+  - `flow/flow_auto_v2.py`: Implemented `save_session_report` to generate detailed `.txt` logs.
+  - `flow/flow_auto.py`: Backported the reporting logic to the V1 script for consistency.
+  - `gemini 설명서.md`: Added strict "Continuous Engagement" rules (No goodbye phrases).
+  - **Logic**: Captures start/end times, calculates duration per scene, and saves file with prompt metadata.
+- **Result**: Automated generation of `Report_filename_timestamp.txt` in `logs/` folder after every run.
+
+---
 ## 2026-01-16 (Fri) - The "Anti-IME" War & System Optimization
 - **Error**: Korean characters (`ㄴ8 ㅖ개...`) appearing instead of English prompts despite multiple IME detection fixes.
 - **Cause**: 

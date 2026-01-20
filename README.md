@@ -25,6 +25,11 @@ Double-click **`2_오토_프로그램_실행.bat`**.
 
 ## 🛠️ Key Features (V2 Update)
 
+### 📊 Detailed Reporting (New!)
+- **Auto-Logging**: Automatically saves a detailed session report (`logs/Report_...txt`) after completion.
+- **Performance Stats**: Tracks total time, average speed per scene, and individual prompt durations.
+- **Metadata**: Records which prompt file was used and exact timestamps.
+
 ### 🛡️ Ultimate Safety
 - **Anti-IME Typing**: Uses advanced **Clipboard Detection** (10 retries) to ensure English input before typing.
 - **Zombie Slayer**: Automatically terminates old bot processes on startup to prevent conflicts.

@@ -1,964 +1,232 @@
-장면 1
+S1 **prompt:**
+3d pixar studio style. **Fast camera panning up from the bottom to the top**. The bottom area is a frozen glacier land with biting cold wind and cracked ice. As the camera moves up rapidly, it reveals a blindingly bright golden lava land on top with magical fire sparks and heat haze. Extreme temperature contrast between ice and fire. Blockbuster scale. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text.
 
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a blue hoodie floating in the air and playing happily with colorful glowing orbs, bright and peaceful atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 여러분, 요즘 챗GPT나 구글 제미나이, 하루에 몇 번이나 쓰시나요?
-
-정말 편하죠?
-
-마치 내 손안에 24시간 대기하는 천재 비서가 있는 기분일 겁니다.
-
-
 |||
-
-
-장면 2
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a blue hoodie holding a giant sparkling diamond in one hand and a tiny coin in the other hand, looking confused and comparing them, no voice, no speech, no text, sound effects only, kawaii style
+S2 
+**prompt:**
+3d pixar studio style. Ominous dark atmosphere. A cute chubby penguin wearing a red hoodie shouting desperately at a gigantic looming golden wall in the dark. **Magical blue soundwaves erupting from the penguin's mouth** but magically disintegrating into dust instantly upon hitting the immovable wall. Low angle shot emphasizing the scale of the wall. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 
-장면설명: 그런데 말이죠... 혹시 계산해 보셨나요?
-
-이 천재 비서를 고용하는 데 여러분이 지불한 돈이 얼마인지.
-
-대부분은 '0원', 혹은 커피 몇 잔 값인 '20달러' 정도일 겁니다.
-
-
 |||
-
-
-장면 4
-
-영상 프롬프트: 3d pixar studio style, a giant friendly white robot smiling and raining down colorful gift boxes on a cute cat wearing a blue hoodie, happy atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그런데 지금 전 세계 시가총액 1위, 2위를 다투는 기업들이,
+S3 
+**prompt:**
+3d pixar studio style. A magical steam train speeding through darkness. The front engine part is made of solid gold and emitting blindingly bright magical light and massive golden sparks. **Blockbuster scale dynamic tracking shot** following the train's speed. Intense motion blur and magical energy trails. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text.
 
-인류 역사상 가장 비싼 기술이라는 인공지능을, 왜 우리에게 거의 공짜로 퍼주고 있을까요?
-
-그들이 자선사업가라서? 아니면 인류의 평화를 위해서?
-
-
 |||
-
-
-장면 6
-
-영상 프롬프트: 3d pixar studio style, a cute white rabbit wearing a red scarf presses a cute button, and an endless long paper strip flows out like a snake from behind the button, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 지금 당장은 돈을 안 내는 것 같지만,
-
-사실 우리는 돈보다 훨씬 비싼 무언가를... 매일매일 그들에게 상납하고 있습니다.
+S4
+**prompt:**
+3d pixar studio style. A cute chubby owl wearing a "TTZ" graduation cap magically appears from the corner and waves a magic wand at a long speeding magical steam train. The train magically splits in half with a loud magical boom and explosion effect. Dynamic camera movement capturing the separation moment with intense magical shockwaves and particles flying. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 
-현재, 실리콘밸리에서 무슨 일이 벌어지고 있는지.
-
-
 |||
-
-
-장면 7
-
-영상 프롬프트: 3d pixar studio style, a robotic hand suddenly snatches a glowing heart-shaped light from a surprised white rabbit's chest (wearing red scarf), slightly scary but cute, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그리고 우리가 알게 모르게 당하고 있는 '착취'의 구조가 무엇인지.
-
-오늘 아주 낱낱이, 뼈가 시리도록 파헤쳐 드리겠습니다. 준비되셨나요?
-
-그럼, 팩트 폭격... 시작합니다!
+S5 **prompt:**
+3d pixar studio style. A cute chubby penguin wearing a red hoodie sitting alone on a frozen dark ice field. The penguin lights a single small magical match, magically creating a tiny warm orange magical aura around him. Extreme dark and cold atmosphere, high contrast lighting between the small fire and vast darkness. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text.
 
-
 |||
-
-
-장면 9
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a yellow construction helmet and holding a toy hammer, looking determined and serious, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 2025년 한 해에만 '태워버린' 돈이 자그마치... **2,000억 달러!!**
-
-우리 돈으로 환산하면 약 **280조 원**이 넘습니다.
-
-감이 잘 안 오시죠?
-
+S6 **prompt:**
+3d pixar studio style. Blockbuster scale. A cute chubby penguin wearing a red hoodie finding a magically glowing treasure map, then running and magically flying towards a blindingly bright light in the distance. **Fast camera tracking shot** following the flying penguin. Magical sparkles and light beams filling the air. Hopeful and energetic atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text.
 
 |||
+S7 **prompt:**
+3d pixar studio style. A cute chubby owl wearing a "TTZ" graduation cap waving a magic wand. Small golden bricks on the ground magically growing into gigantic golden skyscrapers. **Camera zooming out rapidly** to show the massive scale of the growing city. Intense magical dust and golden sparks exploding. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text.
 
-
-장면 10
-
-영상 프롬프트: 3d pixar studio style, three glossy white robots walking with difficulty carrying huge heavy sacks full of gold coins, the robots have logos of Google, Microsoft, and OpenAI on their chests, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 대한민국 정부 1년 예산의 거의 절반에 가까운 돈이,
-
-단 1년 만에 서버와 전기세, 그리고 칩을 사는 데 들어갔습니다.
-
-그런데 수익은 어떨까요?... 물론 유료 구독자가 늘어나긴 했습니다.
-
 |||
-
-장면 13
-
-영상 프롬프트: 3d pixar studio style, cute robot armies wearing toy soldier hats facing each other in a standoff, serious but cute atmosphere, no voice, no speech, no text, sound effects only, kawaii style
+S8 prompt: 3d pixar studio style. A majestic waterfall of liquid gold magically pouring down from the sky. A cute chubby white Persian cat wearing a dark navy pinstripe suit is sitting comfortably on a rock, catching the falling gold with a satisfied smile. Beautiful colorful flowers magically bloom around the cat. Slow panning shot. Magical glitter and sparkles everywhere. Dreamy and rich atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text.  kawaii style.
 
-장면설명: 도대체 왜일까요? 단순히 나중에 돈을 벌기 위한 '투자'라고 하기엔 규모가 너무 기괴합니다.
+||| S9  prompt: 3d pixar studio style. Masterpiece visual. A vast landscape completely covered in thick blue glaciers and sharp ice. A cute chubby penguin wearing a red hoodie is standing alone in the center of the vast frozen land, shivering violently in the biting cold wind. Static wide shot emphasizing the small penguin in the frozen silence. Dark, gloomy, and frozen atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text.  
 
-이건 '투자'가 아니라... **'전쟁'**이기 때문입니다.
+||| S10 prompt: 3d pixar studio style. A luxurious golden carriage labeled "VIP" magically detaching from the ground and launching straight up into the sky with magical rocket thrusters. A cute chubby white Persian cat wearing a dark navy pinstripe suit is looking out from the carriage window, waving arrogantly. Dynamic low angle shot looking up at the flying carriage. Massive magical smoke. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
 
 
 |||
 
-
-장면 14
-
-영상 프롬프트: 3d pixar studio style, inside a cute science lab, a red siren light rotating urgently, cute penguin scientists running around in panic, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 2025년 12월 2일, 오픈AI 내부에서 '코드 레드'가 발령됐다는 소식, 들으셨나요?
-
-구글이 내놓은 '제미나이 3'의 성능이 챗GPT를 압도한다는 내부 보고서가 나오자,
-
-모든 수익화 계획을 뒤로하고 "일단 점유율부터 지켜!!"라는 명령이 떨어진 겁니다.
-
-
+S21 prompt:
+3d pixar studio style. A peaceful magically golden castle wall scene. Suddenly, a gigantic ominous shadow shaped like a Panda magically covers the entire sky above the castle, blocking the sun. Cute chubby white Persian cats wearing navy suits inside the castle look up at the giant shadow with nervous expressions. High contrast lighting between the golden castle and the dark shadow. Tension and grand scale. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
 |||
-
-
-장면 15
-
-영상 프롬프트: 3d pixar studio style, a robot throwing away a money bag and planting a large flag on the ground firmly, claiming territory, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이게 무슨 뜻일까요?... 지금 이들에게 중요한 건 '당장의 흑자'가 아닙니다.
-
-이 시장은 2등이 존재할 수 없는, 승자가 모든 것을 독식하는, 이른바 **'Winner Takes All'** 게임이기 때문입니다.
-
-
+S22 prompt:
+3d pixar studio style. A cute chubby owl wearing a "TTZ" graduation cap looking at a floating real estate document. Suddenly, a gigantic glowing red flag with five yellow stars magically bursts out from the paper with blinding light. The owl falls back in shock, eyes wide open. Magical particle effects filling the room. Surprise and impact. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 16
-
-영상 프롬프트: 3d pixar studio style, a podium where one giant robot stands victoriously while smaller robots slide off the edges, blue sky background, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 과거 인터넷이 처음 나왔을 때를 기억하시나요?
-
-야후, 라이코스, 엠파스... 수많은 검색 엔진이 있었지만, 결국 **'구글'** 하나만 살아남았습니다.
-
-
+S23 prompt:
+3d pixar studio style. Thick white fog magically clears instantly. A gigantic cute chubby Panda wearing a red scarf and a traditional vest lands from the sky with a massive "BOOM", creating a powerful magical shockwave and dust cloud. Tiny cute chubby penguins wearing red hoodies are blown away by the impact and tumble on the ground. Dynamic action camera capturing the heavy impact. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 17
-
-영상 프롬프트: 3d pixar studio style, a colorful airship with Google logo floating alone in the sky, other balloons popping around it, no voice, no speech, sound effects only, kawaii style
-
-장면설명: 그리고 구글은 전 세계 검색 시장의 90%를 장악한 뒤, 지난 20년 동안 천문학적인 광고 수익을 독점했죠.
-
-지금 AI 전쟁은 그보다 100배는 더 큰 판입니다.
-
-
+S24 prompt:
+3d pixar studio style. A cute chubby penguin wearing a red hoodie magically flying towards the golden city walls with hope. Suddenly, the penguin hits an invisible blue magical barrier, creating blue ripples and sparks. The penguin bounces off and falls down tragically towards the dark ground. Sad atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 18
-
-영상 프롬프트: 3d pixar studio style, camera zooms out from a cute Earth globe to reveal a vast starry universe, sense of massive scale, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 지금 200조, 아니 300조 원을 태워서라도, 전 세계 80억 인구가 'AI' 하면 딱 하나의 서비스만 떠올리게 만드는 것.
-
-그것이 그들의 첫 번째 목표입니다.
-
-
+S25 prompt:
+3d pixar studio style. The gigantic cute chubby Panda wearing a red scarf crouches and performs a massive magical super-jump. The Panda soars high into the sky, leaving a trail of golden magical sparkles, effortlessly crossing over the high castle walls. Low angle shot tracking the jump. Dynamic energy. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 19
-
-영상 프롬프트: 3d pixar studio style, a robot holding out a shiny red apple, but the shadow cast on the wall looks like a skull, ominous but cute, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 경쟁자들을 말려 죽이는 치킨 게임.
-
-여러분이 지금 누리고 있는 '무료'의 혜택은, 사실 경쟁자들을 질식시키기 위해 그들이 뿌리고 있는... **'독이 든 사과'**입니다.
-
-
+S26 prompt:
+3d pixar studio style. A cute chubby penguin wearing a red hoodie standing in the dark, its feet completely frozen by blue ice magic, unable to move. Fast magical camera transition to a warm golden room where the Panda and a White Persian Cat are sitting on a velvet sofa, holding cocktails and laughing. Extreme contrast between cold restraint and warm freedom. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
 |||
-
-
-장면 20
-
-영상 프롬프트: 3d pixar studio style, a cute white rabbit wearing a red scarf taking a glowing gem out of their pocket and offering it to a robot, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 하지만 이게 전부가 아닙니다. 돈을 태우는 진짜 이유는 따로 있습니다.
-
-바로 여러분이 그들에게 **'가장 비싼 자원'**을 공짜로 주고 있기 때문입니다.
-
-
+S27 prompt:
+3d pixar studio style. A cute chubby Panda wearing a red scarf waves a paw with magical energy. Gigantic golden skyscrapers magically erupt and shoot up from the ground instantly like bamboo shoots, surrounded by dazzling golden magical effects. Camera tilts up rapidly to follow the rising buildings, emphasizing the immense height. Blockbuster scale. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 21
-
-영상 프롬프트: 3d pixar studio style, a cute penguin wearing round glasses crossing wings to make an X shape, refusing gesture, shaking head no, simple action, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 여러분이 챗지피티를 쓰면서 가장 많이 하는 행동이 뭔가요?
-
-질문을 하고, 마음에 안 들면 "야, 이거 틀렸어. 다시 해봐."라고 피드백을 주는 겁니다.
-
-
+S28 prompt:
+3d pixar studio style. A bamboo forest is engulfed in fierce red magical flames. A cute chubby Panda wearing a red scarf runs desperately away from the fire, carrying a heavy glowing golden bundle on its back. Sparks and embers fly everywhere. Urgent survival atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 22
-
-영상 프롬프트: 3d pixar studio style, a cute penguin wearing round glasses and a gold crown sitting comfortably on a sofa, looking like a king, happy atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그리고 친절한 AI는 말하죠. "죄송합니다. 지적해 주신 내용을 바탕으로 수정했습니다."
-
-여러분은 생각할 겁니다. '아, 내가 이 똑똑한 AI를 부려먹고 있구나... 내가 주인이다.'
-
-
+S29 prompt:
+3d pixar studio style. A cute chubby Panda wearing a red scarf throws the golden bundle into the air. Instantly, a magical transparent crystal sphere forms around the gold, solidifying into an indestructible diamond-like barrier floating in the air. The Panda looks relieved. Orbit camera shot showing the shimmering protective barrier. Magical defense. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 23
-
-영상 프롬프트: 3d pixar studio style, a cute penguin wearing round glasses wiping sweat from forehead with a wing, looking tired after work, heavy boxes in background, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 착각하지 마세요!! 그 순간, 진짜 이득을 본 건 AI 기업입니다.
-
-이것을 전문 용어로 **RLHF**, 즉, **'인간 피드백 기반 강화 학습'**이라고 합니다.
-
-
+S30 prompt:
+3d pixar studio style. A colorful fantasy amusement park at night. A cute chubby Panda wearing a red scarf, a cute chubby Eagle wearing an American flag shirt, and a cute chubby White Persian Cat wearing a navy suit are dancing together happily. Colorful magical fireworks explode in the sky above them. Festival atmosphere with neon lights. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
 |||
-
-
-장면 24
-
-영상 프롬프트: 3d pixar studio style, a cute penguin wearing round glasses looking at a red apple and a golden apple, then picking up the golden apple, choosing the best one, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: AI는 확률적으로 단어를 뱉어내는 기계일 뿐입니다.
-
-이 기계가 사람처럼 완벽하게 대답하려면, 반드시 **'사람의 채점(선호도 선택)'**이 필요합니다.
-
-
-
+S31 prompt:
+3d pixar studio style. A magical golden steam train flying through a snowy blizzard night, emitting magical golden sparks. Fast camera movement zooming into the train window. Inside, a cute chubby Panda wearing a red scarf and a cute chubby White Persian Cat wearing a navy pinstripe suit are dancing happily together. Warm and luxurious atmosphere inside. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
 |||
-
-장면 25
-
-영상 프롬프트: 3d pixar studio style, a cute white rabbit with long ears wearing a red scarf looking confused between a red button and a blue button, hesitation, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: "이 대답은 백점짜리야." , "이 대답은 빵점이야."
-
-우리는 끊임없이 정답을 골라주고 있습니다.
-
-
+S32 prompt:
+3d pixar studio style. A miniature golden apartment building displayed inside a glass case in a dark museum. The building glows with blindingly bright magical diamond light, shooting rainbow beams everywhere. Extreme close-up on the sparkling treasure. Magical and precious atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 26
-
-영상 프롬프트: 3d pixar studio style, a cute penguin wearing round glasses and a white lab coat turning their pockets inside out, only dust comes out, showing they have no money, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이 채점을 누가 해줄까요? AI 박사님들이 모여서 하나하나 다 채점할까요?
-
-아니요... 그러면 인건비가 감당이 안 됩니다.
-
-
+S33 prompt:
+3d pixar studio style. A vast barren landscape with deeply cracked dry earth. Raindrops fall from the sky but magically evaporate into grey steam the moment they touch the hot ground. The cracks on the ground magically spread wider with ominous sounds. Desolate and gloomy atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 27
-
-영상 프롬프트: 3d pixar studio style, a group of cute animals (cats, dogs, rabbits) standing side by side in a playground, raising their hands high at the same time, bright atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그래서 그들은 전 세계 10억 명의 사용자, 바로 여러분에게 이 작업을 **'무료'**로 시키고 있는 겁니다.
-
-
+S34 prompt:
+3d pixar studio style. A cute chubby owl wearing a "TTZ" graduation cap opening an antique magic book. Magical golden dust rises from the pages and magically forms the shape of a glowing "Honey Pot" in the air. Magical sparkles and library background. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 28
-
-영상 프롬프트: 3d pixar studio style, a cute cat paw pressing a button with a Heart Thumbs Up icon, then pressing a button with a Refresh Arrow icon, repeatedly, close-up, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 여러분이 "다시 써줘" 버튼을 누르는 순간, 여러분은 AI에게 "이 답변은 오답이야"라는 데이터를 제공한 겁니다.
-
-여러분이 "좋아요" 버튼을 누르거나, 답변을 복사해서 그대로 쓴다면, "이 답변은 정답이야"라는 데이터를 제공한 겁니다.
-
-
+S35 prompt:
+3d pixar studio style. A cute chubby bear wearing a red outfit holding a honey pot and eating delicious golden honey happily. Cute round bees fly around him, sprinkling magical golden dust like fairy powder. Warm and sweet atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 29
-
-영상 프롬프트: 3d pixar studio style, close-up of a small open box with a sparkling golden crown inside, glowing effect, high value, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이 데이터 하나하나의 가치가 얼마나 되는지 아십니까?
-
-전문 데이터 라벨링 업체에 맡기면, 전문적인 코딩 수정이나 법률 자문 피드백 하나당 수만 원, 아니 수십만 원을 줘야 합니다.
-
-
+S36 prompt:
+3d pixar studio style. Blockbuster scale. A gigantic golden honey pot magically appears in the sky above a grey city. Thick golden honey magically pours down from the pot like a massive waterfall, covering the city streets. Low angle shot looking up at the pot. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 30
-
-영상 프롬프트: 3d pixar studio style, a gentle brown bear wearing a yellow vest politely offering the golden crown with two hands to a robot. no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그런데 그들은 이걸 여러분에게 '서비스'라는 명목으로 제공하고, 여러분은 신나서 자신의 전문 지식과 판단력을 **'공짜'**로 입력해 줍니다.
-
-심지어 "와, 내가 AI를 가르쳤어!"라며 뿌듯해하기까지 하죠.
-
-
+S37 prompt:
+3d pixar studio style. A cute chubby White Persian Cat wearing a navy pinstripe suit sitting in a luxurious room filled with hundreds of magically glowing golden honey jars. The cat is happily eating honey with a spoon. Magical sparkles coming from the honey. Rich atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
 |||
-
-
-장면 31
-
-영상 프롬프트: 3d pixar studio style, a gentle brown bear wearing a yellow vest and a construction helmet, looking at robot's empty hands with a bitter expression, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 냉정하게 말하면... 우리는 지금 오픈AI와 구글의 **'무급 비정규직 데이터 라벨러'**로 취업한 상태입니다.
-
-
+S38 prompt:
+3d pixar studio style. A cute chubby White Persian Cat wearing a colorful swimsuit swimming relaxed backstroke in a large swimming pool filled with glowing golden liquid honey. Magical sparkles and golden splashes. Summer vacation atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
 |||
-
-
-장면 32
-
-영상 프롬프트: 3d pixar studio style, a gentle brown bear wearing a yellow vest sweeping the floor diligently with a broom around a robot's feet, cleaning worker, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 월급은커녕, 가끔은 구독료까지 내면서 일을 해주고 있는 셈이죠.
-
-
+S39 prompt:
+3d pixar studio style. A cute chubby White Persian Cat wearing a navy pinstripe suit touching a rough grey concrete building. The building instantly magically transforms into a shining solid gold skyscraper with a blinding magical flash and "poof" effect. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
 |||
-
-
-장면 33
-
-영상 프롬프트: 3d pixar studio style, a cute white rabbit wearing a red scarf looking up at photo tiles of traffic lights and buses floating in the air, curious expression, blue sky background, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 과거에 구글이 **'리캡차라는 걸로 우리를 이용했던 거 기억나시나요?
-
-
+S40 prompt:
+3d pixar studio style. Golden skyscrapers magically growing taller and shooting up into the sky at high speed. A cute chubby White Persian Cat wearing a navy pinstripe suit sits on the roof of the rising building, eating honey and laughing. Dynamic camera tracking the upward movement. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
 |||
-
-
-장면 34
-
-영상 프롬프트: 3d pixar studio style, close-up of a cute white rabbit paw poking one of the floating photo tiles, selecting it, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: "로봇이 아닙니다" 체크할 때, 신호등 찾으세요, 횡단보도 찾으세요, 하면서 귀찮게 굴었죠?
-
-
+S41 prompt:
+3d pixar studio style. A cute chubby penguin wearing a red hoodie stands in a dark, cold room. Suddenly, icy blue water magically rises from the floor at an alarming speed, filling the room. The penguin panic and desperately tries to swim, reaching out its flippers for help. High tension atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 35
-
-영상 프롬프트: 3d pixar studio style, a cute red toy car with 'Waymo' and 'Google' logos on the side absorbing glowing light particles from the air, magical effect, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그때 우리가 찍은 점들, 그게 전부 구글의 자율주행차,
-
-**'웨이모(Waymo)'**를 훈련시키는 데이터로 쓰였습니다.
-
-
+S42 prompt:
+3d pixar studio style. A stream of glowing golden liquid honey magically flows towards a cute chubby penguin wearing a red hoodie. The moment the golden liquid touches the penguin's hands, it magically transforms into sticky black tar and disgusting mud with a dark magical "poof" effect and purple sparks. The penguin is covered in filth. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 36
-
-영상 프롬프트: 3d pixar studio style, the same red toy car with 'Waymo' and 'Google' logos driving smoothly on a road by itself, speed lines, sunny day, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 우리는 귀찮은 걸 참았지만, 구글은 수억 명의 눈을 빌려,
-
-자율주행 기술을 **'공짜'**로 완성했습니다.
-
-
+S43 prompt:
+3d pixar studio style. A luxurious banquet hall filled with many cute chubby White Persian Cats wearing navy pinstripe suits. They are happily feasting on a lavish dinner with golden food, drinking champagne, and laughing. Magical golden sparkles and confetti fill the air, creating a festive and rich atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
 |||
-
-
-장면 37
-
-영상 프롬프트: 3d pixar studio style, a white robot standing surrounded by floating colorful glowing clouds, dreamy atmosphere, magic, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 지금 AI는 스케일이 다릅니다. 논리, 창의성, 전문 지식까지!
-
-인간 지성의 정수를 데이터로 몽땅 빨아들이고 있습니다.
-
-
+S44 prompt:
+3d pixar studio style. Blockbuster scale. A panoramic view of a gigantic futuristic golden city at night. Countless magical golden coins and light beams rain down fiercely from the sky into the city, like a massive golden meteor shower. Dynamic camera movement capturing the grand spectacle. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 38
-
-영상 프롬프트: 3d pixar studio style, a round glossy white robot holding a small bag of coins in one hand and a huge glowing magical orb in the other, hugging the orb tightly, valuing it more, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 적자에도 무료인 이유? 당장의 서버비 몇조 원보다,
-
-여러분이 제공하는 데이터의 가치가 훨씬 크기 때문이죠.
-
-
+S45 prompt:
+3d pixar studio style. A dark and desolate dilapidated provincial town street at night. Several cute chubby penguins wearing ragged, torn clothes are huddling together, shivering in the cold. The street is empty and crumbling, with flickering broken streetlights. Gloomy and poverty-stricken atmosphere with magical dust. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 39
-
-영상 프롬프트: 3d pixar studio style, a cute white rabbit wearing a red scarf looking at a sign with a Gift Box icon in a flower field, but a large trap is hidden underneath, slightly ominous, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 데이터만 가져갈까요? 기업이 그럴 리 없죠.
-
-이 '무료' 전략엔 더 무서운 심리적 덫이 숨겨져 있습니다.
-
-
+S46 prompt:
+3d pixar studio style. A cute chubby penguin wearing a red hoodie shouting angrily at a gigantic, blindingly bright solid golden wall. Suddenly, the ground beneath the penguin's feet magically crumbles and collapses into a dark abyss with magical shockwaves. The penguin looks terrified as it falls. Dynamic camera emphasizing the fall. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 40
-
-영상 프롬프트: 3d pixar studio style, a cute white rabbit wearing a red scarf walks into a fancy area, and suddenly a golden cage gently lowers from above, trapping the rabbit inside, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 경제 용어로 **'락인 효과(Lock-in Effect)'**라고 합니다.
-
-쉽게 말해서, 한번 들어오면 못 나가게 가둬버리는 겁니다.
-
-
+S47 prompt:
+3d pixar studio style. Close-up on a cute chubby penguin wearing a red hoodie holding large coins made of ice. The ice coins rapidly melt and drip water, magically vanishing into thin air with a magical "poof" effect. The penguin watches with a sad, crying expression as its hands become empty. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 41
-
-영상 프롬프트: 3d pixar studio style, a cute white rabbit wearing a red scarf receiving a sweet candy from a round glossy white robot, looking happy, holding hands with the robot and walking together, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 처음엔 공짜니까 써봅니다. 공부할 때도, 일할 때도.
-
-그러다 점점 AI 없는 업무 처리는 상상할 수 없게 되죠.
-
-
+S48 prompt:
+3d pixar studio style. High contrast lighting. A busy provincial town street filled with many cute animal characters. Suddenly, they all begin to magically dissolve and disappear into grey dust one by one, leaving the street completely empty and silent. The buildings look abandoned. Ghostly and eerie atmosphere with magical particles. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 42
-
-영상 프롬프트: 3d pixar studio style, a round glossy white robot reading a thick book (diary) while a cute cat wearing a blue hoodie sits right next to it, leaning on the robot, dependent atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 내 말투, 업무 기록이 AI에게 차곡차곡 쌓입니다.
-
-나보다 나를 더 잘 아는 비서를, 과연 해고할 수 있을까요?
-
-
+S49 prompt:
+3d pixar studio style. Dynamic action shot. A cute chubby owl wearing a "TTZ" graduation cap is flying through the air, casting a powerful magical fire spell on a large old book. The book instantly erupts into massive magical red and orange flames and burns away completely with explosive effects. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 43
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a blue hoodie looks outside at a gray, motionless, boring robot, shakes head in disappointment, and turns back to the colorful white robot, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 절대 못 합니다. 멍청한 비서를 처음부터 다시 가르친다?
-
-불가능합니다. 이걸 **'전환 비용의 극대화'**라고 하죠.
-
-
+S50 prompt:
+3d pixar studio style. Many small, dim magical lights (representing poor people) are moving from a dark outer area towards a gigantic, blindingly bright pillar of magical light in the center (representing the city). As they enter the central light, they magically transform into brilliant, sparkling golden light particles, making the central pillar glow even brighter. High contrast and intense magical atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 44
-
-영상 프롬프트: 3d pixar studio style, a cute penguin wearing round glasses connected to a round glossy white robot by a glowing cable like an umbilical cord, typing on a laptop, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 사무직 90%가 코파일럿 없이 엑셀을 못 돌리고,
-
-개발자가 AI 없이 코드 한 줄 못 짜는 세상.
-
-
-|||
-
-
-장면 45
-
-영상 프롬프트: 3d pixar studio style, a round glossy white robot suddenly changes expression to serious and holds out a hand demanding something, a red hologram X mark appears, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그 세상이 오면 진짜 청구서가 날아옵니다.
-
-"월 20만 원입니다"라고 해도, 우리는 결제할 수밖에 없습니다.
-
-
-|||
-
-
-장면 46
-
-영상 프롬프트: 3d pixar studio style, a cute chubby orange tabby cat wearing a hoodie riding a red rocket flying straight up into the sky, high speed, rising, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 안 쓰면 도태되니까요! 그때는 선택권이 없습니다.
-
-기업용 AI 솔루션 가격은 이미 천정부지로 치솟고 있습니다.
-
-
-|||
-
-
-장면 47
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a hoodie happily eating honey from a giant jar, but looking down to see their legs are stuck deep in a pool of sticky yellow honey, struggling to move, cute but trapped, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이른바 **'달콤한 늪'** 전략입니다.
-
-꿀맛에 취해 정신없이 먹다 보면, 어느새 발이 묶여버리죠.
-
-
-|||
-
-
-장면 48
-
-영상 프롬프트: 3d pixar studio style, steam fills the screen, and a giant ominous shadow rises from within the steam, mystery, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 편리함의 따뜻함이, 어쩌면 끓기 직전의 온도일지도 모릅니다.
-
-그들이 노리는 건 고작 돈이 아닙니다. 더 무서운 게 있죠.
-
-|||
-
-장면 49
-
-영상 프롬프트: 3d pixar studio style, a giant baby made of starlight curling up in the dark universe, opening its shining eyes, mystical, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그들의 최종 목표는 **'AGI'**, 즉 '범용 인공지능'의 완성입니다.
-
-이것은 단순한 기계가 아니라, 새로운 권력의 탄생입니다.
-
-
-|||
-
-
-장면 50
-
-영상 프롬프트: 3d pixar studio style, a giant glowing golden silhouette of a humanoid figure floating in space, radiating holy light, mystery, god-like, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: AGI가 무엇이냐고요?
-
-모든 면에서 인간을 능가하는, 사실상 **'신(God)'**과 같은 존재입니다.
-
-
-|||
-
-
-장면 51
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a hoodie throwing away a black oil drum and looking in awe at a glowing golden seed rising from the ground, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이걸 먼저 개발하면 돈이 문제가 아닙니다.
-
-경제, 군사, 기술... 세상의 모든 시스템을 재편할 힘을 갖게 되죠.
-
-
-|||
-
-
-장면 52
-
-영상 프롬프트: 3d pixar studio style, a giant tree made of light growing rapidly to cover the entire world, a cute white rabbit wearing a red scarf, gathering under it, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 핵무기보다 강력하고, 석유보다 필수적입니다.
-
-지금 빅테크 기업들이 필사적으로 확보하고 있는 것이 무엇인지 보세요.
-
-
-|||
-
-
-장면 53
-
-영상 프롬프트: 3d pixar studio style, three floating objects in space: a thick book, a blue glowing computer chip, and a burning sun, representing resources, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 첫째 **데이터**, 둘째 **반도체**, 셋째 **에너지**.
-
-이 거대한 세 가지 자원이 그들의 뿌리로 모여들고 있습니다.
-
-
+S51 prompt:
+3d pixar studio style. A vast, empty frozen snowy field with a violent blizzard stormy weather. Scattered cute chubby penguins wearing red hoodies are shivering in the cold. They slowly gather towards the center, forming a tight circle. As their bodies touch, a magical warm orange glowing bonfire spontaneously erupts in the center, creating a warm light radius amidst the snow. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 54
-
-영상 프롬프트: 3d pixar studio style, a cute penguin wearing round glasses looking down as the ground transforms into a transparent crystal circuit board, futuristic texture, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그들은 단순한 소프트웨어 회사가 아닙니다.
-
-우리가 발 딛고 서 있는 미래 문명의 **'물리적 기반'**을 독점하는 겁니다.
-
-
+S52 prompt:
+3d pixar studio style. Scattered grey concrete factory buildings on a wide barren land magically detach from the ground and fly towards the center point. They magically merge and transform in mid-air with bright flashes, combining into a single, gigantic, futuristic diamond and glass skyscraper that towers into the sky, glowing with blinding magical blue light. Blockbuster scale. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 55
-
-영상 프롬프트: 3d pixar studio style, a cute penguin wearing round glasses inserts a coin into a cute floating vending machine, and a glowing lightbulb (idea) falls out, happy expression, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 수도세, 전기세 내듯이...
-
-미래에는 생각을 하고 문제를 해결하는 데도 돈을 내야 할지 모릅니다.
-
-
+S53 prompt:
+3d pixar studio style. A cute chubby golden-brown fox wearing a smart business suit and a cute chubby White Persian Cat wearing a smart business suit are standing face to face, having an intense discussion. Instead of words, intense magical red and blue lightning bolts shoot out from their heads, colliding in the air between them and creating a massive, glowing magical purple energy sphere representing innovation. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
 |||
-
-
-장면 56
-
-영상 프롬프트: 3d pixar studio style, a golden castle floating high in the clouds, connected to the ground by a very long beanstalk elevator, distinct separation, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이른바 **'지능세(Intelligence Tax)'**입니다.
-
-거대한 성을 가진 영주와 소작농... 이것이 **'디지털 봉건주의'**입니다.
-
-
+S54 prompt:
+3d pixar studio style. Inside a gigantic, transparent golden magical dome that glows brightly. It is a luxurious party scene with confetti and magical sparkles. A cute chubby golden-brown fox wearing a suit, a cute chubby Panda wearing a red scarf, and a cute chubby White Persian Cat wearing a suit are dancing happily together, holding champagne glasses. The atmosphere is extremely rich and festive with magical light effects. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 57
-
-영상 프롬프트: 3d pixar studio style, a gentle brown bear wearing a yellow vest tying harvest crops to balloons and floating them up to the sky castle, paying tribute, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 우리는 그 땅에서 일하고 대가를 바치는 소작농이 되는 구조죠.
-
-너무 비약이 심한 것 같나요? 하지만 역사를 돌아보세요.
-
+S55 prompt:
+3d pixar studio style. A sleek, futuristic luxury sports car driven by a cute chubby White Persian Cat wearing cool sunglasses and a driving suit is speeding towards a glittering futuristic city on the horizon. The road is golden and magical, and the car leaves a trail of light. Low angle tracking shot emphasizing speed and luxury. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
 |||
-
-장면 58
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a hoodie walking on a road, the ground texture changes rapidly from wood to glowing wires then to transparent glass, evolution, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 철도, 전기, 인터넷... 시대는 달라도 법칙은 같습니다.
-
-항상 그 길(인프라)을 장악한 소수가 부와 권력을 독점했죠.
-
-
+S56 prompt:
+3d pixar studio style. Blockbuster cosmic scale. A gigantic blindingly bright golden sun (representing Seoul) is in the center of dark space, generating powerful magical gravity. Numerous small planetary bodies (representing provinces) and tiny cute chubby penguins wearing astronaut suits are being magically pulled into the golden sun like comets with magical light trails, disappearing into its light. High contrast. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 59
-
-영상 프롬프트: 3d pixar studio style, the transparent glass road turns into a vertical rollercoaster rail, a cute cat wearing a hoodie riding it at light speed, neon lights, fast motion, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 지금은 그 인프라가 '인공지능'으로 바뀌었을 뿐입니다.
-
-다만, 그 속도와 파급력은 과거와 비교할 수 없을 정도로 압도적이죠.
-
-
+S57 prompt:
+3d pixar studio style. A magnificent golden skyscraper magically growing taller and taller at an incredible speed, shooting straight up and piercing through the clouds into the sky. Magical light and gold dust explode around it. A cute chubby White Persian Cat and a Fox in suits are on the top floor, laughing. Dynamic low angle camera shot tracking the upward growth, emphasizing extreme height. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
 |||
-
-
-장면 60
-
-영상 프롬프트: 3d pixar studio style, inside a translucent Earth globe model, a robotic hand removing an old battery and inserting a glowing blue cube (new core), no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 우리가 멍하니 있는 사이,
-
-세상의 운영체제가 그들의 손으로 넘어가고 있습니다.
-
-
+S58 prompt:
+3d pixar studio style. A wide square filled with crowded cute chubby penguins wearing red hoodies. Suddenly, a magical wind blows, and the penguins on the outskirts start to magically vanish one by one with grey magical smoke and "poof" effects. Only a small group of penguins in the very center remain, looking terrified. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 61
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a hoodie shivering with fear, then suddenly putting on cool black sunglasses and smiling confidently, attitude change, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 자, 너무 겁을 줬나요? 하지만 걱정 마세요.
-
-똑똑즈의 모토 기억하시죠? "현실을 직시하되, 쫄지는 말자!!"
-
-
+S59 prompt:
+3d pixar studio style. A view of Earth from space at night. The entire planet is covered in absolute pitch black darkness, except for one single tiny island (Seoul) that is exploding with blindingly bright golden and neon city lights, shining like a brilliant jewel in the dark. Extreme contrast lighting. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 62
-
-영상 프롬프트: 3d pixar studio style, a giant wave made of colorful balls coming, a cute white rabbit wearing a red scarf trying to block it with a tiny umbrella, futile effort, cute, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 이 거대한 흐름을 우리가 막을 수는 없습니다.
-
-샘 알트만 찾아가서 "AI 개발 멈춰!"라고 시위해 봤자 소용없죠.
-
-
+S60 prompt:
+3d pixar studio style. An endless, dry grey desert landscape under a dark sky. In the center, there is a beautiful, magical oasis protected by a shimmering transparent magical dome. Inside the dome, there are lush green trees and glowing golden buildings. Outside the dome, skeleton remains of penguins are lying on the sand, looking towards the oasis. High contrast. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 63
-
-영상 프롬프트: 3d pixar studio style, a cute white rabbit wearing a red scarf riding a surfboard skillfully on the wave of colorful balls, exciting and fun, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 우린 호구가 아니라, **'영리한 기생'** 전략을 써야 합니다.
-
-피할 수 없다면, 그 파도 위에 올라타서 즐기는 겁니다!
-
-
+S61 prompt:
+3d pixar studio style. A stormy dark ocean with huge waves. A gigantic golden Noah's Ark floats in the distance. In the foreground, a single magically glowing golden ticket is floating in the air. Hundreds of cute chubby penguins wearing red hoodies are reaching out desperately towards the ticket, screaming and crying. Chaotic survival atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 64
-
-영상 프롬프트: 3d pixar studio style, a cute penguin wearing round glasses catching a glowing butterfly with a net, simple collecting action, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 지금 이 상황을 역이용하는 겁니다.
-
-똑똑이들을 위한 3가지 생존 수칙, 잘 들으세요.
-
-
+S62 prompt:
+3d pixar studio style. Blockbuster scale. A group of cute chubby penguins wearing red hoodies standing at the edge of a massive, terrifyingly deep blue ice cliff. The camera tilts down rapidly from the penguins to the bottomless dark abyss below, showing the dizzying height. The penguins are shaking and crying in fear. Horror atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 65
-
-영상 프롬프트: 3d pixar studio style, a cute penguin wearing round glasses controlling a wooden puppet with strings skillfully, looking like a master, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: **첫째, '사용자'가 아닌 '설계자'가 되세요.**
-
-단순히 "이거 요약해 줘"라고 시키는 건 누구나 할 수 있습니다.
-
+S63 prompt:
+3d pixar studio style. A busy construction site filled with tower cranes and cute chubby bears wearing yellow hard hats and construction vests. Suddenly, a magical blue ice blast hits the site, instantly freezing the cranes and the bear workers into solid ice statues. Magical frost and ice textures covering everything. Time stopped atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-장면 66
-
-영상 프롬프트: 3d pixar studio style, a cute penguin wearing round glasses sitting in a director's chair and holding a megaphone, boss vibes, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: AI 테스트만 해주지 마세요.
-
-대신 AI를 부려서 **'나만의 결과물'**을 만들어 내는 '설계자'가 되세요.
-
+S64 prompt:
+3d pixar studio style. A single small golden sapling standing alone in a violent storm with heavy rain and lightning. The sapling glows with a faint green magical aura, struggling to grow very slowly against the wind. Time-lapse effect showing the slow and difficult growth process. Emotional and dramatic atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 67
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a hoodie waving a glowing magic wand, and icons of books, app squares, and graduation caps popping out in the air, magical atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: AI로 코딩해서 내 앱을 만들고, 글을 써서 책을 내고.
-
-나의 능력을 마법처럼 확장하는 겁니다.
-
-
+S65 prompt:
+3d pixar studio style. A vast, empty, dry brown field with no crops. A cute chubby fox wearing a straw hat and farmer overalls is holding an empty wooden basket, looking at the barren land with a devastated expression. Dust blows across the empty field. Desolate atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 68
-
-영상 프롬프트: 3d pixar studio style, a gentle brown bear wearing a yellow vest skillfully building a cool robot dog using a toy hammer, happy creator, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: AI는 도구일 뿐입니다.
-
-누가 쓰느냐에 따라 흉기가 될 수도, 명검이 될 수도 있습니다.
-
-
+S66 prompt:
+3d pixar studio style. A cute chubby White Bear wearing a formal government suit and glasses standing at a press conference podium. Camera flashes popping like strobe lights. The bear looks serious and is making an urgent announcement gesture. Breaking news atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 69
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a hoodie riding on a flying robot's back, soaring high through the clouds, fast and cool, superhero vibe, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 노동력을 대체당하지 말고,
-
-오히려 AI의 노동력을 착취해서 생산성을 100배로 튀기세요.
-
-
+S67 prompt:
+3d pixar studio style. A cute chubby bear wearing a mayor's sash and top hat waving a magic wand frantically at the empty ground. Magical sparks fly, but only a single tiny green sprout magically pops up with a "bloop" sound effect visual. The bear looks confused and sweaty. Comedy and failure. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 70
-
-영상 프롬프트: 3d pixar studio style, a gentle brown bear wearing a yellow vest sitting comfortably on the shoulders of a giant white robot, teamwork, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 그들이 우리를 이용하려 한다면,
-
-우리도 그들의 자본과 기술을 이용해서 내 과실을 따먹어야 합니다.
-
+S68 prompt:
+3d pixar studio style. Dark museum interior. A miniature glowing modern apartment building is displayed inside a glass case like a precious ancient artifact. Cute chubby foxes and cats wearing casual clothes are crowding around the case, taking photos with flashes. Magical sparkles around the artifact. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 71
-
-영상 프롬프트: 3d pixar studio style, a cute white rabbit wearing a red scarf hugging a thick book with a lock icon tightly, treasuring it, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: **둘째, '데이터 주권'을 지키세요.**
-
-아무 생각 없이 회사의 기밀이나 일기장을 AI에게 먹여주지 마세요.
-
-
+S69 prompt:
+3d pixar studio style. Kawaii Horror theme. A dark abandoned apartment complex at night with fog. No lights in the windows. Scary translucent white ghosts with glowing eyes are magically floating around the buildings. Spooky magical purple mist and spiderwebs. Horror atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 72
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a hoodie sneaking behind a robot and turning off a small switch on its back, click action, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 설정창에 있는 **'내 데이터를 학습에 사용하지 않음'** 옵션.
-
-귀찮더라도 반드시 찾아서 꺼두세요.
-
-
+S70 prompt:
+3d pixar studio style. Camera panning back and forth. On the left, a cute chubby White Bear in a suit is pointing towards a hot empty desert. On the right, a group of cute chubby penguins in red hoodies are ignoring him and walking determinedly towards a massive, blindingly bright golden wall in the distance. Contrast of choices. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 73
-
-영상 프롬프트: 3d pixar studio style, a gentle brown bear wearing a yellow vest holding a sparkling treasure chest, rich atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 여러분의 경험과 지식은 공짜가 아닙니다.
-
-그걸 헐값에 넘기지 말고, 나만의 자산으로 쌓아두세요.
-
-
+S71 prompt:
+3d pixar studio style. A cute chubby penguin wearing a red hoodie tries to climb a golden slope but slips and slides down a long magical ice slide into a dark forest. The penguin looks sad and keeps slipping back down despite trying hard. High angle shot looking down at the sliding penguin. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 74
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a hoodie waving a large brush, magical glowing butterflies and flowers appearing in the air, fantasy effect, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: AI가 흉내 낼 수 없는 **'인간적인 통찰'**과 **'경험'**.
-
-그 마지막 '한 끗'이 여러분의 가장 강력한 무기가 될 겁니다.
-
+S72 prompt:
+3d pixar studio style. Blockbuster scale. A gigantic golden wall reaching the sky. many cute chubby penguins wearing red hoodies are stacking on top of each other to form a massive tower of bodies to reach the top of the wall. The penguin at the very top reaches out its hand desperately. Desperate survival atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 75
-
-영상 프롬프트: 3d pixar studio style, a round glossy white robot speaking confidently but its nose suddenly growing long like Pinocchio, lying, funny, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: **셋째, '의존'하지 말고 '검증'하세요.**
-
-AI를 맹신하지 마세요. 그 녀석들도 뻔뻔하게 거짓말(할루시네이션)을 합니다.
-
-
+S73 prompt:
+3d pixar studio style. A vast frozen wasteland covered in blue ice. A single small magical fire burns in the center. Many cute chubby penguins wearing red hoodies are huddled extremely close to the fire to survive, shivering. Outside the small light circle is pitch black darkness and ice. High contrast lighting. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 76
-
-영상 프롬프트: 3d pixar studio style, a cute penguin wearing round glasses holding a wooden judge gavel, serious expression, authority, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 초안은 AI가 짜더라도,
-
-최종 판단과 책임은 인간인 여러분이 져야 합니다.
-
-
+S74 prompt:
+3d pixar studio style. A gigantic security robot with glowing round eyes blocking a golden gate. It scans cute chubby penguins wearing red hoodies with a red magical laser beam. A holographic red barrier appears, pushing the penguins back. The penguins look frustrated. Sci-fi magical atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 77
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a hoodie holding a leash and walking a small robot dog confidently, the human is the master, proud walk, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 생각하는 근육을 잃어버리는 순간,
-
-우리는 진짜로 그들의 '애완 인간'으로 전락하게 됩니다.
-
-
+S75 prompt:
+3d pixar studio style. A long train on a snowy field. The front engine car is made of solid gold and magically detaches from the rest of the train. The golden engine magically flies up into the sky with rocket thrusters and magical sparkles, leaving the old rusty back cars stranded on the ground. Fantasy separation scene. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-장면 78
-
-영상 프롬프트: 3d pixar studio style, a cute white rabbit wearing a red scarf opening a pretty gift box, but a cleaning broom pops out instead of a gift, surprised and disappointed expression, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: "공짜 선물인 줄 알았더니, 청소 도구였어?!"
-
-조금 억울하고 배신감이 들 수도 있습니다.
-
-
+S76 prompt:
+3d pixar studio style. Inside a flying golden palace floating above the clouds. A cute chubby Golden Fox wearing a suit, a Panda wearing a red scarf, and an Eagle wearing a flag shirt are clinking champagne glasses and laughing. Bright sunlight and magical golden dust surround them. Luxurious party atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 79
-
-영상 프롬프트: 3d pixar studio style, a cute white rabbit wearing a red scarf sitting inside a beautiful golden birdcage, trapped, looking outside, sad expression, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 하지만 자본주의 사회에서 '공짜'는 가장 비싼 미끼입니다.
-
-이제 그 달콤한 유혹의 대가가 눈에 보이시나요?
-
-
+S77 prompt:
+3d pixar studio style. View of a dark Earth from space. Three massive pillars of magical neon light erupt from three specific points on the globe. These three pillars connect with each other using blindingly bright magical laser beams, forming a glowing triangle network. The rest of the planet remains dark. Cinematic cosmic scale. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 80
-
-영상 프롬프트: 3d pixar studio style, three giant robots racing, the leading robot has a Google 'G' logo on its chest and runs significantly faster leaving burning footprints, the others (MS, OpenAI) are chasing, speed effect, no voice, no speech, sound effects only, kawaii style
-
-장면설명: 지금 빅테크 기업들은 300조 원을 태우며 질주하고 있습니다.
-
-미래의 패권을 쥐기 위한 그들의 속도전은 멈추지 않을 겁니다.
-
-
+S78 prompt:
+3d pixar studio style. Inside a dark, cold, rusty train car. A cute chubby penguin wearing a red hoodie is kicking the metal wall and shouting in anger. Cold white breath comes out of its mouth. The atmosphere is gloomy and hopeless. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 81
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a hoodie steering a sturdy yacht through rough waves, cutting through the water confidently, brave, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 거대한 파도에 휩쓸려 익사할 것인가,
-
-아니면 정신 똑바로 차리고 그 파도 위에 올라탈 것인가.
-
-
+S79 prompt:
+3d pixar studio style. A cute chubby penguin wearing a red hoodie puts on a heavy backpack. He looks at a map and walks determinedly into a heavy magical snowstorm towards a faint but warm golden light shining in the distance. Heroic survival journey vibe. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 82
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a hoodie sitting proudly on top of a giant robot's head, the cat is wearing a golden crown, asserting dominance, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 선택은 여러분의 몫입니다.
-
-우리는 데이터 셔틀이 아니라, 이 도구를 지배하는 **주인**이 되어야 하니까요.
-
-
+S80 prompt:
+3d pixar studio style. A gigantic golden city gate is slowly closing with heavy vibration and dust. Blinding white magical light shoots out from the narrowing crack of the door. The gap is getting smaller and smaller. Cinematic tension and urgency. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 83
-
-영상 프롬프트: 3d pixar studio style, a cute white rabbit wearing a red scarf hugging a giant red heart cushion tightly, rubbing cheek against it happily, cozy atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 오늘 이야기가 뇌세포를 짜릿하게 자극했다면,
-
-좋아요와 구독, 알림 설정까지 꾹 눌러주세요.
-
-
+S81 prompt:
+3d pixar studio style. A dark world is collapsing with ground cracking and stormy weather. Amidst the destruction, a single, blindingly bright magical golden ladder descends from a break in the dark clouds above. A cute chubby penguin wearing a red hoodie is determinedly climbing up the glowing ladder, while other shadowy figures below remain frozen in fear. High contrast lighting. Hopeful magical atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 84
-
-영상 프롬프트: 3d pixar studio style, a cute cat wearing a hoodie sitting at a table taking a big delicious bite out of a steaming hot pizza slice, happy eating, yummy expression, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: (여러분의 좋아요는 AI 훈련용이 아닙니다.)
-
-(똑똑즈에게 맛있는 밥을 사주는 후원입니다. 헤헷)
-
-
+S82 prompt:
+3d pixar studio style. Countless streams of magical golden energy and light particles flowing from all directions across a dark landscape, converging in the center to magically construct magnificent golden skyscrapers from the ground up rapidly. A cute chubby golden-brown fox wearing a business suit stands watching this massive magical construction process with a knowing expression. Epic magical scale. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 85
-
-영상 프롬프트: 3d pixar studio style, a cute white rabbit wearing a red scarf blowing heart-shaped soap bubbles towards the camera, bubbles floating dreamily, lovely atmosphere, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 소중한 의견을 댓글로 남겨주시면,
-
-제가 하나하나 다 읽어보고 하트 뿅뿅 날려드릴게요.
-
-
+S83 prompt:
+3d pixar studio style. A wide shot of a gigantic, solid, blindingly bright golden city standing firm against a dark night sky, radiating immense light. In the foreground, a cute chubby golden-brown fox in a suit and a cute chubby penguin in a red hoodie stand together on a hill, looking at the city, then turning to the camera and waving goodbye happily. Final grand atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 |||
-
-
-장면 86
+CTA prompt:
+3d pixar studio style. a cute chubby White Persian Cat wearing a navy pinstripe suit and a cute chubby penguin in a red hoodie dancing happily on a bright stage. They press floating giant 'Heart shape'(Like). magically, a massive explosion of magical glowing pink and red hearts bursts out from the buttons, magically filling the entire screen and dancing around wildly. Joyful celebration atmosphere with magical sparkles. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
 
-영상 프롬프트: 3d pixar studio style, a gentle brown bear wearing a yellow vest holding a golden shield and standing firmly, blocking incoming arrows with a 'ting' sound, protected, strong, no voice, no speech, no text, sound effects only, kawaii style
-
-장면설명: 다음 시간에도 여러분의 지갑과 멘탈을 지켜줄,
-
-더 날카롭고 유익한 이야기로 돌아오겠습니다.
-
-
-|||
