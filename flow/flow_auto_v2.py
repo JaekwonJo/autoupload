@@ -49,15 +49,15 @@ DEFAULT_CONFIG = {
     "afk_mode": False,    
     "prompt_slots": [],
     "active_prompt_slot": 0,
-    "sound_enabled": True,    # [NEW] 소리 켜기/끄기
-    "relay_mode": False,      # [NEW] 이어달리기 모드
-    "relay_count": 1          # [NEW] 몇 개의 슬롯을 연속으로 할지
+    "sound_enabled": True,
+    "relay_mode": False,
+    "relay_count": 1
 }
 
 # [알림창 클래스]
 class CountdownAlert:
     def __init__(self, master, seconds=30, sound_enabled=True):
-        self.master_app = master # 메인 앱 참조 (소리 설정 확인용)
+        self.master_app = master 
         self.sound_enabled = sound_enabled
         self.root = tk.Toplevel(master)
         self.root.title("봇 출동 알림")
@@ -101,7 +101,7 @@ class CountdownAlert:
         deltay = event.y - self.y
         x = self.root.winfo_x() + deltax
         y = self.root.winfo_y() + deltay
-        self.root.geometry(f"{x}+{y}")
+        self.root.geometry(f"+{x}+{y}")
 
     def update_time(self, seconds):
         if not self.root.winfo_exists(): return
@@ -109,7 +109,6 @@ class CountdownAlert:
         sec_int = int(seconds)
         self.lbl_time.config(text=f"{sec_int}초 전")
         
-        # [SOUND] 설정 확인 후 재생
         if self.sound_enabled:
             if sec_int == 30:
                 winsound.MessageBeep(winsound.MB_ICONASTERISK)
@@ -118,7 +117,6 @@ class CountdownAlert:
             elif 0 < sec_int <= 5:
                 winsound.Beep(1000, 100)
         
-        # 10초 전부터 긴급 깜빡임 효과
         if sec_int <= 10:
             if self.blink_state:
                 bg_color = "#FF5555" 
@@ -217,110 +215,20 @@ def load_config_from_file(path):
     except:
         return DEFAULT_CONFIG.copy()
 
+# [Legacy] 팝업 설정창은 유지 (원할 때 상세 확인용)
 class HumanConfigWindow:
     def __init__(self, master, actor):
         self.actor = actor
         self.root = tk.Toplevel(master)
-        self.root.title("🤖 실시간 인격 모니터 (Live Persona)")
-        self.root.geometry("550x900")
+        self.root.title("🤖 상세 인격 분석표")
+        self.root.geometry("500x600")
         self.root.configure(bg="#282A36")
         
-        canvas = tk.Canvas(self.root, bg="#282A36", highlightthickness=0)
-        scrollbar = ttk.Scrollbar(self.root, orient="vertical", command=canvas.yview)
-        self.frame = tk.Frame(canvas, bg="#282A36")
+        tk.Label(self.root, text="이 창은 '상세 값' 확인용입니다.\n메인 화면의 대시보드에서 요약 정보를 볼 수 있습니다.", 
+                 fg="#BD93F9", bg="#282A36", font=("Malgun Gothic", 10)).pack(pady=20)
         
-        self.frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
-        canvas.create_window((0, 0), window=self.frame, anchor="nw")
-        canvas.configure(yscrollcommand=scrollbar.set)
-        
-        canvas.pack(side="left", fill="both", expand=True)
-        scrollbar.pack(side="right", fill="y")
-        
-        tk.Label(self.frame, text="🕵️ 현재 봇의 인격 상태", font=("Malgun Gothic", 14, "bold"), bg="#282A36", fg="#FF79C6").pack(pady=10)
-        
-        self.lbl_persona = tk.Label(self.frame, text="...", font=("Malgun Gothic", 12, "bold"), bg="#282A36", fg="#50FA7B")
-        self.lbl_persona.pack(pady=5)
-        
-        tk.Label(self.frame, text="* 이 값들은 '작업 배치'마다 자동으로 랜덤 변경됩니다.\n* 저장이 불가능하며, 매번 새로운 패턴을 생성합니다.", 
-                 font=("Malgun Gothic", 9), bg="#282A36", fg="#F8F8F2", justify="center").pack(pady=(0, 20))
-
-        self.scales = {}
-        self.entries = {}
-
-        self.add_section("1. 생체 역학 (Biomechanics)")
-        self.add_scale("speed_multiplier", "속도 배율 (낮을수록 빠름)", 0.5, 3.0)
-        self.add_scale("hesitation_rate", "이동 중 멈칫 확률", 0.0, 1.0)
-        self.add_scale("overshoot_rate", "오버슈트 확률", 0.0, 1.0)
-        self.add_scale("micro_correction_rate", "미세 경로 수정 강도", 0.0, 1.0)
-
-        self.add_section("2. 입력 & 클릭 디테일")
-        self.add_scale("typo_rate", "오타 발생 확률", 0.0, 0.2)
-        self.add_scale("breathing_rate", "숨 고르기 빈도", 0.0, 0.5)
-        self.add_scale("click_hesitation_rate", "클릭 전 망설임", 0.0, 1.0)
-        self.add_scale("double_click_mistake", "더블클릭 실수", 0.0, 0.2)
-
-        self.add_section("3. 환경")
-        self.add_scale("distraction_rate", "딴짓 종합 확률", 0.0, 1.0)
-        self.add_scale("gaze_simulation", "시선 확인 확률", 0.0, 1.0)
-        self.add_scale("empty_click_rate", "빈 공간 실수 확률", 0.0, 0.5)
-        self.add_scale("fatigue_factor", "피로도 누적 속도", 0.0, 0.5)
-
-        self.add_section("4. 스케줄")
-        self.add_dual_display("batch_min", "batch_max", "배치 작업 개수 범위")
-        self.add_dual_display("break_min_sec", "break_max_sec", "휴식 시간 범위 (초)")
-        self.add_dual_display("work_start_hour", "work_end_hour", "활동 시간")
-        self.add_scale("weekend_skip_rate", "주말 건너뛸 확률", 0.0, 1.0)
-
-        btn_frame = tk.Frame(self.root, bg="#282A36", pady=20)
-        btn_frame.pack(fill="x")
-        ttk.Button(btn_frame, text="🎲 인격 리셋 (Randomize Now)", command=self.randomize).pack(side="bottom", ipadx=20, ipady=10)
-
-        self.refresh_ui()
-
-    def add_section(self, title):
-        tk.Label(self.frame, text=title, font=("Malgun Gothic", 11, "bold"), bg="#282A36", fg="#8BE9FD", anchor="w").pack(fill="x", padx=10, pady=(15, 5))
-        tk.Frame(self.frame, bg="#44475A", height=1).pack(fill="x", padx=10, pady=(0, 10))
-
-    def add_scale(self, key, text, from_, to):
-        frame = tk.Frame(self.frame, bg="#282A36", padx=10, pady=2)
-        frame.pack(fill="x")
-        
-        lbl = tk.Label(frame, text=f"{text}: 0.00", bg="#282A36", fg="white", width=35, anchor="w")
-        lbl.pack(side="left")
-        
-        scale = tk.Scale(frame, from_=from_, to=to, resolution=0.01, orient="horizontal", 
-                         bg="#282A36", fg="white", highlightthickness=0, length=150, state="disabled")
-        scale.pack(side="right")
-        
-        self.scales[key] = (scale, lbl, text)
-
-    def add_dual_display(self, key1, key2, text):
-        frame = tk.Frame(self.frame, bg="#282A36", padx=10, pady=2)
-        frame.pack(fill="x")
-        lbl = tk.Label(frame, text=f"{text}: 0 ~ 0", bg="#282A36", fg="white", anchor="w")
-        lbl.pack(side="top", fill="x")
-        self.entries[(key1, key2)] = (lbl, text)
-
-    def refresh_ui(self):
-        p_name = self.actor.current_persona_name
-        self.lbl_persona.config(text=f"현재 인격: {p_name}")
-        
-        for key, (scale, lbl, text) in self.scales.items():
-            val = self.actor.cfg.get(key, 0)
-            scale.config(state="normal")
-            scale.set(val)
-            scale.config(state="disabled")
-            lbl.config(text=f"{text}: {val:.2f}")
-
-        for (k1, k2), (lbl, text) in self.entries.items():
-            v1 = self.actor.cfg.get(k1, 0)
-            v2 = self.actor.cfg.get(k2, 0)
-            lbl.config(text=f"{text}: {v1} ~ {v2}")
-
-    def randomize(self):
-        self.actor.randomize_persona()
-        self.refresh_ui()
-        messagebox.showinfo("변경 완료", f"새로운 인격 '{self.actor.current_persona_name}'이(가) 적용되었습니다.")
+        # 간단히 닫기 버튼만 제공 (메인 대시보드로 유도)
+        ttk.Button(self.root, text="닫기", command=self.root.destroy).pack(pady=20)
 
 class FlowVisionApp:
     def __init__(self):
@@ -335,14 +243,13 @@ class FlowVisionApp:
         self.alert_window = None
         self.config_window = None
         
-        # [NEW] 이어달리기 진행 상황 (현재 몇 번째 슬롯인지)
         self.relay_progress = 0 
         
         self.actor = HumanActor()
         
         self.root = tk.Tk()
         self.root.title(APP_NAME)
-        self.root.geometry("800x900") # 높이 약간 증가
+        self.root.geometry("950x700") # 가로로 넓게 확장
         self.root.configure(bg="#1E1E2E")
         
         try:
@@ -350,6 +257,26 @@ class FlowVisionApp:
             if icon_path.exists():
                 self.root.iconbitmap(str(icon_path))
         except: pass
+        
+        # [THEME] 스타일 설정
+        self.style = ttk.Style()
+        self.style.theme_use('clam')
+        
+        # 다크 테마 컬러 팔레트
+        # BG: #1E1E2E, FG: #F8F8F2, Purple: #BD93F9, Pink: #FF79C6, Green: #50FA7B
+        self.style.configure("TFrame", background="#1E1E2E")
+        self.style.configure("TLabelframe", background="#1E1E2E", foreground="#BD93F9")
+        self.style.configure("TLabelframe.Label", background="#1E1E2E", foreground="#BD93F9", font=("Malgun Gothic", 10, "bold"))
+        self.style.configure("TLabel", background="#1E1E2E", foreground="#F8F8F2")
+        self.style.configure("TButton", background="#44475A", foreground="white", borderwidth=1, focuscolor="none")
+        self.style.map("TButton", background=[('active', '#6272A4')])
+        
+        # 프로그레스바 스타일
+        self.style.configure("Horizontal.TProgressbar", background="#BD93F9", troughcolor="#44475A", bordercolor="#44475A", lightcolor="#BD93F9", darkcolor="#BD93F9")
+        
+        # Accent Button
+        self.style.configure("Accent.TButton", background="#50FA7B", foreground="#282A36", font=("Malgun Gothic", 10, "bold"))
+        self.style.map("Accent.TButton", background=[('active', '#FF79C6')])
 
         self._ensure_prompt_slots()
         self._build_ui()
@@ -357,11 +284,9 @@ class FlowVisionApp:
         
         self.root.after(1000, self._tick)
 
-    # [NEW] 소리 재생 래퍼 함수 (Sound Wrapper)
     def play_sound(self, category):
         if not self.cfg.get("sound_enabled", True):
-            return # 소리 끄기 설정이면 무시
-        
+            return 
         try:
             if category == "start":
                 winsound.MessageBeep(winsound.MB_OK)
@@ -401,21 +326,12 @@ class FlowVisionApp:
         ia = self.cfg.get('input_area')
         sa = self.cfg.get('submit_area')
         
-        if not ia and self.cfg.get('input_coords'):
-            messagebox.showwarning("업그레이드 알림", "입력창 위치를 '드래그' 방식으로 다시 설정해주세요!")
-            return
-        if not sa and self.cfg.get('submit_coords'):
-            messagebox.showwarning("업그레이드 알림", "생성 버튼 위치를 '드래그' 방식으로 다시 설정해주세요!")
-            return
-
         if not ia or not sa:
             messagebox.showwarning("주의", "먼저 [입력창]과 [생성 버튼]의 영역을 설정해주세요.")
             return
             
         self._prevent_sleep()
         
-        # [NEW] 세션 기록 초기화
-        # 이어달리기 중이 아닐 때만 초기화 (첫 시작일 때)
         if self.relay_progress == 0:
             self.session_start_time = datetime.now()
             self.session_log = []
@@ -423,11 +339,9 @@ class FlowVisionApp:
         self.running = True
         self.btn_start.config(state="disabled")
         self.btn_stop.config(state="normal")
-        self.entry_interval.config(state="disabled")
         self.t_next = time.time()
-        self.lbl_status.config(text="🚀 자동화 시작!", fg="#50FA7B")
+        self.update_status_label("🚀 자동화 시작!", "#50FA7B")
         
-        # [NEW] 소리 (Wrapper 사용)
         self.play_sound("start")
 
         self.actor.update_batch_size()
@@ -437,10 +351,9 @@ class FlowVisionApp:
         self.running = False
         self.btn_start.config(state="normal")
         self.btn_stop.config(state="disabled")
-        self.entry_interval.config(state="normal")
-        self.lbl_status.config(text="⏹ 멈춤 (설정 변경 가능)", fg="#FF5555")
+        self.update_status_label("⏹ 멈춤", "#FF5555")
         
-        self.relay_progress = 0 # 릴레이 초기화
+        self.relay_progress = 0 
         self._allow_sleep()
         
         if self.alert_window:
@@ -453,120 +366,174 @@ class FlowVisionApp:
         else:
             self.config_window.root.lift()
 
+    def update_status_label(self, text, color):
+        self.lbl_main_status.config(text=text, fg=color)
+
+    # [UI Construction - Refactored for Dashboard]
     def _build_ui(self):
-        main = self.root
-
-        # 1. 상태 바
-        header_frame = tk.Frame(main, bg="#282A36", height=40)
-        header_frame.pack(fill="x")
+        # 3단 레이아웃: Top(Title), Middle(Content), Bottom(Logs)
         
-        self.lbl_status = tk.Label(header_frame, text="준비됨", font=("Malgun Gothic", 12, "bold"), bg="#282A36", fg="#F8F8F2")
-        self.lbl_status.pack(side="left", padx=10, pady=5)
+        # 1. Top Header
+        top_frame = tk.Frame(self.root, bg="#1E1E2E", pady=10)
+        top_frame.pack(fill="x", side="top")
         
-        self.lbl_eta = tk.Label(header_frame, text="-", font=("Malgun Gothic", 10), bg="#282A36", fg="#6272A4")
-        self.lbl_eta.pack(side="right", padx=10, pady=5)
+        tk.Label(top_frame, text=APP_NAME, font=("Malgun Gothic", 16, "bold"), bg="#1E1E2E", fg="#BD93F9").pack(side="left", padx=20)
+        self.lbl_main_status = tk.Label(top_frame, text="Ready", font=("Malgun Gothic", 14, "bold"), bg="#1E1E2E", fg="#6272A4")
+        self.lbl_main_status.pack(side="right", padx=20)
 
-        # 2. 좌표 설정
-        coord_frame = tk.LabelFrame(main, text=" 1. 영역 설정 (드래그) ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=5)
-        coord_frame.pack(fill="x", padx=20, pady=5)
+        # 2. Middle Section (Left: Control, Right: Dashboard)
+        mid_frame = tk.Frame(self.root, bg="#1E1E2E")
+        mid_frame.pack(fill="both", expand=True, padx=20)
+
+        # --- Left Panel (Controls & Setup) ---
+        left_panel = tk.LabelFrame(mid_frame, text=" 🎮 Control Panel ", padding=10)
+        left_panel.pack(side="left", fill="both", expand=False, padx=(0, 10), ipadx=5)
         
-        btn_box = tk.Frame(coord_frame, bg="#1E1E2E")
-        btn_box.pack(fill="x")
-        ttk.Button(btn_box, text="⬛ 입력창 영역 지정", command=lambda: self.start_capture("input")).pack(side="left", expand=True, fill="x", padx=2)
-        ttk.Button(btn_box, text="⬛ 생성 버튼 영역 지정", command=lambda: self.start_capture("submit")).pack(side="left", expand=True, fill="x", padx=2)
-        ttk.Button(btn_box, text="🟩 딴짓(AFK) 영역 지정", command=lambda: self.start_capture("afk")).pack(side="left", expand=True, fill="x", padx=2)
+        # A. 영역 설정
+        tk.Label(left_panel, text="1. 영역 지정 (필수)", font=("Malgun Gothic", 10, "bold")).pack(anchor="w", pady=(0, 5))
+        btn_grid = tk.Frame(left_panel, bg="#1E1E2E")
+        btn_grid.pack(fill="x", pady=5)
+        ttk.Button(btn_grid, text="⬛ 입력창", command=lambda: self.start_capture("input")).pack(side="left", fill="x", expand=True, padx=1)
+        ttk.Button(btn_grid, text="⬛ 버튼", command=lambda: self.start_capture("submit")).pack(side="left", fill="x", expand=True, padx=1)
+        ttk.Button(btn_grid, text="🟩 AFK", command=lambda: self.start_capture("afk")).pack(side="left", fill="x", expand=True, padx=1)
         
-        self.lbl_coords = tk.Label(coord_frame, text=self._get_coord_text(), bg="#1E1E2E", fg="#8BE9FD")
-        self.lbl_coords.pack(pady=2)
-
-        # 3. 실행 제어
-        run_frame = tk.LabelFrame(main, text=" 2. 실행 제어 ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=10, pady=5)
-        run_frame.pack(fill="x", padx=20, pady=5)
+        self.lbl_coords = tk.Label(left_panel, text=self._get_coord_text(), font=("Malgun Gothic", 8), fg="#6272A4")
+        self.lbl_coords.pack(anchor="w", pady=(0, 10))
         
-        # [NEW] 옵션 행 (AFK, 소리, 이어달리기)
-        opt_box = tk.Frame(run_frame, bg="#1E1E2E")
-        opt_box.pack(fill="x", pady=2)
-
-        # 1) AFK
-        self.afk_var = tk.BooleanVar(value=self.cfg.get("afk_mode", False))
-        chk_afk = tk.Checkbutton(opt_box, text="👻 AFK 모드", variable=self.afk_var, 
-                                 command=self.on_option_toggle, bg="#1E1E2E", fg="#F1FA8C", selectcolor="#1E1E2E", activebackground="#1E1E2E", activeforeground="#F1FA8C")
-        chk_afk.pack(side="left", padx=5)
-
-        # 2) Sound [NEW]
+        # B. 옵션 스위치
+        tk.Label(left_panel, text="2. 환경 설정", font=("Malgun Gothic", 10, "bold")).pack(anchor="w", pady=(5, 5))
+        
+        # Sound
         self.sound_var = tk.BooleanVar(value=self.cfg.get("sound_enabled", True))
-        chk_sound = tk.Checkbutton(opt_box, text="🔊 소리 켜기", variable=self.sound_var,
-                                   command=self.on_option_toggle, bg="#1E1E2E", fg="#8BE9FD", selectcolor="#1E1E2E", activebackground="#1E1E2E", activeforeground="#8BE9FD")
-        chk_sound.pack(side="left", padx=5)
+        chk_sound = tk.Checkbutton(left_panel, text="🔊 효과음 켜기", variable=self.sound_var, command=self.on_option_toggle,
+                                   bg="#1E1E2E", fg="#8BE9FD", selectcolor="#1E1E2E", activebackground="#1E1E2E", activeforeground="#8BE9FD", font=("Malgun Gothic", 9))
+        chk_sound.pack(anchor="w")
 
-        # 3) Relay [NEW]
-        relay_frame = tk.Frame(opt_box, bg="#1E1E2E")
-        relay_frame.pack(side="left", padx=10)
+        # AFK
+        self.afk_var = tk.BooleanVar(value=self.cfg.get("afk_mode", False))
+        chk_afk = tk.Checkbutton(left_panel, text="👻 AFK(딴짓) 모드", variable=self.afk_var, command=self.on_option_toggle,
+                                   bg="#1E1E2E", fg="#F1FA8C", selectcolor="#1E1E2E", activebackground="#1E1E2E", activeforeground="#F1FA8C", font=("Malgun Gothic", 9))
+        chk_afk.pack(anchor="w")
         
+        # Relay
+        relay_box = tk.Frame(left_panel, bg="#1E1E2E", pady=5)
+        relay_box.pack(fill="x", anchor="w")
         self.relay_var = tk.BooleanVar(value=self.cfg.get("relay_mode", False))
-        chk_relay = tk.Checkbutton(relay_frame, text="🏃 이어달리기:", variable=self.relay_var,
-                                   command=self.on_option_toggle, bg="#1E1E2E", fg="#FF79C6", selectcolor="#1E1E2E", activebackground="#1E1E2E", activeforeground="#FF79C6")
+        chk_relay = tk.Checkbutton(relay_box, text="🏃 이어달리기", variable=self.relay_var, command=self.on_option_toggle,
+                                   bg="#1E1E2E", fg="#FF79C6", selectcolor="#1E1E2E", activebackground="#1E1E2E", activeforeground="#FF79C6", font=("Malgun Gothic", 9))
         chk_relay.pack(side="left")
         
         self.relay_cnt_var = tk.IntVar(value=self.cfg.get("relay_count", 1))
-        spin_relay = tk.Spinbox(relay_frame, from_=1, to=10, width=3, textvariable=self.relay_cnt_var, command=self.on_option_toggle)
-        spin_relay.pack(side="left", padx=2)
-        tk.Label(relay_frame, text="개 슬롯", bg="#1E1E2E", fg="#FF79C6").pack(side="left")
+        tk.Spinbox(relay_box, from_=1, to=10, width=3, textvariable=self.relay_cnt_var, command=self.on_option_toggle, 
+                   bg="#282A36", fg="white", buttonbackground="#44475A").pack(side="left", padx=5)
+        tk.Label(relay_box, text="개 연속", bg="#1E1E2E", fg="#FF79C6", font=("Malgun Gothic", 9)).pack(side="left")
 
-
-        inner_box = tk.Frame(run_frame, bg="#1E1E2E")
-        inner_box.pack(fill="x", pady=5)
-        
-        tk.Label(inner_box, text="간격(초):", bg="#1E1E2E", fg="white").pack(side="left")
-        self.entry_interval = tk.Entry(inner_box, width=5)
+        # Interval
+        tk.Label(left_panel, text="3. 시간 간격 (초)", font=("Malgun Gothic", 10, "bold")).pack(anchor="w", pady=(15, 5))
+        self.entry_interval = tk.Entry(left_panel, bg="#282A36", fg="#50FA7B", insertbackground="white", font=("Consolas", 11))
         self.entry_interval.insert(0, str(self.cfg.get("interval_seconds", 180)))
-        self.entry_interval.pack(side="left", padx=5)
+        self.entry_interval.pack(fill="x", padx=5)
+
+        # Action Buttons
+        tk.Frame(left_panel, height=20, bg="#1E1E2E").pack() # Spacer
+        self.btn_start = ttk.Button(left_panel, text="🌙 시작 (START)", style="Accent.TButton", command=self.on_start)
+        self.btn_start.pack(fill="x", pady=5, ipady=5)
         
-        self.btn_start = ttk.Button(inner_box, text="🌙 조용히 시작", style="Accent.TButton", command=self.on_start)
-        self.btn_start.pack(side="left", padx=10, fill="x", expand=True)
-        self.btn_stop = ttk.Button(inner_box, text="🛑 멈추기", command=self.on_stop, state="disabled")
-        self.btn_stop.pack(side="left", fill="x", expand=True)
+        self.btn_stop = ttk.Button(left_panel, text="🛑 정지 (STOP)", command=self.on_stop, state="disabled")
+        self.btn_stop.pack(fill="x", pady=2)
 
-        ttk.Button(run_frame, text="⚙️ 인간화 설정 (Humanizer)", command=self.on_human_config).pack(fill="x", pady=5)
 
-        # 4. 프롬프트 & 로그
-        bottom_frame = tk.Frame(main, bg="#1E1E2E")
+        # --- Right Panel (Dashboard & Monitor) ---
+        right_panel = tk.Frame(mid_frame, bg="#1E1E2E")
+        right_panel.pack(side="right", fill="both", expand=True)
+        
+        # 1. Progress Dashboard
+        dash_frame = tk.LabelFrame(right_panel, text=" 📊 Live Progress ", padding=10)
+        dash_frame.pack(fill="x", pady=(0, 10))
+        
+        # Progress Bar
+        self.progress_var = tk.DoubleVar()
+        self.progress_bar = ttk.Progressbar(dash_frame, variable=self.progress_var, maximum=100, mode='determinate', style="Horizontal.TProgressbar")
+        self.progress_bar.pack(fill="x", pady=5)
+        
+        # Info Labels
+        info_grid = tk.Frame(dash_frame, bg="#1E1E2E")
+        info_grid.pack(fill="x")
+        
+        self.lbl_prog_text = tk.Label(info_grid, text="대기 중...", font=("Consolas", 10), fg="#8BE9FD", bg="#1E1E2E")
+        self.lbl_prog_text.pack(side="left")
+        
+        self.lbl_eta = tk.Label(info_grid, text="--:-- 종료 예정", font=("Consolas", 10), fg="#6272A4", bg="#1E1E2E")
+        self.lbl_eta.pack(side="right")
+        
+        # 2. Persona Monitor (Read-Only)
+        monitor_frame = tk.LabelFrame(right_panel, text=" 👁️ Bot Monitor (Read-Only) ", padding=10)
+        monitor_frame.pack(fill="both", expand=True)
+        
+        # Persona Name Big Display
+        tk.Label(monitor_frame, text="Current Persona", font=("Malgun Gothic", 9), fg="#6272A4").pack(anchor="w")
+        self.lbl_live_persona = tk.Label(monitor_frame, text="Waiting...", font=("Malgun Gothic", 16, "bold"), fg="#50FA7B")
+        self.lbl_live_persona.pack(anchor="w", pady=(0, 10))
+        
+        # Grid for Stats
+        stat_grid = tk.Frame(monitor_frame, bg="#1E1E2E")
+        stat_grid.pack(fill="x", pady=5)
+        
+        # Col 1: Mood
+        tk.Label(stat_grid, text="Mood (기분)", fg="#6272A4", font=("Malgun Gothic", 9)).grid(row=0, column=0, sticky="w", padx=10)
+        self.lbl_live_mood = tk.Label(stat_grid, text="-", fg="white", font=("Malgun Gothic", 11, "bold"))
+        self.lbl_live_mood.grid(row=1, column=0, sticky="w", padx=10)
+        
+        # Col 2: Speed Gauge (Visual only)
+        tk.Label(stat_grid, text="Typing Speed", fg="#6272A4", font=("Malgun Gothic", 9)).grid(row=0, column=1, sticky="w", padx=20)
+        self.live_speed_bar = ttk.Progressbar(stat_grid, length=150, mode='determinate', style="Horizontal.TProgressbar")
+        self.live_speed_bar.grid(row=1, column=1, sticky="w", padx=20)
+        self.lbl_live_speed_text = tk.Label(stat_grid, text="x 1.0", fg="#BD93F9", font=("Consolas", 9))
+        self.lbl_live_speed_text.grid(row=2, column=1, sticky="w", padx=20)
+
+        # Col 3: Batch Goal
+        tk.Label(stat_grid, text="Batch Goal", fg="#6272A4", font=("Malgun Gothic", 9)).grid(row=0, column=2, sticky="w", padx=10)
+        self.lbl_live_batch = tk.Label(stat_grid, text="- / -", fg="white", font=("Malgun Gothic", 11, "bold"))
+        self.lbl_live_batch.grid(row=1, column=2, sticky="w", padx=10)
+
+
+        # 3. Bottom Section (Prompts & Logs)
+        bottom_frame = tk.Frame(self.root, bg="#1E1E2E")
         bottom_frame.pack(fill="both", expand=True, padx=20, pady=10)
         
-        left_frame = tk.LabelFrame(bottom_frame, text=" 프롬프트 ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=5, pady=5)
-        left_frame.pack(side="left", fill="both", expand=True, padx=(0, 5))
+        # Prompt Selector
+        prompt_bar = tk.Frame(bottom_frame, bg="#1E1E2E")
+        prompt_bar.pack(fill="x", pady=5)
         
-        toolbar1 = tk.Frame(left_frame, bg="#1E1E2E")
-        toolbar1.pack(fill="x")
+        tk.Label(prompt_bar, text="📁 Prompt File:", fg="#F8F8F2", bg="#1E1E2E").pack(side="left")
         
         self.slot_var = tk.StringVar()
         slots = [s["name"] for s in self.cfg["prompt_slots"]]
-        self.combo_slots = ttk.Combobox(toolbar1, textvariable=self.slot_var, values=slots, state="readonly", width=10)
-        self.combo_slots.pack(side="left", padx=1)
+        self.combo_slots = ttk.Combobox(prompt_bar, textvariable=self.slot_var, values=slots, state="readonly", width=15)
+        self.combo_slots.pack(side="left", padx=5)
         self.combo_slots.bind("<<ComboboxSelected>>", self.on_slot_change)
-        current_idx = self.cfg.get("active_prompt_slot", 0)
-        if 0 <= current_idx < len(slots):
-            self.combo_slots.current(current_idx)
-            
-        ttk.Button(toolbar1, text="✏️", width=3, command=self.on_rename_slot).pack(side="left", padx=1)
-        ttk.Button(toolbar1, text="💾", width=3, command=self.on_save_prompts).pack(side="right", padx=1)
-        ttk.Button(toolbar1, text="🔄", width=3, command=self.on_reload).pack(side="right", padx=1)
-        ttk.Button(toolbar1, text="📂", width=3, command=self.on_open_prompts).pack(side="right", padx=1)
         
-        nav_box = tk.Frame(left_frame, bg="#1E1E2E")
-        nav_box.pack(fill="x", pady=2)
-        ttk.Button(nav_box, text="◀", width=3, command=self.on_prev).pack(side="left")
-        self.lbl_pos = tk.Label(nav_box, text="0/0", bg="#1E1E2E", fg="white", font=("Consolas", 9))
-        self.lbl_pos.pack(side="left", expand=True)
-        ttk.Button(nav_box, text="▶", width=3, command=self.on_next).pack(side="right")
+        if 0 <= self.cfg.get("active_prompt_slot", 0) < len(slots):
+            self.combo_slots.current(self.cfg.get("active_prompt_slot", 0))
 
-        self.text_preview = ScrolledText(left_frame, height=10, bg="#282A36", fg="#F8F8F2", insertbackground="white", font=("Consolas", 9))
+        ttk.Button(prompt_bar, text="✏️", width=3, command=self.on_rename_slot).pack(side="left", padx=1)
+        ttk.Button(prompt_bar, text="📂 열기", command=self.on_open_prompts).pack(side="left", padx=5)
+        ttk.Button(prompt_bar, text="🔄 새로고침", command=self.on_reload).pack(side="left", padx=5)
+
+        # Log & Preview Split
+        split_frame = tk.Frame(bottom_frame, bg="#1E1E2E")
+        split_frame.pack(fill="both", expand=True)
+        
+        # Left: Preview
+        p_frame = tk.LabelFrame(split_frame, text=" 미리보기 ", padding=5)
+        p_frame.pack(side="left", fill="both", expand=True, padx=(0, 5))
+        self.text_preview = ScrolledText(p_frame, height=8, bg="#282A36", fg="#F8F8F2", insertbackground="white", font=("Consolas", 9))
         self.text_preview.pack(fill="both", expand=True)
-
-        right_frame = tk.LabelFrame(bottom_frame, text=" 진행 로그 ", font=("Malgun Gothic", 10, "bold"), bg="#1E1E2E", fg="#F8F8F2", padx=5, pady=5)
-        right_frame.pack(side="right", fill="both", expand=True, padx=(5, 0))
         
-        self.log_text = ScrolledText(right_frame, height=10, bg="#000000", fg="#00FF00", font=("Consolas", 9), state="disabled")
+        # Right: Logs
+        l_frame = tk.LabelFrame(split_frame, text=" 시스템 로그 ", padding=5)
+        l_frame.pack(side="right", fill="both", expand=True, padx=(5, 0))
+        self.log_text = ScrolledText(l_frame, height=8, bg="black", fg="#00FF00", font=("Consolas", 9), state="disabled")
         self.log_text.pack(fill="both", expand=True)
 
     # [NEW] 옵션 저장 통합 함수
@@ -593,15 +560,15 @@ class FlowVisionApp:
         
         if ia:
             w, h = ia['x2'] - ia['x1'], ia['y2'] - ia['y1']
-            i_text = f"✅설정됨 ({w}x{h})"
+            i_text = "✅OK"
         if sa:
             w, h = sa['x2'] - sa['x1'], sa['y2'] - sa['y1']
-            s_text = f"✅설정됨 ({w}x{h})"
+            s_text = "✅OK"
         if aa:
             w, h = aa['x2'] - aa['x1'], aa['y2'] - aa['y1']
-            a_text = f"✅설정됨 ({w}x{h})"
+            a_text = "✅OK"
             
-        return f"상태: 입력창[{i_text}] / 버튼[{s_text}] / 딴짓[{a_text}]"
+        return f"Input[{i_text}] Btn[{s_text}] AFK[{a_text}]"
 
     def log(self, msg):
         print(msg)
@@ -682,10 +649,12 @@ class FlowVisionApp:
             sep = self.cfg.get("prompts_separator", "|||")
             self.prompts = [p.strip() for p in raw.split(sep) if p.strip()]
             if self.index >= len(self.prompts): self.index = 0
-            self._show()
-            self.lbl_status.config(text=f"로드 완료 ({len(self.prompts)}개)", fg="#8BE9FD")
+            
+            # [UI Update] 진행률 즉시 갱신
+            self._update_progress_ui()
+            self.log(f"로드 완료 ({len(self.prompts)}개)")
         except Exception as e:
-            self.lbl_status.config(text=f"로드 실패: {e}", fg="#FF5555")
+            self.log(f"로드 실패: {e}")
 
     def on_first(self):
         self.index = 0
@@ -704,16 +673,50 @@ class FlowVisionApp:
         self._show()
 
     def _show(self):
-        if self.prompts and 0 <= self.index < len(self.prompts):
-            self.lbl_pos.config(text=f"{self.index + 1} / {len(self.prompts)}")
+        # UI 업데이트는 _update_progress_ui 에서 처리
+        self._update_progress_ui()
+
+    def _update_progress_ui(self):
+        total = len(self.prompts)
+        current = self.index
+        
+        # 1. Progress Bar & Text
+        if total > 0:
+            pct = (current / total) * 100
+            self.progress_var.set(pct)
+            self.lbl_prog_text.config(text=f"Progress: {current}/{total} ({pct:.1f}%)")
         else:
-            self.lbl_pos.config(text="0 / 0")
+            self.progress_var.set(0)
+            self.lbl_prog_text.config(text="No Prompts")
+
+    def _update_monitor_ui(self):
+        # Live Monitor 업데이트 (봇의 현재 상태 표시)
+        p_name = self.actor.current_persona_name
+        mood = self.actor.current_mood
+        speed = self.actor.cfg.get('speed_multiplier', 1.0)
+        
+        self.lbl_live_persona.config(text=p_name)
+        self.lbl_live_mood.config(text=f"{mood}")
+        
+        # Mood에 따라 색상 변경
+        mood_color = {"Hasty": "#FF5555", "Relaxed": "#50FA7B", "Tired": "#6272A4", "Normal": "#8BE9FD"}.get(mood, "white")
+        self.lbl_live_mood.config(fg=mood_color)
+        
+        # Speed Visual (역수: 낮을수록 빠름 -> 바는 높게)
+        # speed 0.5 (Fast) -> 100%, speed 3.0 (Slow) -> 10%
+        visual_speed = max(0, min(100, (3.5 - speed) * 33)) 
+        self.live_speed_bar['value'] = visual_speed
+        self.lbl_live_speed_text.config(text=f"x{speed:.1f}")
+        
+        # Batch Count
+        self.lbl_live_batch.config(text=f"{self.actor.processed_count} / {self.actor.current_batch_size}")
+
 
     def _tick(self):
         if self.running and self.t_next:
             remain = self.t_next - time.time()
             if remain > 0:
-                self.lbl_status.config(text=f"⏳ 다음 작업까지 {int(remain)}초...", fg="#F1FA8C")
+                self.update_status_label(f"⏳ 대기 중... {int(remain)}초", "#F1FA8C")
                 
                 if self.cfg.get("afk_mode") and self.cfg.get("afk_area"):
                     self.actor.idle_action(self.cfg["afk_area"])
@@ -723,11 +726,10 @@ class FlowVisionApp:
             remain_cnt = len(self.prompts) - self.index
             total_sec = remain_cnt * base + max(0, int(remain))
             finish_time = datetime.fromtimestamp(time.time() + total_sec).strftime("%p %I:%M")
-            self.lbl_eta.config(text=f"📅 예상 완료: {finish_time} (약 {total_sec//60}분 남음)")
+            self.lbl_eta.config(text=f"🏁 예상 종료: {finish_time}")
 
             if 0 < remain <= 30:
                 if self.alert_window is None:
-                    # [Sound] 알림창 생성 시에도 소리 설정 전달
                     self.alert_window = CountdownAlert(self.root, remain, sound_enabled=self.cfg.get("sound_enabled", True))
                 else:
                     self.alert_window.update_time(remain)
@@ -744,9 +746,9 @@ class FlowVisionApp:
                 interval = int(base + extra_chaos)
                 
                 self.t_next = time.time() + interval
-                self.log(f"🎲 [Safe Chaos] 다음 간격: {interval}초 (최소 {base}초 보장 + {extra_chaos:.1f}초 멍때림)")
+                self.log(f"🎲 [Safe Chaos] 다음 간격: {interval}초 (최소 {base}초 + 랜덤 {extra_chaos:.1f}초)")
         else:
-            self.lbl_eta.config(text="-")
+            self.lbl_eta.config(text="--:--")
         
         self.root.after(1000, self._tick)
 
@@ -816,8 +818,6 @@ class FlowVisionApp:
             f"📂 로그 저장됨:\n{filename}"
         )
         
-        # [NEW] 이어달리기 중이라면 메시지박스를 띄우지 않고 넘어감 (방해 금지)
-        # 하지만 마지막 슬롯이라면 띄움
         is_relay_running = self.cfg.get("relay_mode") and (self.relay_progress + 1 < self.cfg.get("relay_count"))
         if not is_relay_running:
             messagebox.showinfo("작업 완료 보고서", summary)
@@ -826,46 +826,40 @@ class FlowVisionApp:
         is_active, reason = self.actor.check_schedule()
         if not is_active:
             self.log(f"⛔ {reason} - 잠시 대기합니다.")
-            self.lbl_status.config(text=f"🌙 {reason}...", fg="#6272A4")
+            self.update_status_label(f"🌙 {reason}...", "#6272A4")
             self.t_next = time.time() + 300 
             return
 
         if self.actor.processed_count >= self.actor.current_batch_size:
             self.log(f"🛑 배치 목표({self.actor.current_batch_size}개) 달성! 휴식 모드 진입.")
-            self.lbl_status.config(text="☕ 재충전 중...", fg="#FF5555")
+            self.update_status_label("☕ 재충전 중...", "#FF5555")
             duration = self.actor.take_bio_break()
             self.actor.update_batch_size()
             self.log(f"☕ 휴식 끝! 다음 배치는 {self.actor.current_batch_size}개 예정.")
             return
 
         if not self.prompts or self.index >= len(self.prompts):
-            # [CORE] 현재 슬롯 완료
-            self.save_session_report() # 일단 현재 슬롯 결과 저장
+            self.save_session_report() 
             
-            # [NEW] 이어달리기 로직
             if self.cfg.get("relay_mode", False):
                 target_count = self.cfg.get("relay_count", 1)
-                current_progress = self.relay_progress + 1 # 0부터 시작했으므로 +1
+                current_progress = self.relay_progress + 1 
                 
                 if current_progress < target_count:
-                    # 다음 슬롯으로 이동
                     next_slot_idx = self.cfg["active_prompt_slot"] + 1
                     
                     if next_slot_idx < len(self.cfg["prompt_slots"]):
                         self.log(f"🏃 [이어달리기] {current_progress}번 완료 -> {current_progress + 1}번 슬롯으로 이동합니다!")
                         
-                        # 슬롯 변경 및 로드
                         self.cfg["active_prompt_slot"] = next_slot_idx
-                        self.combo_slots.current(next_slot_idx) # UI 반영
-                        self.on_slot_change() # 파일 로드
+                        self.combo_slots.current(next_slot_idx) 
+                        self.on_slot_change() 
                         
                         self.relay_progress = current_progress
-                        self.index = 0 # 처음부터 시작
+                        self.index = 0 
                         
-                        # [Sound] 슬롯 교체 알림
                         self.play_sound("success")
                         
-                        # 바로 시작하지 않고 약간의 텀을 둠 (자연스럽게)
                         self.t_next = time.time() + 10 
                         self.log("⏳ 슬롯 교체 중... 10초 뒤 시작합니다.")
                         return
@@ -875,16 +869,20 @@ class FlowVisionApp:
                     self.log(f"🏁 [이어달리기] 목표 달성 ({target_count}개 슬롯 완료)!")
 
             self.running = False
-            self.lbl_status.config(text="🎉 모든 작업 완료!", fg="#BD93F9")
+            self.update_status_label("🎉 완료!", "#BD93F9")
             self.log("작업 완료")
-            self.play_sound("finish") # [Sound]
+            self.play_sound("finish") 
             self.on_stop()
             return
 
         self._show()
         prompt = self.prompts[self.index]
-        task_start_time = datetime.now() # [NEW] 장면 시작 시간 기록
+        task_start_time = datetime.now()
+        
+        # [CORE Logic] Randomize Persona
         self.actor.randomize_persona()
+        # [UI Update] Refresh Monitor with new stats
+        self._update_monitor_ui()
         
         if self.config_window and self.config_window.root.winfo_exists():
             self.config_window.refresh_ui()
@@ -901,16 +899,16 @@ class FlowVisionApp:
             return
 
         try:
+            # Mood Icon Update
             mood_icon = {"Hasty": "⚡", "Relaxed": "☕", "Tired": "😴", "Normal": "🙂"}.get(self.actor.current_mood, "🙂")
-            self.lbl_status.config(text=f"{mood_icon} [{self.actor.current_mood}] 준비 중...", fg="#FFB86C")
+            self.update_status_label(f"{mood_icon} [{self.actor.current_mood}] 작업 중...", "#FFB86C")
             
-            # [Sound] 작업 시작
             self.play_sound("start")
 
             self.actor.simulate_focus_loss()
             self.actor.random_behavior_routine()
 
-            self.lbl_status.config(text="🖱️ 입력창 이동...", fg="white")
+            self.update_status_label("🖱️ 입력창 이동...", "white")
             
             ix_rand = random.randint(ia['x1'], ia['x2'])
             iy_rand = random.randint(ia['y1'], ia['y2'])
@@ -932,10 +930,10 @@ class FlowVisionApp:
             if random.random() < self.actor.cfg["gaze_simulation"]:
                 self.actor.simulate_gaze()
 
-            self.lbl_status.config(text="✍️ 입력 중...", fg="white")
+            self.update_status_label("✍️ 입력 중...", "white")
             self.actor.type_text(prompt, input_area=ia)
             
-            self.lbl_status.config(text="📖 검토 중...", fg="#8BE9FD")
+            self.update_status_label("📖 검토 중...", "#8BE9FD")
             if random.random() < 0.5:
                 self.actor.highlight_text_habit()
             else:
@@ -944,12 +942,12 @@ class FlowVisionApp:
             self.actor.read_prompt_pause(prompt)
             
             if random.random() < self.actor.cfg.get("enter_submit_rate", 0.0):
-                self.lbl_status.config(text="↵ 엔터 제출!", fg="#50FA7B")
+                self.update_status_label("↵ 엔터 제출!", "#50FA7B")
                 self.log("↵ [Human] Enter Key Submit")
                 time.sleep(random.uniform(0.2, 0.5))
                 pyautogui.press('enter')
             else:
-                self.lbl_status.config(text="🖱️ 클릭 제출...", fg="white")
+                self.update_status_label("🖱️ 클릭 제출...", "white")
                 
                 s_w = sa['x2'] - sa['x1']
                 s_h = sa['y2'] - sa['y1']
@@ -971,7 +969,7 @@ class FlowVisionApp:
                 self.actor.smart_click()
             
             self.log(f"✅ 제출 완료")
-            self.play_sound("success") # [Sound]
+            self.play_sound("success") 
             
             task_end_time = datetime.now()
             duration_sec = (task_end_time - task_start_time).total_seconds()
@@ -996,6 +994,7 @@ class FlowVisionApp:
         
         finally:
             self.index += 1
+            self._update_progress_ui() # Update progress bar
 
 if __name__ == "__main__":
     FlowVisionApp().root.mainloop()
