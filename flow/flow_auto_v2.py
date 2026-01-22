@@ -8,7 +8,11 @@ from pathlib import Path
 from datetime import datetime
 import ctypes
 import importlib 
-import winsound 
+try:
+    import winsound
+    WINSOUND_AVAILABLE = True
+except ImportError:
+    WINSOUND_AVAILABLE = False
 
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
@@ -109,13 +113,15 @@ class CountdownAlert:
         sec_int = int(seconds)
         self.lbl_time.config(text=f"{sec_int}초 전")
         
-        if self.sound_enabled:
-            if sec_int == 30:
-                winsound.MessageBeep(winsound.MB_ICONASTERISK)
-            elif sec_int == 10:
-                winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
-            elif 0 < sec_int <= 5:
-                winsound.Beep(1000, 100)
+        if self.sound_enabled and WINSOUND_AVAILABLE:
+            try:
+                if sec_int == 30:
+                    winsound.MessageBeep(winsound.MB_ICONASTERISK)
+                elif sec_int == 10:
+                    winsound.MessageBeep(winsound.MB_ICONEXCLAMATION)
+                elif 0 < sec_int <= 5:
+                    winsound.Beep(1000, 100)
+            except: pass
         
         if sec_int <= 10:
             if self.blink_state:
@@ -285,7 +291,7 @@ class FlowVisionApp:
         self.root.after(1000, self._tick)
 
     def play_sound(self, category):
-        if not self.cfg.get("sound_enabled", True):
+        if not self.cfg.get("sound_enabled", True) or not WINSOUND_AVAILABLE:
             return 
         try:
             if category == "start":
