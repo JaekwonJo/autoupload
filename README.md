@@ -23,9 +23,19 @@ Double-click **`2_오토_프로그램_실행.bat`**.
 2. **Coordinates**: Click "⬛ 입력창" and drag to select the text box. Click "⬛ 버튼" for the submit button.
 3. **AFK Area (Optional)**: Click "🟩 딴짓(AFK)" and select a safe area (like the desktop wallpaper) for the mouse to play in during wait times.
 
-## 🛠️ Key Features (V2 Update)
+## 🛠️ Key Features (V3 Ultimate Update)
 
-### 📊 Detailed Reporting (New!)
+### 📊 Dashboard & Live Monitor (New!)
+- **Dark UI**: A professional, eye-friendly Dracula-themed interface.
+- **Live Progress**: Real-time progress bar and ETA (Estimated Time of Arrival).
+- **Bot Monitor**: Watch the bot's "Personality", "Mood", and "Typing Speed" change in real-time on the dashboard.
+
+### 🏃 Relay Mode & Automation (New!)
+- **Relay Run**: Automatically load and run the next prompt file slot after finishing the current one (e.g., Run 3 slots in a row).
+- **Sound Toggle**: Mute all sound effects with a single checkbox.
+- **Crash Catcher**: Never closes unexpectedly. Displays a clear error log if something goes wrong.
+
+### 📊 Detailed Reporting
 - **Auto-Logging**: Automatically saves a detailed session report (`logs/Report_...txt`) after completion.
 - **Performance Stats**: Tracks total time, average speed per scene, and individual prompt durations.
 - **Metadata**: Records which prompt file was used and exact timestamps.

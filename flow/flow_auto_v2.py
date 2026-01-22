@@ -4,10 +4,13 @@ import time
 import random
 import threading
 import math
+import traceback 
 from pathlib import Path
 from datetime import datetime
 import ctypes
 import importlib 
+
+# [CRITICAL] 윈도우/리눅스(WSL) 호환성 체크
 try:
     import winsound
     WINSOUND_AVAILABLE = True
@@ -221,7 +224,6 @@ def load_config_from_file(path):
     except:
         return DEFAULT_CONFIG.copy()
 
-# [Legacy] 팝업 설정창은 유지 (원할 때 상세 확인용)
 class HumanConfigWindow:
     def __init__(self, master, actor):
         self.actor = actor
@@ -232,8 +234,6 @@ class HumanConfigWindow:
         
         tk.Label(self.root, text="이 창은 '상세 값' 확인용입니다.\n메인 화면의 대시보드에서 요약 정보를 볼 수 있습니다.", 
                  fg="#BD93F9", bg="#282A36", font=("Malgun Gothic", 10)).pack(pady=20)
-        
-        # 간단히 닫기 버튼만 제공 (메인 대시보드로 유도)
         ttk.Button(self.root, text="닫기", command=self.root.destroy).pack(pady=20)
 
 class FlowVisionApp:
@@ -255,7 +255,7 @@ class FlowVisionApp:
         
         self.root = tk.Tk()
         self.root.title(APP_NAME)
-        self.root.geometry("950x700") # 가로로 넓게 확장
+        self.root.geometry("950x700") 
         self.root.configure(bg="#1E1E2E")
         
         try:
@@ -264,12 +264,9 @@ class FlowVisionApp:
                 self.root.iconbitmap(str(icon_path))
         except: pass
         
-        # [THEME] 스타일 설정
         self.style = ttk.Style()
         self.style.theme_use('clam')
         
-        # 다크 테마 컬러 팔레트
-        # BG: #1E1E2E, FG: #F8F8F2, Purple: #BD93F9, Pink: #FF79C6, Green: #50FA7B
         self.style.configure("TFrame", background="#1E1E2E")
         self.style.configure("TLabelframe", background="#1E1E2E", foreground="#BD93F9")
         self.style.configure("TLabelframe.Label", background="#1E1E2E", foreground="#BD93F9", font=("Malgun Gothic", 10, "bold"))
@@ -277,10 +274,8 @@ class FlowVisionApp:
         self.style.configure("TButton", background="#44475A", foreground="white", borderwidth=1, focuscolor="none")
         self.style.map("TButton", background=[('active', '#6272A4')])
         
-        # 프로그레스바 스타일
         self.style.configure("Horizontal.TProgressbar", background="#BD93F9", troughcolor="#44475A", bordercolor="#44475A", lightcolor="#BD93F9", darkcolor="#BD93F9")
         
-        # Accent Button
         self.style.configure("Accent.TButton", background="#50FA7B", foreground="#282A36", font=("Malgun Gothic", 10, "bold"))
         self.style.map("Accent.TButton", background=[('active', '#FF79C6')])
 
@@ -375,11 +370,7 @@ class FlowVisionApp:
     def update_status_label(self, text, color):
         self.lbl_main_status.config(text=text, fg=color)
 
-    # [UI Construction - Refactored for Dashboard]
     def _build_ui(self):
-        # 3단 레이아웃: Top(Title), Middle(Content), Bottom(Logs)
-        
-        # 1. Top Header
         top_frame = tk.Frame(self.root, bg="#1E1E2E", pady=10)
         top_frame.pack(fill="x", side="top")
         
@@ -387,15 +378,13 @@ class FlowVisionApp:
         self.lbl_main_status = tk.Label(top_frame, text="Ready", font=("Malgun Gothic", 14, "bold"), bg="#1E1E2E", fg="#6272A4")
         self.lbl_main_status.pack(side="right", padx=20)
 
-        # 2. Middle Section (Left: Control, Right: Dashboard)
         mid_frame = tk.Frame(self.root, bg="#1E1E2E")
         mid_frame.pack(fill="both", expand=True, padx=20)
 
-        # --- Left Panel (Controls & Setup) ---
-        left_panel = tk.LabelFrame(mid_frame, text=" 🎮 Control Panel ", padding=10)
+        # [FIX] tk.LabelFrame -> ttk.LabelFrame (for padding option)
+        left_panel = ttk.LabelFrame(mid_frame, text=" 🎮 Control Panel ", padding=10)
         left_panel.pack(side="left", fill="both", expand=False, padx=(0, 10), ipadx=5)
         
-        # A. 영역 설정
         tk.Label(left_panel, text="1. 영역 지정 (필수)", font=("Malgun Gothic", 10, "bold")).pack(anchor="w", pady=(0, 5))
         btn_grid = tk.Frame(left_panel, bg="#1E1E2E")
         btn_grid.pack(fill="x", pady=5)
@@ -406,22 +395,18 @@ class FlowVisionApp:
         self.lbl_coords = tk.Label(left_panel, text=self._get_coord_text(), font=("Malgun Gothic", 8), fg="#6272A4")
         self.lbl_coords.pack(anchor="w", pady=(0, 10))
         
-        # B. 옵션 스위치
         tk.Label(left_panel, text="2. 환경 설정", font=("Malgun Gothic", 10, "bold")).pack(anchor="w", pady=(5, 5))
         
-        # Sound
         self.sound_var = tk.BooleanVar(value=self.cfg.get("sound_enabled", True))
         chk_sound = tk.Checkbutton(left_panel, text="🔊 효과음 켜기", variable=self.sound_var, command=self.on_option_toggle,
                                    bg="#1E1E2E", fg="#8BE9FD", selectcolor="#1E1E2E", activebackground="#1E1E2E", activeforeground="#8BE9FD", font=("Malgun Gothic", 9))
         chk_sound.pack(anchor="w")
 
-        # AFK
         self.afk_var = tk.BooleanVar(value=self.cfg.get("afk_mode", False))
         chk_afk = tk.Checkbutton(left_panel, text="👻 AFK(딴짓) 모드", variable=self.afk_var, command=self.on_option_toggle,
                                    bg="#1E1E2E", fg="#F1FA8C", selectcolor="#1E1E2E", activebackground="#1E1E2E", activeforeground="#F1FA8C", font=("Malgun Gothic", 9))
         chk_afk.pack(anchor="w")
         
-        # Relay
         relay_box = tk.Frame(left_panel, bg="#1E1E2E", pady=5)
         relay_box.pack(fill="x", anchor="w")
         self.relay_var = tk.BooleanVar(value=self.cfg.get("relay_mode", False))
@@ -434,35 +419,29 @@ class FlowVisionApp:
                    bg="#282A36", fg="white", buttonbackground="#44475A").pack(side="left", padx=5)
         tk.Label(relay_box, text="개 연속", bg="#1E1E2E", fg="#FF79C6", font=("Malgun Gothic", 9)).pack(side="left")
 
-        # Interval
         tk.Label(left_panel, text="3. 시간 간격 (초)", font=("Malgun Gothic", 10, "bold")).pack(anchor="w", pady=(15, 5))
         self.entry_interval = tk.Entry(left_panel, bg="#282A36", fg="#50FA7B", insertbackground="white", font=("Consolas", 11))
         self.entry_interval.insert(0, str(self.cfg.get("interval_seconds", 180)))
         self.entry_interval.pack(fill="x", padx=5)
 
-        # Action Buttons
-        tk.Frame(left_panel, height=20, bg="#1E1E2E").pack() # Spacer
+        tk.Frame(left_panel, height=20, bg="#1E1E2E").pack() 
         self.btn_start = ttk.Button(left_panel, text="🌙 시작 (START)", style="Accent.TButton", command=self.on_start)
         self.btn_start.pack(fill="x", pady=5, ipady=5)
         
         self.btn_stop = ttk.Button(left_panel, text="🛑 정지 (STOP)", command=self.on_stop, state="disabled")
         self.btn_stop.pack(fill="x", pady=2)
 
-
-        # --- Right Panel (Dashboard & Monitor) ---
         right_panel = tk.Frame(mid_frame, bg="#1E1E2E")
         right_panel.pack(side="right", fill="both", expand=True)
         
-        # 1. Progress Dashboard
-        dash_frame = tk.LabelFrame(right_panel, text=" 📊 Live Progress ", padding=10)
+        # [FIX] tk.LabelFrame -> ttk.LabelFrame
+        dash_frame = ttk.LabelFrame(right_panel, text=" 📊 Live Progress ", padding=10)
         dash_frame.pack(fill="x", pady=(0, 10))
         
-        # Progress Bar
         self.progress_var = tk.DoubleVar()
         self.progress_bar = ttk.Progressbar(dash_frame, variable=self.progress_var, maximum=100, mode='determinate', style="Horizontal.TProgressbar")
         self.progress_bar.pack(fill="x", pady=5)
         
-        # Info Labels
         info_grid = tk.Frame(dash_frame, bg="#1E1E2E")
         info_grid.pack(fill="x")
         
@@ -472,42 +451,35 @@ class FlowVisionApp:
         self.lbl_eta = tk.Label(info_grid, text="--:-- 종료 예정", font=("Consolas", 10), fg="#6272A4", bg="#1E1E2E")
         self.lbl_eta.pack(side="right")
         
-        # 2. Persona Monitor (Read-Only)
-        monitor_frame = tk.LabelFrame(right_panel, text=" 👁️ Bot Monitor (Read-Only) ", padding=10)
+        # [FIX] tk.LabelFrame -> ttk.LabelFrame
+        monitor_frame = ttk.LabelFrame(right_panel, text=" 👁️ Bot Monitor (Read-Only) ", padding=10)
         monitor_frame.pack(fill="both", expand=True)
         
-        # Persona Name Big Display
         tk.Label(monitor_frame, text="Current Persona", font=("Malgun Gothic", 9), fg="#6272A4").pack(anchor="w")
         self.lbl_live_persona = tk.Label(monitor_frame, text="Waiting...", font=("Malgun Gothic", 16, "bold"), fg="#50FA7B")
         self.lbl_live_persona.pack(anchor="w", pady=(0, 10))
         
-        # Grid for Stats
         stat_grid = tk.Frame(monitor_frame, bg="#1E1E2E")
         stat_grid.pack(fill="x", pady=5)
         
-        # Col 1: Mood
         tk.Label(stat_grid, text="Mood (기분)", fg="#6272A4", font=("Malgun Gothic", 9)).grid(row=0, column=0, sticky="w", padx=10)
         self.lbl_live_mood = tk.Label(stat_grid, text="-", fg="white", font=("Malgun Gothic", 11, "bold"))
         self.lbl_live_mood.grid(row=1, column=0, sticky="w", padx=10)
         
-        # Col 2: Speed Gauge (Visual only)
         tk.Label(stat_grid, text="Typing Speed", fg="#6272A4", font=("Malgun Gothic", 9)).grid(row=0, column=1, sticky="w", padx=20)
         self.live_speed_bar = ttk.Progressbar(stat_grid, length=150, mode='determinate', style="Horizontal.TProgressbar")
         self.live_speed_bar.grid(row=1, column=1, sticky="w", padx=20)
         self.lbl_live_speed_text = tk.Label(stat_grid, text="x 1.0", fg="#BD93F9", font=("Consolas", 9))
         self.lbl_live_speed_text.grid(row=2, column=1, sticky="w", padx=20)
 
-        # Col 3: Batch Goal
         tk.Label(stat_grid, text="Batch Goal", fg="#6272A4", font=("Malgun Gothic", 9)).grid(row=0, column=2, sticky="w", padx=10)
         self.lbl_live_batch = tk.Label(stat_grid, text="- / -", fg="white", font=("Malgun Gothic", 11, "bold"))
         self.lbl_live_batch.grid(row=1, column=2, sticky="w", padx=10)
 
 
-        # 3. Bottom Section (Prompts & Logs)
         bottom_frame = tk.Frame(self.root, bg="#1E1E2E")
         bottom_frame.pack(fill="both", expand=True, padx=20, pady=10)
         
-        # Prompt Selector
         prompt_bar = tk.Frame(bottom_frame, bg="#1E1E2E")
         prompt_bar.pack(fill="x", pady=5)
         
@@ -526,23 +498,35 @@ class FlowVisionApp:
         ttk.Button(prompt_bar, text="📂 열기", command=self.on_open_prompts).pack(side="left", padx=5)
         ttk.Button(prompt_bar, text="🔄 새로고침", command=self.on_reload).pack(side="left", padx=5)
 
+        # [NEW] Navigation Bar (Restore functionality)
+        nav_bar = tk.Frame(bottom_frame, bg="#1E1E2E")
+        nav_bar.pack(fill="x", pady=2)
+        
+        ttk.Button(nav_bar, text="⏮ 처음", width=6, command=self.on_first).pack(side="left", padx=2)
+        ttk.Button(nav_bar, text="◀ 이전", width=6, command=self.on_prev).pack(side="left", padx=2)
+        
+        self.lbl_nav_status = tk.Label(nav_bar, text="0 / 0", font=("Consolas", 11, "bold"), bg="#282A36", fg="white", width=12)
+        self.lbl_nav_status.pack(side="left", padx=10)
+        
+        ttk.Button(nav_bar, text="▶ 다음", width=6, command=self.on_next).pack(side="left", padx=2)
+        ttk.Button(nav_bar, text="⏭ 끝", width=6, command=self.on_last).pack(side="left", padx=2)
+
         # Log & Preview Split
         split_frame = tk.Frame(bottom_frame, bg="#1E1E2E")
         split_frame.pack(fill="both", expand=True)
         
-        # Left: Preview
-        p_frame = tk.LabelFrame(split_frame, text=" 미리보기 ", padding=5)
+        # [FIX] tk.LabelFrame -> ttk.LabelFrame
+        p_frame = ttk.LabelFrame(split_frame, text=" 미리보기 ", padding=5)
         p_frame.pack(side="left", fill="both", expand=True, padx=(0, 5))
         self.text_preview = ScrolledText(p_frame, height=8, bg="#282A36", fg="#F8F8F2", insertbackground="white", font=("Consolas", 9))
         self.text_preview.pack(fill="both", expand=True)
         
-        # Right: Logs
-        l_frame = tk.LabelFrame(split_frame, text=" 시스템 로그 ", padding=5)
+        # [FIX] tk.LabelFrame -> ttk.LabelFrame
+        l_frame = ttk.LabelFrame(split_frame, text=" 시스템 로그 ", padding=5)
         l_frame.pack(side="right", fill="both", expand=True, padx=(5, 0))
         self.log_text = ScrolledText(l_frame, height=8, bg="black", fg="#00FF00", font=("Consolas", 9), state="disabled")
         self.log_text.pack(fill="both", expand=True)
 
-    # [NEW] 옵션 저장 통합 함수
     def on_option_toggle(self):
         self.cfg["afk_mode"] = self.afk_var.get()
         self.cfg["sound_enabled"] = self.sound_var.get()
@@ -656,7 +640,6 @@ class FlowVisionApp:
             self.prompts = [p.strip() for p in raw.split(sep) if p.strip()]
             if self.index >= len(self.prompts): self.index = 0
             
-            # [UI Update] 진행률 즉시 갱신
             self._update_progress_ui()
             self.log(f"로드 완료 ({len(self.prompts)}개)")
         except Exception as e:
@@ -679,14 +662,17 @@ class FlowVisionApp:
         self._show()
 
     def _show(self):
-        # UI 업데이트는 _update_progress_ui 에서 처리
         self._update_progress_ui()
 
     def _update_progress_ui(self):
         total = len(self.prompts)
         current = self.index
         
-        # 1. Progress Bar & Text
+        # Nav Label Update
+        try:
+            self.lbl_nav_status.config(text=f"{current + 1} / {total}")
+        except: pass
+
         if total > 0:
             pct = (current / total) * 100
             self.progress_var.set(pct)
@@ -696,7 +682,6 @@ class FlowVisionApp:
             self.lbl_prog_text.config(text="No Prompts")
 
     def _update_monitor_ui(self):
-        # Live Monitor 업데이트 (봇의 현재 상태 표시)
         p_name = self.actor.current_persona_name
         mood = self.actor.current_mood
         speed = self.actor.cfg.get('speed_multiplier', 1.0)
@@ -704,17 +689,13 @@ class FlowVisionApp:
         self.lbl_live_persona.config(text=p_name)
         self.lbl_live_mood.config(text=f"{mood}")
         
-        # Mood에 따라 색상 변경
         mood_color = {"Hasty": "#FF5555", "Relaxed": "#50FA7B", "Tired": "#6272A4", "Normal": "#8BE9FD"}.get(mood, "white")
         self.lbl_live_mood.config(fg=mood_color)
         
-        # Speed Visual (역수: 낮을수록 빠름 -> 바는 높게)
-        # speed 0.5 (Fast) -> 100%, speed 3.0 (Slow) -> 10%
         visual_speed = max(0, min(100, (3.5 - speed) * 33)) 
         self.live_speed_bar['value'] = visual_speed
         self.lbl_live_speed_text.config(text=f"x{speed:.1f}")
         
-        # Batch Count
         self.lbl_live_batch.config(text=f"{self.actor.processed_count} / {self.actor.current_batch_size}")
 
 
@@ -885,9 +866,7 @@ class FlowVisionApp:
         prompt = self.prompts[self.index]
         task_start_time = datetime.now()
         
-        # [CORE Logic] Randomize Persona
         self.actor.randomize_persona()
-        # [UI Update] Refresh Monitor with new stats
         self._update_monitor_ui()
         
         if self.config_window and self.config_window.root.winfo_exists():
@@ -905,7 +884,6 @@ class FlowVisionApp:
             return
 
         try:
-            # Mood Icon Update
             mood_icon = {"Hasty": "⚡", "Relaxed": "☕", "Tired": "😴", "Normal": "🙂"}.get(self.actor.current_mood, "🙂")
             self.update_status_label(f"{mood_icon} [{self.actor.current_mood}] 작업 중...", "#FFB86C")
             
@@ -1000,7 +978,20 @@ class FlowVisionApp:
         
         finally:
             self.index += 1
-            self._update_progress_ui() # Update progress bar
+            self._update_progress_ui()
 
+# [SAFETY NET] 전체 실행을 감싸서 에러 로그를 남김
 if __name__ == "__main__":
-    FlowVisionApp().root.mainloop()
+    try:
+        app = FlowVisionApp()
+        app.root.mainloop()
+    except Exception as e:
+        err_msg = traceback.format_exc()
+        with open("CRASH_LOG.txt", "w", encoding="utf-8") as f:
+            f.write(err_msg)
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print("   [CRITICAL ERROR] 프로그램이 비정상 종료되었습니다.")
+        print("   로그 파일(CRASH_LOG.txt)을 확인해주세요.")
+        print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+        print(err_msg)
+        input("엔터 키를 누르면 종료합니다...")

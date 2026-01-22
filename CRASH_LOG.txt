@@ -1,0 +1,18 @@
+Traceback (most recent call last):
+  File "C:\Users\jaekw\Documents\autoupload\flow\flow_auto_v2.py", line 964, in <module>
+    app = FlowVisionApp()
+  File "C:\Users\jaekw\Documents\autoupload\flow\flow_auto_v2.py", line 285, in __init__
+    self._build_ui()
+    ~~~~~~~~~~~~~~^^
+  File "C:\Users\jaekw\Documents\autoupload\flow\flow_auto_v2.py", line 386, in _build_ui
+    left_panel = tk.LabelFrame(mid_frame, text=" 🎮 Control Panel ", padding=10)
+                 ~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jaekw\AppData\Local\Python\pythoncore-3.14-64\Lib\tkinter\__init__.py", line 4789, in __init__
+    Widget.__init__(self, master, 'labelframe', cnf, kw)
+    ~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\jaekw\AppData\Local\Python\pythoncore-3.14-64\Lib\tkinter\__init__.py", line 2794, in __init__
+    self.tk.call(
+    ~~~~~~~~~~~~^
+        (widgetName, self._w) + extra + self._options(cnf))
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_tkinter.TclError: unknown option "-padding"

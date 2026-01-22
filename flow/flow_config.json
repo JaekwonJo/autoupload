@@ -1,5 +1,5 @@
 {
-    "prompts_file": "flow_prompts_slot3.txt",
+    "prompts_file": "flow_prompts_slot5.txt",
     "prompts_separator": "|||",
     "check_interval_seconds": 120,
     "flow_base_url": "https://labs.google/fx/ko/tools/flow",
@@ -44,7 +44,7 @@
             "file": "flow_prompts_slot4.txt"
         },
         {
-            "name": "중국소유대한민국",
+            "name": "일본 한국 소비",
             "file": "flow_prompts_slot5.txt"
         },
         {
@@ -68,7 +68,7 @@
             "file": "flow_prompts_slot10.txt"
         }
     ],
-    "active_prompt_slot": 2,
+    "active_prompt_slot": 4,
     "prompt_save_dir": "",
     "download_selector_main": "button[type=\"button\"]",
     "download_selector_quality": "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr",
@@ -82,22 +82,25 @@
     },
     "interval_seconds": 60,
     "input_area": {
-        "x1": 1009,
-        "y1": 1268,
-        "x2": 1248,
-        "y2": 1284
+        "x1": 1003,
+        "y1": 1270,
+        "x2": 1251,
+        "y2": 1279
     },
     "submit_area": {
-        "x1": 1546,
+        "x1": 1544,
         "y1": 1318,
-        "x2": 1557,
-        "y2": 1332
+        "x2": 1558,
+        "y2": 1330
     },
     "afk_area": {
-        "x1": 2255,
-        "y1": 524,
-        "x2": 2493,
-        "y2": 834
+        "x1": 2191,
+        "y1": 699,
+        "x2": 2521,
+        "y2": 1188
     },
-    "afk_mode": true
+    "afk_mode": true,
+    "sound_enabled": true,
+    "relay_mode": false,
+    "relay_count": 1
 }

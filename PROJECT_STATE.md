@@ -1,7 +1,7 @@
 # 🏗️ Project State: Flow Veo Vision Bot
 
 > **Last Updated:** 2026-01-20 (Tue) - Reporting Update
-> **Current Stage:** 📊 V2 Feature Enhancement (Logging & Reporting)
+> **Current Stage:** 📊 V3 UI Overhaul & Ultimate Stability
 
 ## 📊 Project Overview
 - **Type:** Desktop Automation Tool (Python, Tkinter, PyAutoGUI)
@@ -16,16 +16,18 @@
 - **Reporting:** Detailed session logs saved to `logs/` with prompt filename, timestamps, and per-scene duration.
 
 ## ✅ Resolved (Today's Fixes)
-- **[Feature] Detailed Session Report:** Added a comprehensive reporting system that saves a text file to `logs/` after each session.
-- **[Feature] Metadata Logging:** Reports now include the prompt filename, start/end times, and total duration.
-- **[Feature] Scene Timing:** Logs the exact duration (in seconds) for each individual prompt generation.
-- **[Feature] Summary Popup:** Enhanced the completion message box to show a quick summary of the session stats.
+- **[UI] Dark Dashboard:** Complete UI redesign with progress bars, live monitor, and Dracula theme.
+- **[Feature] Relay Mode:** Automatically chains multiple prompt slots for extended operation.
+- **[Feature] Sound Control:** Added toggle to mute all sound effects.
+- **[Fix] Black Screen Crash:** Fixed `tk.LabelFrame` padding error and WSL `winsound` compatibility.
+- **[Fix] Anti-Korean Toggle:** Implemented strict `Shift` release logic before `Space` to prevent IME switching.
+- **[Fix] Navigation:** Restored First/Prev/Next/Last prompt navigation buttons.
 - **[Docs] Gemini Protocol:** Updated `gemini 설명서.md` to strictly enforce "Continuous Engagement" (No goodbyes).
 
 ## 🚧 Next Steps
 1. **Long-term Monitoring**: Watch if "Typing Mode" triggers any captchas over 10+ hours.
-2. **Sound Customization**: Allow users to toggle sound effects on/off.
-3. **Multi-slot Expansion**: Allow running multiple slots sequentially.
+2. **Telegram Integration**: Send notification to phone when job is done or error occurs.
+3. **Smart Resume**: Resume from the last crashed point if interrupted.
 
 ## 🐛 Known Issues
-- **None critical**: The "Zombie" issue is resolved by the new launcher script.
+- **None**: All critical and UX issues have been resolved.

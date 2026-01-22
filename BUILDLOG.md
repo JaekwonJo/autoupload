@@ -1,5 +1,26 @@
 # 🔨 Build Log
 
+## 2026-01-20 (Tue) - V3 UI Overhaul & Critical Stability Fixes
+- **Error**: Black screen crash immediately after launch; Korean characters appearing during typing.
+- **Cause**: 
+  1. `tk.LabelFrame` does not support `padding` option (Python version mismatch).
+  2. `winsound` module missing on WSL/Linux environments.
+  3. Rapid typing caused accidental `Shift+Space` (IME toggle).
+  4. Navigation buttons (First/Prev/Next/Last) were missing in V2 design.
+- **Fix**: 
+  - **UI**: Replaced all `tk.LabelFrame` with `ttk.LabelFrame`.
+  - **Compatibility**: Added `try-except` block for `winsound` to support WSL.
+  - **Typing Engine**: Implemented `Shift` key release safety logic before pressing `Space`.
+  - **Navigation**: Restored First/Prev/Next/Last prompt navigation buttons.
+- **Features Added**:
+  - **Dark Dashboard UI**: Complete redesign with Dracula theme, progress bars, and live status monitor.
+  - **Live Monitor**: Visualizes current Persona, Mood, and Typing Speed in real-time.
+  - **Sound Toggle**: Checkbox to mute all sound effects.
+  - **Relay Mode**: Option to automatically chain multiple prompt slots (e.g., run 3 files in a row).
+  - **Crash Catcher**: Prevents window from closing on error; saves traceback to `CRASH_LOG.txt`.
+- **Result**: A stable, beautiful, and feature-rich automation bot that works on both Windows and WSL without crashes.
+
+---
 ## 2026-01-20 (Tue) - Detailed Reporting System
 - **Error**: N/A (Feature Request)
 - **Cause**: User requested detailed logging of session times and per-scene durations.
