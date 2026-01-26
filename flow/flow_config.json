@@ -1,5 +1,5 @@
 {
-    "prompts_file": "flow_prompts_slot5.txt",
+    "prompts_file": "flow_prompts_slot7.txt",
     "prompts_separator": "|||",
     "check_interval_seconds": 120,
     "flow_base_url": "https://labs.google/fx/ko/tools/flow",
@@ -52,7 +52,7 @@
             "file": "flow_prompts_slot6.txt"
         },
         {
-            "name": "산타와 루돌프",
+            "name": "여성빈곤",
             "file": "flow_prompts_slot7.txt"
         },
         {
@@ -68,7 +68,7 @@
             "file": "flow_prompts_slot10.txt"
         }
     ],
-    "active_prompt_slot": 4,
+    "active_prompt_slot": 6,
     "prompt_save_dir": "",
     "download_selector_main": "button[type=\"button\"]",
     "download_selector_quality": "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr",
@@ -80,24 +80,24 @@
         "x": 1452,
         "y": 1074
     },
-    "interval_seconds": 60,
+    "interval_seconds": 30,
     "input_area": {
-        "x1": 1003,
-        "y1": 1270,
-        "x2": 1251,
-        "y2": 1279
+        "x1": 1002,
+        "y1": 1273,
+        "x2": 1272,
+        "y2": 1284
     },
     "submit_area": {
-        "x1": 1544,
-        "y1": 1318,
-        "x2": 1558,
-        "y2": 1330
+        "x1": 1546,
+        "y1": 1319,
+        "x2": 1559,
+        "y2": 1332
     },
     "afk_area": {
-        "x1": 2191,
-        "y1": 699,
-        "x2": 2521,
-        "y2": 1188
+        "x1": 141,
+        "y1": 532,
+        "x2": 518,
+        "y2": 1122
     },
     "afk_mode": true,
     "sound_enabled": true,
