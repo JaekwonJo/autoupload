@@ -1,4 +1,5 @@
 @echo off
+chcp 65001 >nul
 cd /d "%~dp0"
 
 echo ========================================================
@@ -11,7 +12,9 @@ echo 청소 완료! 깨끗한 상태에서 시작합니다. ✨
 echo.
 
 :: 가상환경 활성화 (있으면)
-if exist ".venv\Scripts\activate.bat" (
+if exist ".venv_wsl\Scripts\activate.bat" (
+    call .venv_wsl\Scripts\activate.bat
+) else if exist ".venv\Scripts\activate.bat" (
     call .venv\Scripts\activate.bat
 ) else if exist "venv\Scripts\activate.bat" (
     call venv\Scripts\activate.bat
@@ -19,6 +22,7 @@ if exist ".venv\Scripts\activate.bat" (
 
 :: [V2] 새로운 붙여넣기 전용 봇 실행
 echo 🚀 Flow Veo Vision Bot (V2) 시작!
-python flow\flow_auto_v2.py
+:: 모듈 실행 방식(-m)으로 변경하여 경로 문제 해결
+python -m flow.flow_auto_v2
 
 pause
