@@ -48,13 +48,15 @@ class HumanActor:
     def randomize_persona(self):
         """[CORE] 인격 생성: 안전 제일 모드"""
         seed_id = random.randint(1000, 9999)
-        self.current_persona_name = f"Modern Human V9 #{seed_id}"
+        self.current_persona_name = f"인간 지능 V9 #{seed_id}"
         
-        self.current_mood = random.choice(["Energetic", "Calm", "Tired", "Meticulous"])
+        moods_ko = {"Energetic": "활기참", "Calm": "차분함", "Tired": "피곤함", "Meticulous": "꼼꼼함"}
+        raw_mood = random.choice(list(moods_ko.keys()))
+        self.current_mood = moods_ko[raw_mood]
         
         base_speed = random.uniform(0.8, 1.2) 
-        if self.current_mood == "Energetic": base_speed *= 1.2
-        if self.current_mood == "Tired": base_speed *= 0.8
+        if raw_mood == "Energetic": base_speed *= 1.2
+        if raw_mood == "Tired": base_speed *= 0.8
 
         self.cfg = {
             "speed_multiplier": base_speed,
@@ -79,6 +81,20 @@ class HumanActor:
             "bio_break_interval": random.randint(15, 30),
             "long_break_duration": (180, 300), 
         }
+        
+        self.active_traits = []
+        if self.cfg["typo_rate"] > 0.04: self.active_traits.append("⌨️ 가끔 오타 발생 및 수정")
+        if self.cfg["hesitation_before_click"] > 0.5: self.active_traits.append("🖱️ 클릭 전 신중하게 고민")
+        if self.cfg["mouse_wiggle_rate"] > 0.1: self.active_traits.append("🌊 마우스 커서 자연스러운 흔들림")
+        if self.cfg["breathing_pause_rate"] > 0.2: self.active_traits.append("🤔 입력 도중 생각하며 멈춤")
+        if self.cfg["overshoot_rate"] > 0.1: self.active_traits.append("🎯 목표 지점 살짝 지나쳤다 복귀")
+        if self.cfg["random_scroll_rate"] > 0.2: self.active_traits.append("📜 가끔 무의미한 스크롤")
+        if self.cfg["window_focus_switch_rate"] > 0.1: self.active_traits.append("👀 다른 창 기웃거리기 (딴짓)")
+        if raw_mood == "Energetic": self.active_traits.append("⚡ 빠른 반응 속도")
+        elif raw_mood == "Tired": self.active_traits.append("💤 반응 속도 다소 느림")
+
+    def get_active_traits(self):
+        return self.active_traits
 
     def get_fatigue_factor(self):
         elapsed_min = (time.time() - self.session_start_time) / 60.0
@@ -100,7 +116,7 @@ class HumanActor:
             scr_w, scr_h = pyautogui.size()
             self.move_to(scr_w - 10, scr_h - 10, overshoot=False)
             
-        print(f"☕ [Bio-Rhythm] Taking a long break for {duration}s...")
+        print(f"☕ [바이오 리듬] 휴식 중... ({duration}초)")
         
         # [SAFETY] 키보드 초기화
         pyautogui.keyUp('ctrl'); pyautogui.keyUp('shift'); pyautogui.keyUp('alt')
@@ -209,21 +225,25 @@ class HumanActor:
     def type_text(self, text, input_area=None, speed_callback=None):
         self._ensure_english_mode_clipboard()
         
-        # [FIX] 변수 누락 방지
         fatigue = self.get_fatigue_factor()
         key_latency = {'q': 0.02, 'p': 0.03, 'z': 0.03, 'm': 0.02, 'space': 0.04}
         
+        # [SAFETY] 시작 전 모든 키 해제
         pyautogui.keyUp('shift'); pyautogui.keyUp('ctrl'); pyautogui.keyUp('alt')
-        text = text.replace('\n', ' ')
-
+        
+        # [CRITICAL] 텍스트 입력 루프
         for i, char in enumerate(text):
+            # 중간에 잠깐 생각하며 멈춤 (클릭 절대 금지)
             if i % random.randint(10, 20) == 0 and random.random() < self.cfg["breathing_pause_rate"]:
                 time.sleep(random.uniform(0.1, 0.3))
 
             current_typo_rate = self.cfg["typo_rate"] * (2.0 if fatigue < 0.9 else 1.0)
-            if char not in [' '] and random.random() < current_typo_rate:
+            
+            # 오타 발생 로직 (공백, 줄바꿈 제외)
+            if char not in [' ', '\n'] and random.random() < current_typo_rate:
                 self._handle_typo(char)
 
+            # CapsLock 실수 시뮬레이션
             if char.isupper() and random.random() < self.cfg["caps_lock_mistake"]:
                 pyautogui.press(char.lower())
                 time.sleep(0.3)
@@ -233,14 +253,25 @@ class HumanActor:
             base_delay += key_latency.get(char.lower(), 0.0)
 
             if speed_callback:
-                speed_callback(round(1.0/base_delay, 1))
+                speed_callback(round(1.0/max(base_delay, 0.01), 1))
 
+            # [STRICT RULE 1] Shift+Space 금지 (한영전환 방지)
             if char == ' ':
-                pyautogui.keyUp('shift')
-                time.sleep(0.02)
+                pyautogui.keyUp('shift') # 반드시 Shift 떼기
+                time.sleep(0.01)
                 pyautogui.press('space')
-                base_delay += 0.05
+                base_delay += 0.03
                 
+            # [STRICT RULE 3] 줄바꿈은 무조건 Shift+Enter
+            elif char == '\n':
+                pyautogui.keyDown('shift')
+                time.sleep(0.02)
+                pyautogui.press('enter')
+                time.sleep(0.02)
+                pyautogui.keyUp('shift')
+                base_delay += 0.1
+                
+            # 특수문자 및 대문자 처리
             elif char.isupper() or char in '!@#$%^&*()_+{}|:"<>?~':
                 pyautogui.keyDown('shift')
                 time.sleep(0.02)
@@ -248,11 +279,12 @@ class HumanActor:
                 else: pyautogui.press(char)
                 time.sleep(0.02)
                 pyautogui.keyUp('shift')
-                time.sleep(0.03)
+                time.sleep(0.02)
                 
             else:
                 pyautogui.press(char)
 
+            # [STRICT RULE 2] 마우스 흔들기만 허용 (클릭 금지)
             self._jitter_mouse_during_typing()
             time.sleep(base_delay)
 
@@ -298,9 +330,9 @@ class HumanActor:
                 time.sleep(random.uniform(0.2, 0.5))
                 
         elif action == "drag":
-            pyautogui.dragRel(random.randint(50, 150), 0, duration=0.3, button='left')
+            # [STRICT] 클릭 금지 - 드래그 대신 마우스만 쓱 움직임
+            pyautogui.moveRel(random.randint(50, 150), 0, duration=0.3)
             time.sleep(0.2)
-            pyautogui.click() 
             
         elif action == "mouse_leave":
             w, h = pyautogui.size()
@@ -331,16 +363,16 @@ class HumanActor:
             pyautogui.scroll(-300) 
 
     def subconscious_drag(self):
-        pyautogui.dragRel(100, 0, 0.3, button='left')
-        time.sleep(0.1)
-        pyautogui.click() 
+        # [STRICT] 클릭 금지 - 드래그 제스처만 취함 (버튼 클릭 X)
+        pyautogui.moveRel(100, 0, duration=0.3)
+        time.sleep(0.1) 
 
     def click_empty_space(self):
         pass 
 
     def read_prompt_pause(self, text):
         dur = random.uniform(2.0, 8.0)
-        print(f"📖 [Human] Reading prompt... ({dur:.1f}s)")
+        print(f"📖 [인간화] 프롬프트 읽는 중... ({dur:.1f}초)")
         start = time.time()
         while time.time() - start < dur:
             if random.random() < 0.3:

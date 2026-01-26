@@ -1,53 +1,90 @@
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageFilter
 import math
-import os
 
-def create_icon(path):
-    size = (256, 256)
-    # 배경: 고급스러운 딥 퍼플(#4A00E0) -> 핑크(#8E2DE2) 그라데이션
-    img = Image.new('RGBA', size, (0, 0, 0, 0))
+def create_modern_icon(size=256):
+    # Create a transparent image
+    img = Image.new('RGBA', (size, size), (0, 0, 0, 0))
     draw = ImageDraw.Draw(img)
+
+    # --- 1. Hexagon Background (Gradient) ---
+    # Center and Radius
+    cx, cy = size / 2, size / 2
+    radius = size * 0.45
     
-    # 1. 배경 그라데이션 (원형)
-    center = (128, 128)
-    radius = 120
-    for r in range(radius, 0, -1):
-        ratio = r / radius
-        # 그라데이션 색상 계산
-        red = int(74 + (142 - 74) * (1 - ratio))
-        green = int(0 + (45 - 0) * (1 - ratio))
-        blue = int(224 + (226 - 224) * (1 - ratio))
-        draw.ellipse([center[0]-r, center[1]-r, center[0]+r, center[1]+r], fill=(red, green, blue))
+    # Calculate Hexagon Points
+    hex_points = []
+    for i in range(6):
+        angle_deg = 60 * i - 30 # Rotate 30 deg to point up
+        angle_rad = math.radians(angle_deg)
+        x = cx + radius * math.cos(angle_rad)
+        y = cy + radius * math.sin(angle_rad)
+        hex_points.append((x, y))
 
-    # 2. 테두리 (연한 핑크빛 광채)
-    draw.ellipse([8, 8, 248, 248], outline=(255, 182, 193, 100), width=4)
+    # Gradient Fill (Simulated by drawing concentric hexagons)
+    # Colors: Deep Blue/Purple to Bright Cyan/Teal
+    steps = 40
+    for i in range(steps):
+        r_scale = 1 - (i / steps)
+        current_radius = radius * r_scale
+        
+        # Calculate points for this step
+        current_points = []
+        for j in range(6):
+            angle_deg = 60 * j - 30
+            angle_rad = math.radians(angle_deg)
+            x = cx + current_radius * math.cos(angle_rad)
+            y = cy + current_radius * math.sin(angle_rad)
+            current_points.append((x, y))
+        
+        # Color Interpolation
+        # Outer: #2c3e50 (Dark Blue-Grey) -> Inner: #00d2ff (Bright Cyan)
+        r = int(44 + (0 - 44) * (i/steps))
+        g = int(62 + (210 - 62) * (i/steps))
+        b = int(80 + (255 - 80) * (i/steps))
+        
+        # Slightly shifting color scheme to be more "AI" like (Purple/Blue)
+        # Outer: Dark Purple (30, 20, 60) -> Inner: Cyan/White (100, 255, 255)
+        r = int(30 + (80 - 30) * (i / steps))
+        g = int(20 + (200 - 20) * (i / steps))
+        b = int(60 + (255 - 60) * (i / steps))
+        
+        draw.polygon(current_points, fill=(r, g, b, 255))
 
-    # 3. 중앙 하트 (부드러운 흰색)
-    # 하트 좌표 계산 함수
-    def get_heart_polygon(cx, cy, scale):
-        points = []
-        for t in range(0, 628): # 0 to 2pi * 100
-            rad = t / 100.0
-            x = 16 * math.sin(rad)**3
-            y = -(13 * math.cos(rad) - 5 * math.cos(2*rad) - 2 * math.cos(3*rad) - math.cos(4*rad))
-            points.append((cx + x * scale, cy + y * scale))
-        return points
+    # --- 2. Border Glow ---
+    draw.line(hex_points + [hex_points[0]], fill=(100, 255, 255, 200), width=4)
 
-    heart_pts = get_heart_polygon(128, 128, 5.5)
-    draw.polygon(heart_pts, fill=(255, 255, 255, 240))
+    # --- 3. Center Symbol (Stylized Eye / Core) ---
+    # White/Cyan Core
+    core_radius = size * 0.18
+    draw.ellipse([cx - core_radius, cy - core_radius, cx + core_radius, cy + core_radius], fill=(255, 255, 255, 255))
+    
+    # Inner Iris
+    iris_radius = size * 0.12
+    draw.ellipse([cx - iris_radius, cy - iris_radius, cx + iris_radius, cy + iris_radius], fill=(0, 200, 255, 255))
+    
+    # Pupil
+    pupil_radius = size * 0.07
+    draw.ellipse([cx - pupil_radius, cy - pupil_radius, cx + pupil_radius, cy + pupil_radius], fill=(20, 20, 50, 255))
 
-    # 4. 하이라이트 (유리 질감)
-    draw.chord([40, 40, 216, 216], 150, 210, fill=(255, 255, 255, 60))
+    # Reflection (Shine)
+    shine_r = size * 0.03
+    draw.ellipse([cx - iris_radius + shine_r, cy - iris_radius + shine_r, cx - iris_radius + shine_r*3, cy - iris_radius + shine_r*3], fill=(255, 255, 255, 200))
 
-    img.save(path, format='ICO', sizes=[(256, 256), (128, 128), (64, 64), (48, 48), (32, 32), (16, 16)])
-    print(f"Icon created: {path}")
+    # --- 4. Tech Accents ---
+    # Draw some "circuit" lines
+    line_color = (100, 200, 255, 150)
+    width = 3
+    # Top line
+    draw.line([cx, cy - radius, cx, cy - core_radius], fill=line_color, width=width)
+    # Bottom line
+    draw.line([cx, cy + core_radius, cx, cy + radius], fill=line_color, width=width)
+    # Side lines
+    draw.line([cx - radius*0.8, cy + radius*0.5, cx - core_radius*0.8, cy + core_radius*0.5], fill=line_color, width=width)
+    draw.line([cx + radius*0.8, cy - radius*0.5, cx + core_radius*0.8, cy - core_radius*0.5], fill=line_color, width=width)
+
+    # Save
+    img.save("icon.ico", format='ICO', sizes=[(256, 256), (128, 128), (64, 64), (48, 48), (32, 32)])
+    print("New modern icon.ico created.")
 
 if __name__ == "__main__":
-    try:
-        create_icon("icon.ico")
-    except ImportError:
-        print("Pillow not installed. Running pip install...")
-        os.system("pip install pillow")
-        create_icon("icon.ico")
-    except Exception as e:
-        print(f"Error: {e}")
+    create_modern_icon()

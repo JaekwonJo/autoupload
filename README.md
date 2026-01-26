@@ -1,68 +1,59 @@
-# 🌊 Flow Veo Vision Bot (Ultimate V2)
+# 🌊 Flow Veo Vision Bot (Final Ver)
 
 > **Auto-Upload Automation for Flow/Sora**
 > *Automate your creative workflow with precision, human-like behavior, and bulletproof reliability.*
 
-![Status](https://img.shields.io/badge/Status-V2_Stable-success)
+![Status](https://img.shields.io/badge/Status-Final_Ver-success)
 ![Python](https://img.shields.io/badge/Python-3.12%2B-blue)
 
-## 📖 Introduction
-This project automates the submission of prompts to Flow/Sora web interfaces. It features a "Vision Bot" approach with **advanced human behavior simulation** (Bezier curves, random typos, variable speed) and **anti-detection measures**.
+## 🏆 Final Version Features (V2)
+This version represents the **Final Stable Release**. It includes strict safety rules to prevent errors and a professional HUD interface.
+
+### ✨ New in Final Ver
+- **Human Action HUD**: A detailed dashboard showing the bot's internal state (Fatigue, Typo Probability, Hesitation, Focus Loss) in real-time.
+- **Strict Input Safety**:
+  - **No Random Clicks**: The bot never clicks randomly. Clicks are reserved *only* for the "Submit" button.
+  - **Shift+Space/Enter**: Prevents accidental IME toggling or premature sending.
+- **Silent Launch**: `Flow_Start.vbs` launches the bot without any distracting black console windows.
+- **Separate Log Window**: A dedicated, large window to view logs and prompt previews comfortably.
 
 ## 🚀 Quick Start
 
 ### 1. Installation
-Run **`1_필수라이브러리_설치.bat`** if it's your first time.
+Run **`1_필수라이브러리_설치.bat`** (Only needed once).
 
-### 2. Execution
-Double-click **`2_오토_프로그램_실행.bat`**.
-*Tip: This launcher automatically kills any zombie processes to ensure a clean start.*
+### 2. Execution (Silent)
+Double-click **`Flow_Start.vbs`**. 
+*(Or use `2_오토_프로그램_실행.bat` if you prefer).*
 
-### 3. Setup (First Run)
+### 3. Setup
 1. **Prompts**: Edit `flow_prompts.txt` (separated by `|||`).
-2. **Coordinates**: Click "⬛ 입력창" and drag to select the text box. Click "⬛ 버튼" for the submit button.
-3. **AFK Area (Optional)**: Click "🟩 딴짓(AFK)" and select a safe area (like the desktop wallpaper) for the mouse to play in during wait times.
+2. **Coordinates**: 
+   - Click "⬛ 입력창" -> Drag to select text box.
+   - Click "⬛ 생성 버튼" -> Drag to select submit button.
+3. **AFK Area**: Click "🟩 딴짓(AFK)" -> Select a safe area (e.g., desktop wallpaper) for mouse idling.
 
-## 🛠️ Key Features (V3 Ultimate Update)
+## 🛠️ Core Features
 
-### 📊 Dashboard & Live Monitor (New!)
-- **Dark UI**: A professional, eye-friendly Dracula-themed interface.
-- **Live Progress**: Real-time progress bar and ETA (Estimated Time of Arrival).
-- **Bot Monitor**: Watch the bot's "Personality", "Mood", and "Typing Speed" change in real-time on the dashboard.
-
-### 🏃 Relay Mode & Automation (New!)
-- **Relay Run**: Automatically load and run the next prompt file slot after finishing the current one (e.g., Run 3 slots in a row).
-- **Sound Toggle**: Mute all sound effects with a single checkbox.
-- **Crash Catcher**: Never closes unexpectedly. Displays a clear error log if something goes wrong.
-
-### 📊 Detailed Reporting
-- **Auto-Logging**: Automatically saves a detailed session report (`logs/Report_...txt`) after completion.
-- **Performance Stats**: Tracks total time, average speed per scene, and individual prompt durations.
-- **Metadata**: Records which prompt file was used and exact timestamps.
+### 📊 Dashboard & HUD
+- **Dark UI**: Professional Dracula-themed interface.
+- **Live Monitor**: Watch "Personality", "Mood", and detailed stats (Fatigue, Typos) change in real-time.
 
 ### 🛡️ Ultimate Safety
-- **Anti-IME Typing**: Uses advanced **Clipboard Detection** (10 retries) to ensure English input before typing.
-- **Zombie Slayer**: Automatically terminates old bot processes on startup to prevent conflicts.
-- **FailSafe**: Move mouse to the top-left corner to instantly emergency stop.
-- **System Optimized**: WSL2 memory usage limited to 6GB via `.wslconfig`.
+- **Anti-IME**: Bruteforce checks to ensure English input.
+- **Zombie Slayer**: Kills old processes on startup.
+- **FailSafe**: Move mouse to top-left to emergency stop.
 
 ### 🎭 Human-Like Behavior
-- **AFK Mode**: Mouse moves, scrolls, and idles in a safe area while waiting (No clicks).
-- **Random Speed**: Typing speed varies per prompt (Burst mode vs Slow mode).
-- **Speed Slider**: Real-time control to adjust the base speed (x0.5 ~ x10.0).
-- **Sound Effects**: Audio feedback for start, finish, and countdown events.
+- **AFK Mode**: Mouse moves and scrolls (no clicks) during wait times.
+- **Random Speed**: Typing speed varies naturally.
+- **Reporting**: Detailed session logs saved to `logs/`.
 
 ## 📂 File Structure
-- `flow/flow_auto_v2.py`: The main brain (V2).
-- `flow/human_behavior_v2.py`: The behavior engine (Typing logic, Physics movement).
-- `flow_config_final.json`: User settings.
-- `2_오토_프로그램_실행.bat`: Smart launcher.
-
-## ❓ Troubleshooting (긴급 수리)
-
-### 🖥️ 검정 화면(CMD)이 떴다가 바로 꺼지는 경우
-**원인:** 프로그램 실행 중 오류가 발생했으나, 에러 메시지를 보여줄 창이 바로 닫혀버리기 때문입니다. 주로 필수 라이브러리가 없거나, 설정 파일 경로가 잘못되었을 때 발생합니다.
-**해결법:** `2_오토_프로그램_실행.bat` 파일을 수정하여 `pythonw` 대신 `python`을 사용하고, 마지막에 `pause`를 추가해 에러 메시지를 확인합니다. (현재 V2 버전에는 이미 이 수정사항이 적용되어 있습니다.)
+- `flow/flow_auto_v2.py`: Main application (UI & Logic).
+- `flow/human_behavior_v2.py`: Behavior engine (Strict Rules).
+- `Flow_Start.vbs`: Silent Launcher.
+- `2_오토_프로그램_실행.bat`: Backup Launcher.
 
 ---
 *Maintained by Jaekwon Jo*
