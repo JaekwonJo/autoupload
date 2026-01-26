@@ -58,5 +58,11 @@ Double-click **`2_오토_프로그램_실행.bat`**.
 - `flow_config_final.json`: User settings.
 - `2_오토_프로그램_실행.bat`: Smart launcher.
 
+## ❓ Troubleshooting (긴급 수리)
+
+### 🖥️ 검정 화면(CMD)이 떴다가 바로 꺼지는 경우
+**원인:** 프로그램 실행 중 오류가 발생했으나, 에러 메시지를 보여줄 창이 바로 닫혀버리기 때문입니다. 주로 필수 라이브러리가 없거나, 설정 파일 경로가 잘못되었을 때 발생합니다.
+**해결법:** `2_오토_프로그램_실행.bat` 파일을 수정하여 `pythonw` 대신 `python`을 사용하고, 마지막에 `pause`를 추가해 에러 메시지를 확인합니다. (현재 V2 버전에는 이미 이 수정사항이 적용되어 있습니다.)
+
 ---
 *Maintained by Jaekwon Jo*

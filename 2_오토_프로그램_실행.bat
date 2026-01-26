@@ -19,6 +19,6 @@ if exist ".venv\Scripts\activate.bat" (
 
 :: [V2] 새로운 붙여넣기 전용 봇 실행
 echo 🚀 Flow Veo Vision Bot (V2) 시작!
-start "" pythonw flow\flow_auto_v2.py
+python flow\flow_auto_v2.py
 
-exit
+pause
