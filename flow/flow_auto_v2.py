@@ -479,10 +479,21 @@ class FlowVisionApp:
         
         btn_nav = tk.Frame(file_f, bg=self.color_bg)
         btn_nav.pack(side="left", padx=20)
-        ttk.Button(btn_nav, text="◀ 이전", width=6, command=self.on_prev).pack(side="left")
-        self.lbl_nav_status = tk.Label(btn_nav, text="0 / 0", width=10, fg=self.color_text, font=("Consolas", 11, "bold"))
-        self.lbl_nav_status.pack(side="left")
-        ttk.Button(btn_nav, text="다음 ▶", width=6, command=self.on_next).pack(side="left")
+        
+        # [NEW] First / Prev
+        ttk.Button(btn_nav, text="⏮", width=3, command=self.on_first).pack(side="left", padx=1)
+        ttk.Button(btn_nav, text="◀", width=3, command=self.on_prev).pack(side="left", padx=1)
+        
+        # [NEW] Jump (Clickable Label)
+        self.lbl_nav_status = tk.Label(btn_nav, text="0 / 0", width=12, fg=self.color_text, 
+                                       font=("Consolas", 11, "bold"), cursor="hand2", bg="#E9ECEF", relief="flat")
+        self.lbl_nav_status.pack(side="left", padx=5)
+        self.lbl_nav_status.bind("<Button-1>", self.on_jump_to)
+        ToolTip(self.lbl_nav_status, "클릭하여 번호로 이동")
+        
+        # [NEW] Next / Last
+        ttk.Button(btn_nav, text="▶", width=3, command=self.on_next).pack(side="left", padx=1)
+        ttk.Button(btn_nav, text="⏭", width=3, command=self.on_last).pack(side="left", padx=1)
         
         ttk.Button(file_f, text="📂 파일 열기", command=self.on_open_prompts).pack(side="right", padx=5)
         ttk.Button(file_f, text="🔄 새로고침", command=self.on_reload).pack(side="right")
@@ -796,12 +807,35 @@ class FlowVisionApp:
             self.root.after(0, self._update_progress_ui)
             self.is_processing = False
 
-    def on_first(self): self.index = 0; self._update_progress_ui()
+    def on_first(self): 
+        self.index = 0
+        self._update_progress_ui()
+        
     def on_prev(self): 
         if self.index > 0: self.index -= 1; self._update_progress_ui()
+        
     def on_next(self):
         if self.index < len(self.prompts) - 1: self.index += 1; self._update_progress_ui()
-    def on_last(self): self.index = len(self.prompts)-1; self._update_progress_ui()
+        
+    def on_last(self): 
+        if self.prompts: self.index = len(self.prompts)-1
+        self._update_progress_ui()
+        
+    def on_jump_to(self, event=None):
+        if not self.prompts: return
+        total = len(self.prompts)
+        try:
+            target = simpledialog.askinteger("이동", f"이동할 번호를 입력하세요 (1 ~ {total}):", parent=self.root)
+            if target is not None:
+                idx = target - 1
+                if 0 <= idx < total:
+                    self.index = idx
+                    self._update_progress_ui()
+                    self.log(f"🚀 {target}번으로 점프!")
+                else:
+                    messagebox.showwarning("범위 초과", "존재하지 않는 번호입니다.")
+        except: pass
+
     def on_open_prompts(self): os.startfile(self.base / self.cfg["prompts_file"])
     
     def on_rename_slot(self):

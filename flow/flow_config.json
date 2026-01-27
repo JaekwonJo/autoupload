@@ -56,7 +56,7 @@
             "file": "flow_prompts_slot7.txt"
         },
         {
-            "name": "골프붕괴",
+            "name": "차은우세금",
             "file": "flow_prompts_slot8.txt"
         },
         {
@@ -80,7 +80,7 @@
         "x": 1452,
         "y": 1074
     },
-    "interval_seconds": 30,
+    "interval_seconds": 45,
     "input_area": {
         "x1": 1005,
         "y1": 1272,
