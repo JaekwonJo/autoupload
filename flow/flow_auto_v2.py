@@ -474,6 +474,9 @@ class FlowVisionApp:
         self.combo_slots.pack(side="left", padx=10)
         self.combo_slots.bind("<<ComboboxSelected>>", self.on_slot_change)
         
+        # [NEW] Rename Button
+        ttk.Button(file_f, text="✏️", width=3, command=self.on_rename_slot).pack(side="left", padx=2)
+        
         btn_nav = tk.Frame(file_f, bg=self.color_bg)
         btn_nav.pack(side="left", padx=20)
         ttk.Button(btn_nav, text="◀ 이전", width=6, command=self.on_prev).pack(side="left")
@@ -800,7 +803,24 @@ class FlowVisionApp:
         if self.index < len(self.prompts) - 1: self.index += 1; self._update_progress_ui()
     def on_last(self): self.index = len(self.prompts)-1; self._update_progress_ui()
     def on_open_prompts(self): os.startfile(self.base / self.cfg["prompts_file"])
-    def on_rename_slot(self): pass
+    
+    def on_rename_slot(self):
+        idx = self.combo_slots.current()
+        if idx < 0: return
+        
+        current_name = self.cfg["prompt_slots"][idx]["name"]
+        new_name = simpledialog.askstring("이름 변경", "새로운 슬롯 이름을 입력하세요:", initialvalue=current_name)
+        
+        if new_name:
+            self.cfg["prompt_slots"][idx]["name"] = new_name
+            self.save_config()
+            
+            # UI Update
+            slots = [s["name"] for s in self.cfg["prompt_slots"]]
+            self.combo_slots["values"] = slots
+            self.combo_slots.current(idx)
+            self.log(f"📝 슬롯 이름 변경: {current_name} -> {new_name}")
+
     def save_session_report(self): pass
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 {
-    "prompts_file": "flow_prompts_slot7.txt",
+    "prompts_file": "flow_prompts_slot8.txt",
     "prompts_separator": "|||",
     "check_interval_seconds": 120,
     "flow_base_url": "https://labs.google/fx/ko/tools/flow",
@@ -68,7 +68,7 @@
             "file": "flow_prompts_slot10.txt"
         }
     ],
-    "active_prompt_slot": 6,
+    "active_prompt_slot": 7,
     "prompt_save_dir": "",
     "download_selector_main": "button[type=\"button\"]",
     "download_selector_quality": "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr",
