@@ -172,24 +172,34 @@ class LogWindow:
     def __init__(self, master):
         self.root = tk.Toplevel(master)
         self.root.title("📜 시스템 로그 & 프롬프트 모니터")
-        self.root.geometry("600x700")
+        self.root.geometry("800x850") # 더 크게!
         self.root.configure(bg="#212529")
         
+        # [NEW] 마법의 칸막이 (PanedWindow) 설치
+        self.paned = ttk.Panedwindow(self.root, orient="vertical")
+        self.paned.pack(fill="both", expand=True, padx=10, pady=10)
+
         # 1. Prompt Preview Section
-        lbl1 = tk.Label(self.root, text="📝 현재 로드된 프롬프트 (미리보기)", font=("Malgun Gothic", 11, "bold"), bg="#212529", fg="#FFC107")
-        lbl1.pack(anchor="w", padx=10, pady=(10, 5))
+        self.frame_top = tk.Frame(self.paned, bg="#212529")
+        self.paned.add(self.frame_top, weight=1) # 비중 설정
+
+        lbl1 = tk.Label(self.frame_top, text="📝 현재 로드된 프롬프트 (미리보기)", font=("Malgun Gothic", 11, "bold"), bg="#212529", fg="#FFC107")
+        lbl1.pack(anchor="w", pady=(0, 5))
         
-        self.text_preview = ScrolledText(self.root, height=12, bg="#343A40", fg="#F8F9FA", 
-                                         font=("Consolas", 10), insertbackground="white", borderwidth=1, relief="solid")
-        self.text_preview.pack(fill="x", padx=10, pady=5)
+        self.text_preview = ScrolledText(self.frame_top, bg="#343A40", fg="#F8F9FA", 
+                                         font=("Consolas", 11), insertbackground="white", borderwidth=1, relief="solid")
+        self.text_preview.pack(fill="both", expand=True)
 
         # 2. System Log Section
-        lbl2 = tk.Label(self.root, text="💻 시스템 작동 로그", font=("Malgun Gothic", 11, "bold"), bg="#212529", fg="#20C997")
-        lbl2.pack(anchor="w", padx=10, pady=(15, 5))
+        self.frame_bottom = tk.Frame(self.paned, bg="#212529")
+        self.paned.add(self.frame_bottom, weight=2) # 로그 칸을 더 크게
 
-        self.log_text = ScrolledText(self.root, height=20, bg="black", fg="#00FF00", 
-                                     font=("Consolas", 9), state="disabled", borderwidth=1, relief="solid")
-        self.log_text.pack(fill="both", expand=True, padx=10, pady=5)
+        lbl2 = tk.Label(self.frame_bottom, text="💻 시스템 작동 로그", font=("Malgun Gothic", 11, "bold"), bg="#212529", fg="#20C997")
+        lbl2.pack(anchor="w", pady=(10, 5))
+
+        self.log_text = ScrolledText(self.frame_bottom, bg="black", fg="#00FF00", 
+                                     font=("Consolas", 10), state="disabled", borderwidth=1, relief="solid")
+        self.log_text.pack(fill="both", expand=True)
         
         btn_close = ttk.Button(self.root, text="창 닫기 (백그라운드 유지)", command=self.root.withdraw)
         btn_close.pack(pady=10)
