@@ -1,232 +1,30 @@
-S1 **prompt:**
-3d pixar studio style. **Fast camera panning up from the bottom to the top**. The bottom area is a frozen glacier land with biting cold wind and cracked ice. As the camera moves up rapidly, it reveals a blindingly bright golden lava land on top with magical fire sparks and heat haze. Extreme temperature contrast between ice and fire. Blockbuster scale. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text.
+S15 : 3d pixar studio style. A bright spotlight suddenly turns on in the center of a dark stage. A cute chubby red robot with round eyes walks confidently into the light, waving hands. Surrounding the stage, a crowd of cute chubby animals wearing clothes are cheering and clapping. Debut atmosphere. high fidelity cinematic sound effects, foley, ambience, spotlight click, cheering crowd, footsteps, no voice, no speech. kawaii style. |||
 
-|||
-S2 
-**prompt:**
-3d pixar studio style. Ominous dark atmosphere. A cute chubby penguin wearing a red hoodie shouting desperately at a gigantic looming golden wall in the dark. **Magical blue soundwaves erupting from the penguin's mouth** but magically disintegrating into dust instantly upon hitting the immovable wall. Low angle shot emphasizing the scale of the wall. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-
-|||
-S3 
-**prompt:**
-3d pixar studio style. A magical steam train speeding through darkness. The front engine part is made of solid gold and emitting blindingly bright magical light and massive golden sparks. **Blockbuster scale dynamic tracking shot** following the train's speed. Intense motion blur and magical energy trails. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text.
-
-|||
-S4
-**prompt:**
-3d pixar studio style. A cute chubby owl wearing a "TTZ" graduation cap magically appears from the corner and waves a magic wand at a long speeding magical steam train. The train magically splits in half with a loud magical boom and explosion effect. Dynamic camera movement capturing the separation moment with intense magical shockwaves and particles flying. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-
-|||
-S5 **prompt:**
-3d pixar studio style. A cute chubby penguin wearing a red hoodie sitting alone on a frozen dark ice field. The penguin lights a single small magical match, magically creating a tiny warm orange magical aura around him. Extreme dark and cold atmosphere, high contrast lighting between the small fire and vast darkness. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text.
-
-|||
-S6 **prompt:**
-3d pixar studio style. Blockbuster scale. A cute chubby penguin wearing a red hoodie finding a magically glowing treasure map, then running and magically flying towards a blindingly bright light in the distance. **Fast camera tracking shot** following the flying penguin. Magical sparkles and light beams filling the air. Hopeful and energetic atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text.
-
-|||
-S7 **prompt:**
-3d pixar studio style. A cute chubby owl wearing a "TTZ" graduation cap waving a magic wand. Small golden bricks on the ground magically growing into gigantic golden skyscrapers. **Camera zooming out rapidly** to show the massive scale of the growing city. Intense magical dust and golden sparks exploding. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text.
-
-|||
-S8 prompt: 3d pixar studio style. A majestic waterfall of liquid gold magically pouring down from the sky. A cute chubby white Persian cat wearing a dark navy pinstripe suit is sitting comfortably on a rock, catching the falling gold with a satisfied smile. Beautiful colorful flowers magically bloom around the cat. Slow panning shot. Magical glitter and sparkles everywhere. Dreamy and rich atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text.  kawaii style.
-
-||| S9  prompt: 3d pixar studio style. Masterpiece visual. A vast landscape completely covered in thick blue glaciers and sharp ice. A cute chubby penguin wearing a red hoodie is standing alone in the center of the vast frozen land, shivering violently in the biting cold wind. Static wide shot emphasizing the small penguin in the frozen silence. Dark, gloomy, and frozen atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text.  
-
-||| S10 prompt: 3d pixar studio style. A luxurious golden carriage labeled "VIP" magically detaching from the ground and launching straight up into the sky with magical rocket thrusters. A cute chubby white Persian cat wearing a dark navy pinstripe suit is looking out from the carriage window, waving arrogantly. Dynamic low angle shot looking up at the flying carriage. Massive magical smoke. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
+S19 : 3d pixar studio style. a cute chubby siamese cat wearing denim overalls holding a fancy paper certificate labelled "STOCK". The paper magically morphs into a worthless, crumpled piece of white tissue paper in his paws. The cat looks devastated. Magical transformation. high fidelity cinematic sound effects, foley, ambience, paper crinkle, magical poof, no voice, no speech. kawaii style. |||
 
 
-|||
+S22 : 3d pixar studio style. A magical golden tree growing in a dark void. Stormy winds blow and break some branches, but the tree instantly magically heals and grows even taller and thicker towards the sky, glowing with bright light. Unstoppable growth. high fidelity cinematic sound effects, foley, ambience, wind howl, magical growing sound, no voice, no speech. |||
 
-S21 prompt:
-3d pixar studio style. A peaceful magically golden castle wall scene. Suddenly, a gigantic ominous shadow shaped like a Panda magically covers the entire sky above the castle, blocking the sun. Cute chubby white Persian cats wearing navy suits inside the castle look up at the giant shadow with nervous expressions. High contrast lighting between the golden castle and the dark shadow. Tension and grand scale. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
-|||
-S22 prompt:
-3d pixar studio style. A cute chubby owl wearing a "TTZ" graduation cap looking at a floating real estate document. Suddenly, a gigantic glowing red flag with five yellow stars magically bursts out from the paper with blinding light. The owl falls back in shock, eyes wide open. Magical particle effects filling the room. Surprise and impact. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S23 prompt:
-3d pixar studio style. Thick white fog magically clears instantly. A gigantic cute chubby Panda wearing a red scarf and a traditional vest lands from the sky with a massive "BOOM", creating a powerful magical shockwave and dust cloud. Tiny cute chubby penguins wearing red hoodies are blown away by the impact and tumble on the ground. Dynamic action camera capturing the heavy impact. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S24 prompt:
-3d pixar studio style. A cute chubby penguin wearing a red hoodie magically flying towards the golden city walls with hope. Suddenly, the penguin hits an invisible blue magical barrier, creating blue ripples and sparks. The penguin bounces off and falls down tragically towards the dark ground. Sad atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S25 prompt:
-3d pixar studio style. The gigantic cute chubby Panda wearing a red scarf crouches and performs a massive magical super-jump. The Panda soars high into the sky, leaving a trail of golden magical sparkles, effortlessly crossing over the high castle walls. Low angle shot tracking the jump. Dynamic energy. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S26 prompt:
-3d pixar studio style. A cute chubby penguin wearing a red hoodie standing in the dark, its feet completely frozen by blue ice magic, unable to move. Fast magical camera transition to a warm golden room where the Panda and a White Persian Cat are sitting on a velvet sofa, holding cocktails and laughing. Extreme contrast between cold restraint and warm freedom. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
-|||
-S27 prompt:
-3d pixar studio style. A cute chubby Panda wearing a red scarf waves a paw with magical energy. Gigantic golden skyscrapers magically erupt and shoot up from the ground instantly like bamboo shoots, surrounded by dazzling golden magical effects. Camera tilts up rapidly to follow the rising buildings, emphasizing the immense height. Blockbuster scale. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S28 prompt:
-3d pixar studio style. A bamboo forest is engulfed in fierce red magical flames. A cute chubby Panda wearing a red scarf runs desperately away from the fire, carrying a heavy glowing golden bundle on its back. Sparks and embers fly everywhere. Urgent survival atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S29 prompt:
-3d pixar studio style. A cute chubby Panda wearing a red scarf throws the golden bundle into the air. Instantly, a magical transparent crystal sphere forms around the gold, solidifying into an indestructible diamond-like barrier floating in the air. The Panda looks relieved. Orbit camera shot showing the shimmering protective barrier. Magical defense. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S30 prompt:
-3d pixar studio style. A colorful fantasy amusement park at night. A cute chubby Panda wearing a red scarf, a cute chubby Eagle wearing an American flag shirt, and a cute chubby White Persian Cat wearing a navy suit are dancing together happily. Colorful magical fireworks explode in the sky above them. Festival atmosphere with neon lights. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
-|||
-S31 prompt:
-3d pixar studio style. A magical golden steam train flying through a snowy blizzard night, emitting magical golden sparks. Fast camera movement zooming into the train window. Inside, a cute chubby Panda wearing a red scarf and a cute chubby White Persian Cat wearing a navy pinstripe suit are dancing happily together. Warm and luxurious atmosphere inside. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
-|||
-S32 prompt:
-3d pixar studio style. A miniature golden apartment building displayed inside a glass case in a dark museum. The building glows with blindingly bright magical diamond light, shooting rainbow beams everywhere. Extreme close-up on the sparkling treasure. Magical and precious atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S33 prompt:
-3d pixar studio style. A vast barren landscape with deeply cracked dry earth. Raindrops fall from the sky but magically evaporate into grey steam the moment they touch the hot ground. The cracks on the ground magically spread wider with ominous sounds. Desolate and gloomy atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S34 prompt:
-3d pixar studio style. A cute chubby owl wearing a "TTZ" graduation cap opening an antique magic book. Magical golden dust rises from the pages and magically forms the shape of a glowing "Honey Pot" in the air. Magical sparkles and library background. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S35 prompt:
-3d pixar studio style. A cute chubby bear wearing a red outfit holding a honey pot and eating delicious golden honey happily. Cute round bees fly around him, sprinkling magical golden dust like fairy powder. Warm and sweet atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S36 prompt:
-3d pixar studio style. Blockbuster scale. A gigantic golden honey pot magically appears in the sky above a grey city. Thick golden honey magically pours down from the pot like a massive waterfall, covering the city streets. Low angle shot looking up at the pot. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S37 prompt:
-3d pixar studio style. A cute chubby White Persian Cat wearing a navy pinstripe suit sitting in a luxurious room filled with hundreds of magically glowing golden honey jars. The cat is happily eating honey with a spoon. Magical sparkles coming from the honey. Rich atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
-|||
-S38 prompt:
-3d pixar studio style. A cute chubby White Persian Cat wearing a colorful swimsuit swimming relaxed backstroke in a large swimming pool filled with glowing golden liquid honey. Magical sparkles and golden splashes. Summer vacation atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
-|||
-S39 prompt:
-3d pixar studio style. A cute chubby White Persian Cat wearing a navy pinstripe suit touching a rough grey concrete building. The building instantly magically transforms into a shining solid gold skyscraper with a blinding magical flash and "poof" effect. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
-|||
-S40 prompt:
-3d pixar studio style. Golden skyscrapers magically growing taller and shooting up into the sky at high speed. A cute chubby White Persian Cat wearing a navy pinstripe suit sits on the roof of the rising building, eating honey and laughing. Dynamic camera tracking the upward movement. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
-|||
-S41 prompt:
-3d pixar studio style. A cute chubby penguin wearing a red hoodie stands in a dark, cold room. Suddenly, icy blue water magically rises from the floor at an alarming speed, filling the room. The penguin panic and desperately tries to swim, reaching out its flippers for help. High tension atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S42 prompt:
-3d pixar studio style. A stream of glowing golden liquid honey magically flows towards a cute chubby penguin wearing a red hoodie. The moment the golden liquid touches the penguin's hands, it magically transforms into sticky black tar and disgusting mud with a dark magical "poof" effect and purple sparks. The penguin is covered in filth. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S43 prompt:
-3d pixar studio style. A luxurious banquet hall filled with many cute chubby White Persian Cats wearing navy pinstripe suits. They are happily feasting on a lavish dinner with golden food, drinking champagne, and laughing. Magical golden sparkles and confetti fill the air, creating a festive and rich atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
-|||
-S44 prompt:
-3d pixar studio style. Blockbuster scale. A panoramic view of a gigantic futuristic golden city at night. Countless magical golden coins and light beams rain down fiercely from the sky into the city, like a massive golden meteor shower. Dynamic camera movement capturing the grand spectacle. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S45 prompt:
-3d pixar studio style. A dark and desolate dilapidated provincial town street at night. Several cute chubby penguins wearing ragged, torn clothes are huddling together, shivering in the cold. The street is empty and crumbling, with flickering broken streetlights. Gloomy and poverty-stricken atmosphere with magical dust. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S46 prompt:
-3d pixar studio style. A cute chubby penguin wearing a red hoodie shouting angrily at a gigantic, blindingly bright solid golden wall. Suddenly, the ground beneath the penguin's feet magically crumbles and collapses into a dark abyss with magical shockwaves. The penguin looks terrified as it falls. Dynamic camera emphasizing the fall. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S47 prompt:
-3d pixar studio style. Close-up on a cute chubby penguin wearing a red hoodie holding large coins made of ice. The ice coins rapidly melt and drip water, magically vanishing into thin air with a magical "poof" effect. The penguin watches with a sad, crying expression as its hands become empty. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S48 prompt:
-3d pixar studio style. High contrast lighting. A busy provincial town street filled with many cute animal characters. Suddenly, they all begin to magically dissolve and disappear into grey dust one by one, leaving the street completely empty and silent. The buildings look abandoned. Ghostly and eerie atmosphere with magical particles. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S49 prompt:
-3d pixar studio style. Dynamic action shot. A cute chubby owl wearing a "TTZ" graduation cap is flying through the air, casting a powerful magical fire spell on a large old book. The book instantly erupts into massive magical red and orange flames and burns away completely with explosive effects. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S50 prompt:
-3d pixar studio style. Many small, dim magical lights (representing poor people) are moving from a dark outer area towards a gigantic, blindingly bright pillar of magical light in the center (representing the city). As they enter the central light, they magically transform into brilliant, sparkling golden light particles, making the central pillar glow even brighter. High contrast and intense magical atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S51 prompt:
-3d pixar studio style. A vast, empty frozen snowy field with a violent blizzard stormy weather. Scattered cute chubby penguins wearing red hoodies are shivering in the cold. They slowly gather towards the center, forming a tight circle. As their bodies touch, a magical warm orange glowing bonfire spontaneously erupts in the center, creating a warm light radius amidst the snow. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S52 prompt:
-3d pixar studio style. Scattered grey concrete factory buildings on a wide barren land magically detach from the ground and fly towards the center point. They magically merge and transform in mid-air with bright flashes, combining into a single, gigantic, futuristic diamond and glass skyscraper that towers into the sky, glowing with blinding magical blue light. Blockbuster scale. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S53 prompt:
-3d pixar studio style. A cute chubby golden-brown fox wearing a smart business suit and a cute chubby White Persian Cat wearing a smart business suit are standing face to face, having an intense discussion. Instead of words, intense magical red and blue lightning bolts shoot out from their heads, colliding in the air between them and creating a massive, glowing magical purple energy sphere representing innovation. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
-|||
-S54 prompt:
-3d pixar studio style. Inside a gigantic, transparent golden magical dome that glows brightly. It is a luxurious party scene with confetti and magical sparkles. A cute chubby golden-brown fox wearing a suit, a cute chubby Panda wearing a red scarf, and a cute chubby White Persian Cat wearing a suit are dancing happily together, holding champagne glasses. The atmosphere is extremely rich and festive with magical light effects. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S55 prompt:
-3d pixar studio style. A sleek, futuristic luxury sports car driven by a cute chubby White Persian Cat wearing cool sunglasses and a driving suit is speeding towards a glittering futuristic city on the horizon. The road is golden and magical, and the car leaves a trail of light. Low angle tracking shot emphasizing speed and luxury. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
-|||
-S56 prompt:
-3d pixar studio style. Blockbuster cosmic scale. A gigantic blindingly bright golden sun (representing Seoul) is in the center of dark space, generating powerful magical gravity. Numerous small planetary bodies (representing provinces) and tiny cute chubby penguins wearing astronaut suits are being magically pulled into the golden sun like comets with magical light trails, disappearing into its light. High contrast. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S57 prompt:
-3d pixar studio style. A magnificent golden skyscraper magically growing taller and taller at an incredible speed, shooting straight up and piercing through the clouds into the sky. Magical light and gold dust explode around it. A cute chubby White Persian Cat and a Fox in suits are on the top floor, laughing. Dynamic low angle camera shot tracking the upward growth, emphasizing extreme height. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. kawaii style.
-|||
-S58 prompt:
-3d pixar studio style. A wide square filled with crowded cute chubby penguins wearing red hoodies. Suddenly, a magical wind blows, and the penguins on the outskirts start to magically vanish one by one with grey magical smoke and "poof" effects. Only a small group of penguins in the very center remain, looking terrified. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S59 prompt:
-3d pixar studio style. A view of Earth from space at night. The entire planet is covered in absolute pitch black darkness, except for one single tiny island (Seoul) that is exploding with blindingly bright golden and neon city lights, shining like a brilliant jewel in the dark. Extreme contrast lighting. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S60 prompt:
-3d pixar studio style. An endless, dry grey desert landscape under a dark sky. In the center, there is a beautiful, magical oasis protected by a shimmering transparent magical dome. Inside the dome, there are lush green trees and glowing golden buildings. Outside the dome, skeleton remains of penguins are lying on the sand, looking towards the oasis. High contrast. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S61 prompt:
-3d pixar studio style. A stormy dark ocean with huge waves. A gigantic golden Noah's Ark floats in the distance. In the foreground, a single magically glowing golden ticket is floating in the air. Hundreds of cute chubby penguins wearing red hoodies are reaching out desperately towards the ticket, screaming and crying. Chaotic survival atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S62 prompt:
-3d pixar studio style. Blockbuster scale. A group of cute chubby penguins wearing red hoodies standing at the edge of a massive, terrifyingly deep blue ice cliff. The camera tilts down rapidly from the penguins to the bottomless dark abyss below, showing the dizzying height. The penguins are shaking and crying in fear. Horror atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S63 prompt:
-3d pixar studio style. A busy construction site filled with tower cranes and cute chubby bears wearing yellow hard hats and construction vests. Suddenly, a magical blue ice blast hits the site, instantly freezing the cranes and the bear workers into solid ice statues. Magical frost and ice textures covering everything. Time stopped atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S64 prompt:
-3d pixar studio style. A single small golden sapling standing alone in a violent storm with heavy rain and lightning. The sapling glows with a faint green magical aura, struggling to grow very slowly against the wind. Time-lapse effect showing the slow and difficult growth process. Emotional and dramatic atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S65 prompt:
-3d pixar studio style. A vast, empty, dry brown field with no crops. A cute chubby fox wearing a straw hat and farmer overalls is holding an empty wooden basket, looking at the barren land with a devastated expression. Dust blows across the empty field. Desolate atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S66 prompt:
-3d pixar studio style. A cute chubby White Bear wearing a formal government suit and glasses standing at a press conference podium. Camera flashes popping like strobe lights. The bear looks serious and is making an urgent announcement gesture. Breaking news atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S67 prompt:
-3d pixar studio style. A cute chubby bear wearing a mayor's sash and top hat waving a magic wand frantically at the empty ground. Magical sparks fly, but only a single tiny green sprout magically pops up with a "bloop" sound effect visual. The bear looks confused and sweaty. Comedy and failure. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S68 prompt:
-3d pixar studio style. Dark museum interior. A miniature glowing modern apartment building is displayed inside a glass case like a precious ancient artifact. Cute chubby foxes and cats wearing casual clothes are crowding around the case, taking photos with flashes. Magical sparkles around the artifact. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S69 prompt:
-3d pixar studio style. Kawaii Horror theme. A dark abandoned apartment complex at night with fog. No lights in the windows. Scary translucent white ghosts with glowing eyes are magically floating around the buildings. Spooky magical purple mist and spiderwebs. Horror atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S70 prompt:
-3d pixar studio style. Camera panning back and forth. On the left, a cute chubby White Bear in a suit is pointing towards a hot empty desert. On the right, a group of cute chubby penguins in red hoodies are ignoring him and walking determinedly towards a massive, blindingly bright golden wall in the distance. Contrast of choices. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S71 prompt:
-3d pixar studio style. A cute chubby penguin wearing a red hoodie tries to climb a golden slope but slips and slides down a long magical ice slide into a dark forest. The penguin looks sad and keeps slipping back down despite trying hard. High angle shot looking down at the sliding penguin. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S72 prompt:
-3d pixar studio style. Blockbuster scale. A gigantic golden wall reaching the sky. many cute chubby penguins wearing red hoodies are stacking on top of each other to form a massive tower of bodies to reach the top of the wall. The penguin at the very top reaches out its hand desperately. Desperate survival atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S73 prompt:
-3d pixar studio style. A vast frozen wasteland covered in blue ice. A single small magical fire burns in the center. Many cute chubby penguins wearing red hoodies are huddled extremely close to the fire to survive, shivering. Outside the small light circle is pitch black darkness and ice. High contrast lighting. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S74 prompt:
-3d pixar studio style. A gigantic security robot with glowing round eyes blocking a golden gate. It scans cute chubby penguins wearing red hoodies with a red magical laser beam. A holographic red barrier appears, pushing the penguins back. The penguins look frustrated. Sci-fi magical atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S75 prompt:
-3d pixar studio style. A long train on a snowy field. The front engine car is made of solid gold and magically detaches from the rest of the train. The golden engine magically flies up into the sky with rocket thrusters and magical sparkles, leaving the old rusty back cars stranded on the ground. Fantasy separation scene. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S76 prompt:
-3d pixar studio style. Inside a flying golden palace floating above the clouds. A cute chubby Golden Fox wearing a suit, a Panda wearing a red scarf, and an Eagle wearing a flag shirt are clinking champagne glasses and laughing. Bright sunlight and magical golden dust surround them. Luxurious party atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S77 prompt:
-3d pixar studio style. View of a dark Earth from space. Three massive pillars of magical neon light erupt from three specific points on the globe. These three pillars connect with each other using blindingly bright magical laser beams, forming a glowing triangle network. The rest of the planet remains dark. Cinematic cosmic scale. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S78 prompt:
-3d pixar studio style. Inside a dark, cold, rusty train car. A cute chubby penguin wearing a red hoodie is kicking the metal wall and shouting in anger. Cold white breath comes out of its mouth. The atmosphere is gloomy and hopeless. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S79 prompt:
-3d pixar studio style. A cute chubby penguin wearing a red hoodie puts on a heavy backpack. He looks at a map and walks determinedly into a heavy magical snowstorm towards a faint but warm golden light shining in the distance. Heroic survival journey vibe. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S80 prompt:
-3d pixar studio style. A gigantic golden city gate is slowly closing with heavy vibration and dust. Blinding white magical light shoots out from the narrowing crack of the door. The gap is getting smaller and smaller. Cinematic tension and urgency. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S81 prompt:
-3d pixar studio style. A dark world is collapsing with ground cracking and stormy weather. Amidst the destruction, a single, blindingly bright magical golden ladder descends from a break in the dark clouds above. A cute chubby penguin wearing a red hoodie is determinedly climbing up the glowing ladder, while other shadowy figures below remain frozen in fear. High contrast lighting. Hopeful magical atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S82 prompt:
-3d pixar studio style. Countless streams of magical golden energy and light particles flowing from all directions across a dark landscape, converging in the center to magically construct magnificent golden skyscrapers from the ground up rapidly. A cute chubby golden-brown fox wearing a business suit stands watching this massive magical construction process with a knowing expression. Epic magical scale. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-S83 prompt:
-3d pixar studio style. A wide shot of a gigantic, solid, blindingly bright golden city standing firm against a dark night sky, radiating immense light. In the foreground, a cute chubby golden-brown fox in a suit and a cute chubby penguin in a red hoodie stand together on a hill, looking at the city, then turning to the camera and waving goodbye happily. Final grand atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
-|||
-CTA prompt:
-3d pixar studio style. a cute chubby White Persian Cat wearing a navy pinstripe suit and a cute chubby penguin in a red hoodie dancing happily on a bright stage. They press floating giant 'Heart shape'(Like). magically, a massive explosion of magical glowing pink and red hearts bursts out from the buttons, magically filling the entire screen and dancing around wildly. Joyful celebration atmosphere with magical sparkles. high fidelity cinematic sound effects, foley, ambience and bgm, no voice, no speech, no text. 
+
+S22 : 3d pixar studio style. A glowing golden staircase building itself upwards into the sky. Sometimes a step cracks, but it immediately repairs itself with magic and continues to build higher. A cute chubby white rabbit climbs the stairs safely. Structural resilience. high fidelity cinematic sound effects, foley, ambience, stone construction sound, magic repair chime, no voice, no speech. |||
+
+
+S34 Prompt :
+3d pixar studio style. A cute white female rabbit wearing a red dress stands on a floating magical golden platform. A heavy blue stone block labelled "STOCK" falls onto the platform, weighing it down. Instantly, a bright green magical balloon labelled "RATE" attaches to the platform and lifts it back up, keeping the rabbit perfectly level and safe. Magical balance physics. high fidelity cinematic sound effects, foley, ambience, heavy thud, balloon inflation sound, magic chime, no voice, no speech. kawaii style.  |||
+S36 Prompt :
+3d pixar studio style. Camera tracks backward. A cute chubby siamese cat wearing denim overalls walks onto a blue path holding a bag of coins labelled "WON". Simultaneously, a cute white female rabbit wearing a red dress walks onto a red path holding a bag of coins labelled "$". The two paths diverge in opposite directions. Divergent destiny. high fidelity cinematic sound effects, foley, ambience, footsteps, magical wind, coin jingle, no voice, no speech. kawaii style.  |||
+
+S38 Prompt :
+3d pixar studio style. Dynamic camera movement. A blue meteor labelled "STOCK" crashes into the ground with a massive explosion. Camera whips rapidly upwards through the smoke to reveal a green magical rocket labelled "RATE" shooting straight up into the sky at supersonic speed from the crash site. Cause and effect transition. high fidelity cinematic sound effects, foley, ambience, crash boom, whip pan whoosh, rocket launch, no voice, no speech.  |||
+
+S39 Prompt :
+3d pixar studio style. Matrix-style bullet time camera rotation. A cute chubby siamese cat wearing denim overalls screams in slow motion. The gold coins labelled "WON" in his hands magically explode into grey ash and dust, blowing away violently in a magical wind. The cat tries to grab the dust but fails. Tragic loss VFX. high fidelity cinematic sound effects, foley, ambience, time warp sound, magical disintegration, crying echo, no voice, no speech. kawaii style. (카메라가 회전하며 원화 코인이 잿더미로 변해 날아가는 절망적인 순간을 슬로우 모션으로 포착) . |||
+
+S54 : 3d pixar studio style. A futuristic golden race car speeding on a track. The car's wheels are glowing red hot and smoking representing "DANGER". Suddenly, a huge green rocket booster labelled "GROWTH" attached to the back ignites with a blue magical flame, pushing the car even faster to supersonic speed. Speed overcomes heat. high fidelity cinematic sound effects, foley, ambience, tires screeching, rocket ignition, sonic boom, no voice, no speech. |||
+
+
+S54 : 3d pixar studio style. Dynamic tracking shot. A golden race car shakes violently and smokes as if it might explode (High Price). Suddenly, a bright green magical energy aura labelled "GROWTH" wraps around the car, stabilizing it and making it shoot forward like a beam of light. Magic stabilization. high fidelity cinematic sound effects, foley, ambience, engine rattling, magical hum, light speed whoosh, no voice, no speech. |||
+
+
+
 

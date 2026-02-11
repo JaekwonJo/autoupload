@@ -1,5 +1,5 @@
 {
-    "prompts_file": "flow_prompts_slot8.txt",
+    "prompts_file": "flow_prompts_slot7.txt",
     "prompts_separator": "|||",
     "check_interval_seconds": 120,
     "flow_base_url": "https://labs.google/fx/ko/tools/flow",
@@ -28,15 +28,15 @@
     ],
     "prompt_slots": [
         {
-            "name": "구글제국",
+            "name": "컨테이너 혁명",
             "file": "flow_prompts.txt"
         },
         {
-            "name": "유대인 공부법",
+            "name": "설탕세 진실",
             "file": "flow_prompts_slot2.txt"
         },
         {
-            "name": "서울 부동산 신화",
+            "name": "나스닥 정석",
             "file": "flow_prompts_slot3.txt"
         },
         {
@@ -44,15 +44,15 @@
             "file": "flow_prompts_slot4.txt"
         },
         {
-            "name": "일본 한국 소비",
+            "name": "채권의 비밀",
             "file": "flow_prompts_slot5.txt"
         },
         {
-            "name": "중국 경제 붕괴",
+            "name": "채권의 비밀 2d",
             "file": "flow_prompts_slot6.txt"
         },
         {
-            "name": "여성빈곤",
+            "name": "빗썸사태",
             "file": "flow_prompts_slot7.txt"
         },
         {
@@ -60,15 +60,15 @@
             "file": "flow_prompts_slot8.txt"
         },
         {
-            "name": "1216부동산붕괴",
+            "name": "여성빈곤_추가",
             "file": "flow_prompts_slot9.txt"
         },
         {
-            "name": "핀테크",
+            "name": "두쫀쿠_경제학",
             "file": "flow_prompts_slot10.txt"
         }
     ],
-    "active_prompt_slot": 7,
+    "active_prompt_slot": 6,
     "prompt_save_dir": "",
     "download_selector_main": "button[type=\"button\"]",
     "download_selector_quality": "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr",
@@ -80,7 +80,7 @@
         "x": 1452,
         "y": 1074
     },
-    "interval_seconds": 45,
+    "interval_seconds": 5,
     "input_area": {
         "x1": 1005,
         "y1": 1272,

@@ -31,6 +31,7 @@ class HumanActor:
         self.base_path = Path(__file__).resolve().parent
         self.config_path = self.base_path / CONFIG_FILE
         self.cfg = {} 
+        self.language_mode = "en" # 기본값: 영어 전용
         self.current_persona_name = "Initializing..."
         self.session_start_time = time.time()
         self.randomize_persona() 
@@ -223,6 +224,16 @@ class HumanActor:
         except: pass
 
     def type_text(self, text, input_area=None, speed_callback=None):
+        # [NEW] 한글+영어 모드 대응: 한글이 포함된 경우 클립보드 붙여넣기 사용
+        if hasattr(self, 'language_mode') and self.language_mode == "ko_en" and any(ord(c) > 127 for c in text):
+            pyperclip.copy(text)
+            time.sleep(random.uniform(0.5, 1.0))
+            pyautogui.hotkey('ctrl', 'v')
+            # 붙여넣기 후 텍스트 길이에 비례해 인간적인 대기 시간 추가
+            typing_time = len(text) * 0.05 * (1.0 / self.cfg.get("speed_multiplier", 1.0))
+            time.sleep(min(typing_time, 5.0))
+            return
+
         self._ensure_english_mode_clipboard()
         
         fatigue = self.get_fatigue_factor()

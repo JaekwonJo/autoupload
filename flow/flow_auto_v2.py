@@ -52,7 +52,8 @@ DEFAULT_CONFIG = {
     "active_prompt_slot": 0,
     "sound_enabled": True,
     "relay_mode": False,
-    "relay_count": 1
+    "relay_count": 1,
+    "language_mode": "en"
 }
 
 # [TOOLTIP] 친절한 설명서 풍선 기능
@@ -228,6 +229,7 @@ class FlowVisionApp:
         self.alert_window = None
         self.relay_progress = 0 
         self.actor = HumanActor()
+        self.actor.language_mode = self.cfg.get("language_mode", "en")
         
         self.root = tk.Tk()
         self.root.title(APP_NAME)
@@ -354,6 +356,11 @@ class FlowVisionApp:
         self.afk_var = tk.BooleanVar(value=self.cfg.get("afk_mode", False))
         c2.config(variable=self.afk_var)
         c2.grid(row=0, column=1, sticky="w", padx=5)
+        
+        c_lang = tk.Checkbutton(op_f, text="한글+영어 모드", variable=tk.BooleanVar(), command=self.on_option_toggle, bg=self.color_bg, font=("Malgun Gothic", 10), activebackground=self.color_bg)
+        self.lang_var = tk.BooleanVar(value=(self.cfg.get("language_mode", "en") == "ko_en"))
+        c_lang.config(variable=self.lang_var)
+        c_lang.grid(row=1, column=0, columnspan=2, sticky="w", padx=5)
         
         # Relay
         relay_f = tk.Frame(left_card, bg=self.color_bg)
@@ -507,9 +514,12 @@ class FlowVisionApp:
         self.cfg["afk_mode"] = self.afk_var.get()
         self.cfg["sound_enabled"] = self.sound_var.get()
         self.cfg["relay_mode"] = self.relay_var.get()
+        self.cfg["language_mode"] = "ko_en" if self.lang_var.get() else "en"
         try: self.cfg["relay_count"] = int(self.relay_cnt_var.get())
         except: self.cfg["relay_count"] = 1
         self.save_config()
+        if hasattr(self, 'actor'):
+            self.actor.language_mode = self.cfg["language_mode"]
         self.log(f"⚙️ 설정 동기화 완료")
 
     def _get_coord_text(self):

@@ -1,69 +1,37 @@
+S66 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. Wide angle shot of a container ship sailing at sunset. The ship is magically overflowing with glowing colorful electronic gadgets like TVs and radios instead of boxes. Above the ship, massive 3D text(Korean) "전자제품 싹쓸이" floats, made of glowing neon circuit boards with electric sparks flying. Dynamic low angle, golden hour lighting, magical sparkles. |||
+S67 Prompt : 3d render, pixar studio style, satirical illustration style, cinematic quality, 8k render. A giant golden scale positioned between a map of Asia and USA. The Asia side is weighed down heavily by mountains of products, while the USA side floats up with dollars flying away. In the center, massive 3D text(Korean) "무역의 대전환" slams down like a heavy meteor, made of cracked solid stone with dust explosion effects. Dramatic lighting, high contrast. |||
+S68 Prompt : 3d render, pixar studio style, blockbuster scale, cinematic quality, 8k render. A 3D globe view focused on Korea. Countless colorful containers are erupting explosively from the land like a volcanic eruption. Above the explosion, fiery 3D text(Korean) "물량 폭발" bursts out, made of burning magma and thick black smoke trails. Epic scale, cinematic lighting, chaos and energy. |||
+S69 Prompt : 3d render, pixar studio style, cinematic portrait, 8k render. A charismatic cute chubby Tiger wearing a beige retro work suit and a yellow hard hat stands on a barren sandy beach. He holds up a glowing banknote labelled "500 WON" high towards the sun. Behind him, a faint majestic hologram of a "Turtle Ship" appears in the sky. Floating next to him, solemn 3D text(Korean) "500원의 기적" shines, made of solid pure gold reflecting the sunlight with god rays. Heroic low angle, inspirational lighting. |||
+S70 Prompt : 3d render, pixar studio style, magic realism, cinematic quality, 8k render. The cute chubby Tiger wearing a beige retro work suit and a yellow hard hat points at the empty beach. From his fingertip, magical blue blueprint lines shoot out, instantly forming the wireframe of two gigantic super-tankers on the sand. Overhead, massive 3D text(Korean) "맨주먹 수주" hangs heavy, made of rusted industrial steel with rivets and welding sparks. Wide shot, magical blue glow effects. |||
+S71 Prompt : 3d render, pixar studio style, infographic style, cinematic quality, 8k render. Symmetrical composition. Left side: A cute chubby Golden Retriever wearing a fedora and black business suit holding a system blueprint. Right side: A cute chubby Tiger wearing a beige retro work suit and a yellow hard hat welding a giant steel ship. In the center, connecting them, dazzling 3D text(Korean) "세계 1위 등극" sparkles, made of brilliant diamonds with rainbow light refraction. Intense spotlight. |||
+S72 Prompt : 3d render, pixar studio style, mystical atmosphere, 8k render. A vintage framed photo of the Golden Retriever stands on a desk. A magical blue spectral energy flows out from the photo, spreading like a spider web across a digital map of the world. Floating above, ghostly 3D text(Korean) "혁신의 영혼" glows softly, made of translucent blue mist and spiritual energy particles. Dark background with neon blue highlights. |||
+S73 Prompt : 3d render, pixar studio style, kawaii horror, 8k render. A gigantic blue container box with a monster mouth is swallowing a factory and a smartphone whole. Inside the mouth, a digital vortex swirls. Bold, scary 3D text(Korean) "모든 것을 삼키다" screams out, made of glitching digital noise and jagged red edges. Dynamic action shot, dramatic shadows. |||
+S74 Prompt : 3d render, pixar studio style, high speed action, 8k render. A cute chubby Cheetah wearing a blue delivery vest and a high-tech rocket backpack is riding a container box flying at supersonic speed. The rocket is blasting massive fire. Zooming past, dynamic 3D text(Korean) "쿠팡: 로켓 배송" trails behind like exhaust, made of blazing fire and speed lines. Motion blur background, vibrant colors. |||
+S75 Prompt : 3d render, pixar studio style, gloomy atmosphere, 8k render. A steep staircase with 5 steps. Cute chubby squirrels are climbing, sweating, and dropping gold coins at each step. Crushing them from above, heavy 3D text(Korean) "5단계 유통 마진" falls, made of rough grey concrete with cracks and dust. Side view, dull lighting. |||
+S76 Prompt : 3d render, pixar studio style, impactful scene, 8k render. A giant futuristic blue laser beam cuts through the 5-step staircase, destroying the middle steps instantly. Debris flies everywhere. In the empty space, bright 3D text(Korean) "중간 단계 삭제" glows powerfully, made of intense neon blue laser energy. High contrast, sparks flying. |||
+S77 Prompt : 3d render, pixar studio style, sci-fi futuristic, 8k render. Inside a massive high-tech warehouse. Random items like teddy bears and ramyeon are magically flying into random empty slots on shelves. Scanning lasers connect everything. Floating in the center, digital 3D text(Korean) "랜덤 스토우 AI" creates a data cloud, made of glowing green Matrix-style binary codes. Wide complex shot, cybernetic atmosphere. |||
+S78 Prompt : 3d render, pixar studio style, educational infographic, 8k render. Split composition showing perfect mirroring. Top: Containers stacking on a ship. Bottom: Products stacking on Coupang shelves. In the middle, connecting them, large bold 3D text(Korean) "동일한 알고리즘" bridges the two worlds, made of solid architectural steel beams. Clean lighting, symmetrical balance. |||
+S79 Prompt : 3d render, pixar studio style, majestic domination, 8k render. The cute chubby Cheetah wearing a blue delivery vest and a high-tech rocket backpack stands proudly on top of a mountain made of delivery boxes reaching the clouds. Below, tiny squirrels look up in despair. Behind the Cheetah, colossal 3D text(Korean) "압도적 규모의 경제" rises like the sun, made of blinding solid gold bullion. Extreme low angle, epic atmosphere. |||
+S80 Prompt : 3d render, pixar studio style, sci-fi cyberpunk, 8k render. A cute chubby Space Fox wearing a futuristic black leather jacket and glowing goggles stands in a dark factory, manipulating a floating red hologram of a car chassis. Surrounding him, sharp 3D text(Korean) "테슬라의 비밀" floats with electric arcs, made of polished liquid chrome reflecting the neon lights. Cool blue and red lighting, mysterious vibe. |||
+S81 Prompt : 3d render, pixar studio style, chaotic industrial, 8k render. Hundreds of tiny squirrel robots are welding a car frame piece by piece. Sparks fly everywhere, looking messy and slow. Overlaying the scene, dusty 3D text(Korean) "과거: 1000번의 용접" looks old and broken, covered in black soot and rust texture. Busy composition, warm orange lighting. |||
+S82 Prompt : 3d render, pixar studio style, industrial revolution, 8k render. A gigantic futuristic press machine stamps down. When it lifts, a complete car body comes out in one piece, glowing hot. Above the machine, massive 3D text(Korean) "기가 캐스팅: 한방에!" slams down, made of glowing red-hot molten steel with steam rising. Steam and heat haze effects, powerful visuals. |||
+S83 Prompt : 3d render, pixar studio style, clean tech demo, 8k render. A car is exploded into 6 large modules floating in the air. Magical lines connect them, showing they are about to snap together like Lego. In the center, sleek 3D text(Korean) "조립의 혁명" floats weightlessly, made of glossy white high-tech plastic. Clean studio background, high-key lighting. |||
+S84 Prompt : 3d render, pixar studio style, comic race, 8k render. The Space Fox wearing a futuristic black leather jacket and glowing goggles is zooming ahead in a futuristic car leaving a light trail. Far behind, bears and rabbits are struggling to push old rusty cars. Between them, stretching wide, 3D text(Korean) "따라올 수 없는 속도" creates a barrier, made of blazing fire and motion blur speed lines. Motion blur, dynamic perspective. |||
+S85 Prompt : 3d render, pixar studio style, eerie atmosphere, 8k render. An old factory building is wrapped tightly in heavy chains and spiderwebs labeled "UNION" and "OLD SYSTEM". It looks stuck and paralyzed. Hovering over it, ghostly 3D text(Korean) "변하지 못하면 죽는다" glows with a scary red aura, dripping with a blood-like horror texture. Foggy, dark lighting. |||
 
-
-Scene 62 (00:09:29 ~ 00:09:39) Prompt :
-3d pixar studio style. a cute chubby bear wearing a tuxedo sitting inside a luxurious golden force field shield, being served by a high-tech holographic AI butler, private and exclusive atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 63 (00:09:39 ~ 00:09:47) Prompt :
-3d pixar studio style. a cute chubby bear wearing a tuxedo and a jetpack flying across the finish line at supersonic speed, while a cute chubby white rabbit wearing red hoodie is running far behind in the distance, extreme speed contrast. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 64 (00:09:47 ~ 00:09:56) Prompt :
-3d pixar studio style. a cute chubby white rabbit wearing red hoodie standing on a floor that rises slightly, but the golden ceiling above flies away much higher and faster, making the room much taller, gap increasing metaphor. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 65 (00:09:56 ~ 00:10:05) Prompt :
-3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat and a bear wearing a tuxedo sitting on a golden tower above the clouds, while a rabbit wearing red hoodie on the ground cannot even see them because of the clouds, extreme height difference. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 66 (00:10:05 ~ 00:10:15) Prompt :
-3d pixar studio style. a cute chubby white rabbit wearing red hoodie standing in front of a golden elevator with a "VIP" sign, but the door slams shut because the rabbit has no ticket, sad atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 67 (00:10:15 ~ 00:10:23) Prompt :
-3d pixar studio style. a cute chubby white rabbit wearing red hoodie walking like a puppet, with glowing blue digital strings attached to its limbs controlling its movement, manipulation metaphor. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 68 (00:10:23 ~ 00:10:32) Prompt :
-3d pixar studio style. a cute chubby bear wearing a tuxedo moving chess pieces shaped like rabbits on a giant chessboard, looking confident, strategic atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 69 (00:10:32 ~ 00:10:41) Prompt :
-3d pixar studio style. a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck and a red robot labelled "Google" wearing a yellow construction hard hat shaking hands, magical streams of data and money circulating between their hands in an infinity loop. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 70 (00:10:41 ~ 00:10:48) Prompt :
-3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat handing a shiny golden key to a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck, welcoming atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 71 (00:10:48 ~ 00:10:59) Prompt :
-3d pixar studio style. a cute chubby white rabbit wearing red hoodie setting up a small stall shop inside the lobby of a magnificent futuristic tower labelled "Google", selling items to other robots, adaptation. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 72 (00:10:59 ~ 00:11:09) Prompt :
-3d pixar studio style. a cute chubby white rabbit wearing red hoodie holding a smartphone, and magical holographic tools like brushes, hammers, and musical instruments popping out from the screen, creative potential. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 73 (00:11:09 ~ 00:11:18) Prompt :
-3d pixar studio style. **Camera panning from left to right**, left side: angry animals holding protest signs, right side: a smart cute chubby gray fox wearing a futuristic white space suit picking up golden eggs from the ground. contrast of attitude. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 74 (00:11:18 ~ 00:11:24) Prompt :
-3d pixar studio style. a cute chubby white rabbit wearing red hoodie standing under a giant golden faucet, enjoying a shower of glowing blue liquid light, happy and successful atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 75 (00:11:24 ~ 00:11:34) Prompt :
-3d pixar studio style. a cute chubby red robot labelled "Google" wearing a yellow construction hard hat, a silver robot labelled "Apple logo" wearing a black turtleneck, a white robot labelled "GPT", a rabbit wearing red hoodie, a fox wearing space suit, and a bear wearing tuxedo all standing together on stage holding hands and bowing, curtain call. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 76 (00:11:34 ~ 00:11:42) Prompt :
-3d pixar studio style. extreme close-up of a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck, the screen glitches with digital noise for a second, mysterious atmosphere. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 77 (00:11:42 ~ 00:11:49) Prompt :
-3d pixar studio style. a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck speaking, but the shadow atmosphere cast on the floor is the shape of a cute chubby red robot wearing a construction hard hat, shocking truth. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
-
-Scene 78 (00:11:49 ~ 00:11:54) Prompt :
-3d pixar studio style. extreme close-up of a cute chubby silver robot labelled "Apple logo" wearing a black turtleneck, its eyes suddenly turning glowing red, and a creepy evil smile appears on its face, horror ending. high fidelity cinematic sound effects, foley, ambience and bgm. no text.
-|||
+S86 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. A cute chubby Cyborg Lizard wearing a grey t-shirt and futuristic smart glasses roundhouse kicks an old, cracked smartphone, shattering it into pieces. In the foreground, the smart glasses glow intensely. Floating above, massive neon 3D text(Korean) "스마트폰의 종말" appears, made of shattered glass fragments and electric sparks. Dynamic action shot, cyberpunk lighting. |||
+S87 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. A cute chubby Squirrel wearing a red hoodie is sweating profusely, trying to lift a gigantic, heavy metal padlock labelled "UNLOCK" on a smartphone screen. It looks like extreme physical labor. Crushing down from above, heavy 3D text(Korean) "1단계: 잠금해제" falls, made of rusty iron chains and heavy concrete. High angle shot, stressful atmosphere. |||
+S88 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. The cute chubby Squirrel wearing a red hoodie is using a pickaxe to hit the keyboard of a giant smartphone, digging for letters like a miner. Sweat flies everywhere. In the background, fiery 3D text(Korean) "타자 = 막노동" burns intensely, made of hot magma and volcanic rock texture. Close-up on the struggle, dramatic lighting. |||
+S89 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. POV shot through the smart glasses. The Cyborg Lizard simply looks at a building, and augmented reality data pops up instantly. Floating in the air, sleek holographic 3D text(Korean) "그냥 보면 끝" glows, made of translucent crystal glass and blue laser data streams. Clean, futuristic atmosphere. |||
+S90 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. A complex maze of smartphone app icons magically disintegrates into dust. In the center of the void, a single glowing door remains. Hovering above, bold 3D text(Korean) "중간 단계 0" shines, made of pure white light and energy beams. Minimalist but powerful composition. |||
+S91 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. A gigantic glowing brain (AI) is being squeezed painfully into a tiny smartphone box. Next to it, the smart glasses project the brain's energy expanding infinitely into the universe. Overlaying this, massive 3D text(Korean) "AI를 담는 그릇" pulses, made of glowing neural networks and synaptic sparks. Wide shot, contrast between small and infinite. |||
+S92 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. X-ray side profile of the Cyborg Lizard. A thick fiber-optic cable connects the glasses directly to the brain, transmitting light at lightspeed. Above the head, speed-line style 3D text(Korean) "인지 비용 99% 절감" zooms past, made of motion-blurred neon light streaks. Dynamic speed visualization. |||
+S93 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. A view of Earth from space. The Meta "Infinity" logo rises like a new sun over the horizon, casting blue light over the planet. The logo transforms into a container shape. Below, majestic 3D text(Korean) "넥스트 컨테이너" floats, made of polished platinum and starlight. Epic, awe-inspiring atmosphere. |||
+S94 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. Avengers-style hero shot. Golden Retriever (Malcolm), Cheetah (Coupang), Space Fox (Tesla), and Cyborg Lizard (Meta) stand side-by-side, looking forward confidently. Behind them, unified 3D text(Korean) "마찰을 없애라" stands tall, made of solid indestructible titanium. Low angle, heroic lighting. |||
+S95 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. A giant pair of golden scissors cuts through a thick red ribbon labelled "COST". From the cut, a massive waterfall of gold coins erupts. In front of the gold, bold 3D text(Korean) "비용 절감 = 부" shines, made of solid gold bars and diamonds. Rich, luxurious lighting. |||
+S96 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. The Squirrel wearing a red hoodie looks into a mirror. The reflection shows a Squirrel wearing dirty denim overalls carrying a heavy sack. On the mirror surface, condensation forms the 3D text(Korean) "당신의 현재는?", written in a spooky, foggy texture. Moody, introspective lighting. |||
+S97 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. Split screen composition (blended). Left: A squirrel digging ground with a shovel (sweating). Right: A fox pressing a single button (relaxing). Between them, mathematical 3D text(Korean) "노력 < 효율" floats, made of red warning lights and green success lights. High contrast. |||
+S98 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. Two paths stretch to the horizon. Left: A dark path of thorns labelled "$5.83". Right: A shining golden escalator labelled "$0.16". In the middle, asking the viewer, giant 3D text(Korean) "어디로 갈래?" hovers, half rusted iron, half shiny gold. Wide angle, choose-your-destiny vibe. |||
+S99 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. Close-up of the Squirrel wearing a red hoodie. Its eyes pop open wide with blue energy, and the top of its head glows as if enlightened. Surrounding the head, refreshing 3D text(Korean) "뇌가 뚫리는 통찰" explodes outward, made of cracking ice and cool blue mint vapor. Energetic, awakening atmosphere. |||
+S100 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. The Golden Retriever wearing a Sherlock Holmes hat and holding a magnifying glass is inspecting a messy office desk. He finds a tiny bug labelled "Inefficiency". Pointing at it, large playful 3D text(Korean) "비효율 제보 받습니다" pops up, made of yellow caution tape and magnifying glass distortion effects. Curious, engaging lighting. |||
+S101 Prompt : 3d render, pixar studio style, cinematic quality, 8k render. All characters (Retriever, Squirrel, Fox, Cheetah, Lizard, Bear) gather together, smiling and waving at the camera. Confetti rains down. In the center, friendly, round 3D text(Korean) "구독이 정답입니다" bounces, made of soft red plush fabric and YouTube play button texture. Bright, warm, happy finale. |||
