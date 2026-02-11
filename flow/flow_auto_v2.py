@@ -484,6 +484,16 @@ class FlowVisionApp:
         # [NEW] Rename Button
         ttk.Button(file_f, text="✏️", width=3, command=self.on_rename_slot).pack(side="left", padx=2)
         
+        # [NEW] Add Slot Button
+        btn_add = ttk.Button(file_f, text="➕", width=3, command=self.on_add_slot)
+        btn_add.pack(side="left", padx=2)
+        ToolTip(btn_add, "새로운 프롬프트 슬롯 추가")
+
+        # [NEW] Delete Slot Button
+        btn_del = ttk.Button(file_f, text="🗑️", width=3, command=self.on_delete_slot)
+        btn_del.pack(side="left", padx=2)
+        ToolTip(btn_del, "현재 프롬프트 슬롯 삭제")
+        
         btn_nav = tk.Frame(file_f, bg=self.color_bg)
         btn_nav.pack(side="left", padx=20)
         
@@ -864,6 +874,67 @@ class FlowVisionApp:
             self.combo_slots["values"] = slots
             self.combo_slots.current(idx)
             self.log(f"📝 슬롯 이름 변경: {current_name} -> {new_name}")
+
+    def on_add_slot(self):
+        new_name = simpledialog.askstring("슬롯 추가", "새로운 슬롯의 이름을 입력하세요:")
+        if not new_name: return
+        
+        # 파일명 생성 (중복 피하기)
+        slot_id = 1
+        while True:
+            new_file = f"flow_prompts_slot_{slot_id}.txt"
+            if not any(s["file"] == new_file for s in self.cfg["prompt_slots"]):
+                break
+            slot_id += 1
+            
+        # 파일 생성
+        try:
+            (self.base / new_file).write_text("", encoding="utf-8")
+        except Exception as e:
+            messagebox.showerror("오류", f"파일 생성 실패: {e}")
+            return
+            
+        # 설정 추가
+        self.cfg["prompt_slots"].append({"name": new_name, "file": new_file})
+        self.save_config()
+        
+        # UI 갱신
+        slots = [s["name"] for s in self.cfg["prompt_slots"]]
+        self.combo_slots["values"] = slots
+        new_idx = len(self.cfg["prompt_slots"]) - 1
+        self.combo_slots.current(new_idx)
+        self.on_slot_change()
+        self.log(f"➕ 새 슬롯 추가됨: {new_name} ({new_file})")
+        messagebox.showinfo("성공", f"'{new_name}' 슬롯이 추가되었습니다!")
+
+    def on_delete_slot(self):
+        if len(self.cfg["prompt_slots"]) <= 1:
+            messagebox.showwarning("삭제 불가", "최소 하나 이상의 슬롯은 유지해야 합니다.")
+            return
+            
+        idx = self.combo_slots.current()
+        if idx < 0: return
+        
+        slot_name = self.cfg["prompt_slots"][idx]["name"]
+        if not messagebox.askyesno("슬롯 삭제", f"'{slot_name}' 슬롯을 삭제할까요?\n(실제 파일은 안전을 위해 삭제되지 않습니다)"):
+            return
+            
+        # 설정 제거
+        removed = self.cfg["prompt_slots"].pop(idx)
+        
+        # 인덱스 조정
+        if self.cfg["active_prompt_slot"] >= len(self.cfg["prompt_slots"]):
+            self.cfg["active_prompt_slot"] = len(self.cfg["prompt_slots"]) - 1
+        
+        self.save_config()
+        
+        # UI 갱신
+        slots = [s["name"] for s in self.cfg["prompt_slots"]]
+        self.combo_slots["values"] = slots
+        self.combo_slots.current(self.cfg["active_prompt_slot"])
+        self.on_slot_change()
+        self.log(f"🗑️ 슬롯 삭제됨: {slot_name}")
+        messagebox.showinfo("성공", f"'{slot_name}' 슬롯이 목록에서 제거되었습니다.")
 
     def save_session_report(self): pass
 
