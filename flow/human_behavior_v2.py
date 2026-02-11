@@ -427,15 +427,17 @@ class HumanActor:
         self._move_bezier(x, y, tx, ty, 0.5)
 
     def idle_action(self, area):
-        if random.random() > 0.2: return
-        action = random.choice(["wiggle", "scroll", "rest"])
+        if random.random() > 0.4: return # 빈도 증가
+        action = random.choice(["wiggle", "scroll", "move", "rest"])
         try:
             if action == "wiggle":
+                self.shake_mouse()
+            elif action == "move":
                 tx = random.randint(area['x1'], area['x2'])
                 ty = random.randint(area['y1'], area['y2'])
-                self.move_to(tx, ty, overshoot=False)
+                self.move_to(tx, ty, overshoot=True)
             elif action == "scroll":
-                pyautogui.scroll(random.randint(-200, 200))
+                pyautogui.scroll(random.choice([-120, 120, -240, 240]))
             elif action == "rest":
-                time.sleep(2.0)
+                time.sleep(random.uniform(1.0, 3.0))
         except: pass

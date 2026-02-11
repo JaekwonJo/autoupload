@@ -705,10 +705,24 @@ class FlowVisionApp:
             remain = self.t_next - time.time()
             if remain > 0:
                 if not self.is_processing:
-                    self.update_status_label(f"⏳ 대기 중... {int(remain)}초", "#FFC107") # Amber for Waiting
-                    if self.cfg.get("afk_mode") and self.cfg.get("afk_area"):
-                        try: self.actor.idle_action(self.cfg["afk_area"])
+                    self.update_status_label(f"⏳ 대기 중... {int(remain)}초 (비상은 마우스 구석으로!)", "#FFC107") # Amber
+                    
+                    # [NEW] 대기 중 마우스 산책 (클릭 절대 금지!)
+                    if random.random() < 0.3: # 30% 확률로 조금씩 움직임
+                        try:
+                            # AFK 영역이 있으면 그 안에서, 없으면 화면 전체에서 살짝 산책
+                            area = self.cfg.get("afk_area")
+                            if area:
+                                tx = random.randint(area['x1'], area['x2'])
+                                ty = random.randint(area['y1'], area['y2'])
+                            else:
+                                sw, sh = pyautogui.size()
+                                tx, ty = random.randint(100, sw-100), random.randint(100, sh-100)
+                            
+                            # 아주 천천히 부드럽게 이동
+                            self.actor.move_to(tx, ty, overshoot=False)
                         except: pass
+            
             try: base = int(self.entry_interval.get())
             except: base = 180
             remain_cnt = len(self.prompts) - self.index
