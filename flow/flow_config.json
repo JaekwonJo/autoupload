@@ -1,5 +1,5 @@
 {
-    "prompts_file": "flow_prompts_slot7.txt",
+    "prompts_file": "flow_prompts_slot8.txt",
     "prompts_separator": "|||",
     "check_interval_seconds": 120,
     "flow_base_url": "https://labs.google/fx/ko/tools/flow",
@@ -60,7 +60,7 @@
             "file": "flow_prompts_slot8.txt"
         },
         {
-            "name": "여성빈곤_추가",
+            "name": "빗썸_이미지",
             "file": "flow_prompts_slot9.txt"
         },
         {
@@ -68,7 +68,7 @@
             "file": "flow_prompts_slot10.txt"
         }
     ],
-    "active_prompt_slot": 6,
+    "active_prompt_slot": 7,
     "prompt_save_dir": "",
     "download_selector_main": "button[type=\"button\"]",
     "download_selector_quality": "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr",
@@ -80,7 +80,7 @@
         "x": 1452,
         "y": 1074
     },
-    "interval_seconds": 5,
+    "interval_seconds": 30,
     "input_area": {
         "x1": 1005,
         "y1": 1272,
@@ -102,5 +102,6 @@
     "afk_mode": true,
     "sound_enabled": true,
     "relay_mode": false,
-    "relay_count": 1
+    "relay_count": 1,
+    "language_mode": "ko_en"
 }

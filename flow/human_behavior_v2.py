@@ -228,10 +228,41 @@ class HumanActor:
         if hasattr(self, 'language_mode') and self.language_mode == "ko_en" and any(ord(c) > 127 for c in text):
             pyperclip.copy(text)
             time.sleep(random.uniform(0.5, 1.0))
+            
+            # [HUMAN] 붙여넣기 전 마우스 살짝 흔들어주기
+            self.shake_mouse()
+            
+            # 붙여넣기 (Ctrl+V)
             pyautogui.hotkey('ctrl', 'v')
-            # 붙여넣기 후 텍스트 길이에 비례해 인간적인 대기 시간 추가
-            typing_time = len(text) * 0.05 * (1.0 / self.cfg.get("speed_multiplier", 1.0))
-            time.sleep(min(typing_time, 5.0))
+            time.sleep(random.uniform(0.3, 0.7))
+
+            # [ANTI-BOT] 사람처럼 보이게 하는 돌발 행동들
+            if random.random() < 0.6:
+                # 1. 방향키로 텍스트 사이를 왔다갔다 (검토하는 척)
+                for _ in range(random.randint(2, 5)):
+                    pyautogui.press(random.choice(['left', 'right']))
+                    time.sleep(random.uniform(0.1, 0.2))
+                pyautogui.press('end') # 다시 끝으로 이동
+            
+            if random.random() < 0.4:
+                # 2. 마지막 글자 지웠다가 다시 쓰기 (오타 수정하는 척)
+                pyautogui.press('backspace')
+                time.sleep(random.uniform(0.4, 0.8))
+                last_char = text[-1]
+                if ord(last_char) > 127:
+                    pyperclip.copy(last_char)
+                    pyautogui.hotkey('ctrl', 'v')
+                else:
+                    pyautogui.press(last_char)
+
+            # 3. 입력 후 마우스 커서 자유 이동 (클릭 없이 슥~ 이동)
+            if random.random() < 0.5:
+                sw, sh = pyautogui.size()
+                tx, ty = random.randint(100, sw-100), random.randint(100, sh-100)
+                self.move_to(tx, ty, overshoot=True)
+                
+            typing_time = len(text) * 0.03 * (1.0 / self.cfg.get("speed_multiplier", 1.0))
+            time.sleep(min(typing_time, 3.0))
             return
 
         self._ensure_english_mode_clipboard()

@@ -501,8 +501,15 @@ class FlowVisionApp:
         ttk.Button(btn_nav, text="⏮", width=3, command=self.on_first).pack(side="left", padx=1)
         ttk.Button(btn_nav, text="◀", width=3, command=self.on_prev).pack(side="left", padx=1)
         
+        # [NEW] Direct Jump Entry
+        tk.Label(btn_nav, text="번호 이동:", font=("Malgun Gothic", 9), bg=self.color_bg).pack(side="left", padx=(5, 2))
+        self.ent_jump = tk.Entry(btn_nav, width=5, font=("Consolas", 10), justify="center", relief="solid", borderwidth=1)
+        self.ent_jump.pack(side="left", padx=2)
+        self.ent_jump.bind("<Return>", self.on_direct_jump)
+        ToolTip(self.ent_jump, "이동할 번호 입력 후 엔터(Enter)")
+        
         # [NEW] Jump (Clickable Label)
-        self.lbl_nav_status = tk.Label(btn_nav, text="0 / 0", width=12, fg=self.color_text, 
+        self.lbl_nav_status = tk.Label(btn_nav, text="0 / 0", width=10, fg=self.color_text, 
                                        font=("Consolas", 11, "bold"), cursor="hand2", bg="#E9ECEF", relief="flat")
         self.lbl_nav_status.pack(side="left", padx=5)
         self.lbl_nav_status.bind("<Button-1>", self.on_jump_to)
@@ -855,6 +862,25 @@ class FlowVisionApp:
                 else:
                     messagebox.showwarning("범위 초과", "존재하지 않는 번호입니다.")
         except: pass
+
+    def on_direct_jump(self, event=None):
+        if not self.prompts: return
+        try:
+            val = self.ent_jump.get().strip()
+            if not val: return
+            target = int(val)
+            total = len(self.prompts)
+            idx = target - 1
+            if 0 <= idx < total:
+                self.index = idx
+                self._update_progress_ui()
+                self.log(f"🚀 {target}번으로 직접 이동!")
+                self.ent_jump.delete(0, 'end')
+                self.root.focus() # 포커스 해제
+            else:
+                messagebox.showwarning("범위 초과", f"1부터 {total} 사이의 숫자를 입력하세요.")
+        except ValueError:
+            messagebox.showerror("오류", "숫자만 입력 가능합니다.")
 
     def on_open_prompts(self): os.startfile(self.base / self.cfg["prompts_file"])
     
