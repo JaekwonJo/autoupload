@@ -1,5 +1,5 @@
 {
-    "prompts_file": "flow_prompts_slot_2.txt",
+    "prompts_file": "flow_prompts.txt",
     "prompts_separator": "|||",
     "check_interval_seconds": 120,
     "flow_base_url": "https://labs.google/fx/ko/tools/flow",
@@ -28,7 +28,7 @@
     ],
     "prompt_slots": [
         {
-            "name": "컨테이너 혁명",
+            "name": "리볼빙 에피소드",
             "file": "flow_prompts.txt"
         },
         {
@@ -76,7 +76,7 @@
             "file": "flow_prompts_slot_2.txt"
         }
     ],
-    "active_prompt_slot": 11,
+    "active_prompt_slot": 0,
     "prompt_save_dir": "",
     "download_selector_main": "button[type=\"button\"]",
     "download_selector_quality": "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr",
@@ -88,7 +88,7 @@
         "x": 1452,
         "y": 1074
     },
-    "interval_seconds": 70,
+    "interval_seconds": 20,
     "input_area": {
         "x1": 1005,
         "y1": 1272,
@@ -122,21 +122,21 @@
         "y2": 1338
     },
     "ref_img1_area": {
-        "x1": 1024,
-        "y1": 740,
-        "x2": 1080,
-        "y2": 792
+        "x1": 1022,
+        "y1": 636,
+        "x2": 1078,
+        "y2": 683
     },
     "ref_img2_area": {
-        "x1": 1166,
-        "y1": 740,
-        "x2": 1237,
-        "y2": 795
+        "x1": 1162,
+        "y1": 645,
+        "x2": 1239,
+        "y2": 700
     },
     "ref_img3_area": {
-        "x1": 1325,
-        "y1": 748,
-        "x2": 1384,
-        "y2": 793
+        "x1": 1343,
+        "y1": 653,
+        "x2": 1382,
+        "y2": 692
     }
 }

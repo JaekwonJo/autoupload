@@ -57,10 +57,14 @@ DEFAULT_CONFIG = {
     "input_mode": "typing", # typing, paste, mixed
     "use_ref_images": False,
     "ref_image_count": 1,
-    "add_btn_area": None,
+    "add_btn1_area": None,
+    "add_btn2_area": None,
+    "add_btn3_area": None,
+    "add_btn4_area": None,
     "ref_img1_area": None,
     "ref_img2_area": None,
-    "ref_img3_area": None
+    "ref_img3_area": None,
+    "ref_img4_area": None
 }
 
 # [TOOLTIP] 친절한 설명서 풍선 기능
@@ -444,15 +448,16 @@ class FlowVisionApp:
         
         tk.Label(img_op_f, text="개수:", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left", padx=(10, 2))
         self.ref_count_var = tk.IntVar(value=self.cfg.get("ref_image_count", 1))
-        tk.Spinbox(img_op_f, from_=1, to=3, width=2, textvariable=self.ref_count_var, command=self.on_option_toggle).pack(side="left")
+        tk.Spinbox(img_op_f, from_=1, to=4, width=2, textvariable=self.ref_count_var, command=self.on_option_toggle).pack(side="left")
 
         img_btn_f = tk.Frame(img_card, bg=self.color_bg)
         img_btn_f.pack(fill="x", pady=5)
         
-        ttk.Button(img_btn_f, text="➕ 버튼 지정", width=10, command=lambda: self.start_capture("add_btn")).grid(row=0, column=0, padx=2, pady=2)
-        ttk.Button(img_btn_f, text="🖼️ 이미지1", width=10, command=lambda: self.start_capture("ref_img1")).grid(row=0, column=1, padx=2, pady=2)
-        ttk.Button(img_btn_f, text="🖼️ 이미지2", width=10, command=lambda: self.start_capture("ref_img2")).grid(row=1, column=0, padx=2, pady=2)
-        ttk.Button(img_btn_f, text="🖼️ 이미지3", width=10, command=lambda: self.start_capture("ref_img3")).grid(row=1, column=1, padx=2, pady=2)
+        # 4개의 행으로 구성된 지정 버튼들
+        for i in range(1, 5):
+            tk.Label(img_btn_f, text=f"Set {i}:", font=("Consolas", 8, "bold"), bg=self.color_bg).grid(row=i-1, column=0, padx=2)
+            ttk.Button(img_btn_f, text=f"➕{i} 지정", width=8, command=lambda x=i: self.start_capture(f"add_btn{x}")).grid(row=i-1, column=1, padx=2, pady=1)
+            ttk.Button(img_btn_f, text=f"🖼️{i} 지정", width=8, command=lambda x=i: self.start_capture(f"ref_img{x}")).grid(row=i-1, column=2, padx=2, pady=1)
         
         self.lbl_img_coords = tk.Label(img_card, text=self._get_img_coord_text(), font=("Consolas", 8), fg=self.color_text_sec, bg=self.color_bg)
         self.lbl_img_coords.pack(fill="x")
@@ -651,7 +656,12 @@ class FlowVisionApp:
 
     def _get_img_coord_text(self):
         c = self.cfg
-        return f"Btn[{'✅' if c.get('add_btn_area') else '❌'}] Img1[{'✅' if c.get('ref_img1_area') else '❌'}] Img2[{'✅' if c.get('ref_img2_area') else '❌'}] Img3[{'✅' if c.get('ref_img3_area') else '❌'}]"
+        res = []
+        for i in range(1, 5):
+            btn = "✅" if c.get(f"add_btn{i}_area") else "❌"
+            img = "✅" if c.get(f"ref_img{i}_area") else "❌"
+            res.append(f"{i}[{btn}/{img}]")
+        return " | ".join(res)
 
     def log(self, msg):
         if hasattr(self, 'log_window'):
@@ -943,28 +953,28 @@ class FlowVisionApp:
             self.update_status_label("✅ 입력 완료!", self.color_success)
             time.sleep(0.5)
 
-            # [NEW] 레퍼런스 이미지 첨부 로직
+            # [NEW] 레퍼런스 이미지 첨부 로직 (페어링 방식)
             if self.cfg.get("use_ref_images"):
                 count = self.cfg.get("ref_image_count", 1)
-                add_btn = self.cfg.get("add_btn_area")
-                if add_btn:
-                    for i in range(1, count + 1):
-                        img_area = self.cfg.get(f"ref_img{i}_area")
-                        if img_area:
-                            self.update_status_label(f"🖼️ 이미지 {i} 첨부 중...", self.color_info)
-                            # 1. + 버튼 클릭
-                            self.actor.move_to(random.randint(add_btn['x1'], add_btn['x2']), 
-                                              random.randint(add_btn['y1'], add_btn['y2']))
-                            pyautogui.click()
-                            time.sleep(1.0 + random.random()) # 메뉴 열리는 시간 대기
-                            
-                            # 2. 이미지 클릭
-                            self.actor.move_to(random.randint(img_area['x1'], img_area['x2']), 
-                                              random.randint(img_area['y1'], img_area['y2']))
-                            self.actor.smart_click()
-                            time.sleep(1.0 + random.random()) # 첨부 반영 대기
-                        else:
-                            self.log(f"⚠️ 이미지 {i} 영역이 설정되지 않아 건너뜁니다.")
+                for i in range(1, count + 1):
+                    add_btn = self.cfg.get(f"add_btn{i}_area")
+                    img_area = self.cfg.get(f"ref_img{i}_area")
+                    
+                    if add_btn and img_area:
+                        self.update_status_label(f"🖼️ 세트 {i} 첨부 중...", self.color_info)
+                        # 1. 해당 단계의 + 버튼 클릭
+                        self.actor.move_to(random.randint(add_btn['x1'], add_btn['x2']), 
+                                          random.randint(add_btn['y1'], add_btn['y2']))
+                        pyautogui.click()
+                        time.sleep(1.0 + random.random()) # 메뉴 열리는 시간 대기
+                        
+                        # 2. 해당 단계의 이미지 클릭
+                        self.actor.move_to(random.randint(img_area['x1'], img_area['x2']), 
+                                          random.randint(img_area['y1'], img_area['y2']))
+                        self.actor.smart_click()
+                        time.sleep(1.5 + random.random()) # 첨부 반영 대기 (조금 더 길게)
+                    else:
+                        self.log(f"⚠️ 세트 {i} 영역 설정 미비로 건너뜁니다.")
 
             self.update_status_label("📖 검토 중...", self.color_info)
             self.actor.read_prompt_pause(prompt)
