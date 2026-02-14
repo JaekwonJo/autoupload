@@ -54,7 +54,13 @@ DEFAULT_CONFIG = {
     "relay_mode": False,
     "relay_count": 1,
     "language_mode": "en",
-    "input_mode": "typing" # typing, paste, mixed
+    "input_mode": "typing", # typing, paste, mixed
+    "use_ref_images": False,
+    "ref_image_count": 1,
+    "add_btn_area": None,
+    "ref_img1_area": None,
+    "ref_img2_area": None,
+    "ref_img3_area": None
 }
 
 # [TOOLTIP] 친절한 설명서 풍선 기능
@@ -254,8 +260,12 @@ class FlowVisionApp:
         
         self.root = tk.Tk()
         self.root.title(APP_NAME)
-        self.root.geometry("1000x850") 
+        self.root.geometry("1100x920") # 1080p에서 가장 쾌적한 사이즈
         self.root.configure(bg="#FFFFFF")
+        
+        # [NEW] Responsive Grid Weight
+        self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_rowconfigure(1, weight=1)
         
         # [NEW] Log Window Instance
         self.log_window = LogWindow(self.root, self)
@@ -340,12 +350,36 @@ class FlowVisionApp:
         self.lbl_main_status.pack(anchor="e")
 
         # 2. Body
-        mid_frame = tk.Frame(self.root, bg=self.color_bg, pady=20)
-        mid_frame.pack(fill="both", expand=True, padx=30)
+        mid_frame = tk.Frame(self.root, bg=self.color_bg, pady=10)
+        mid_frame.pack(fill="both", expand=True, padx=20)
 
-        # --- Left: Settings ---
-        left_card = ttk.LabelFrame(mid_frame, text=" ⚙️ 기본 설정 ", padding=20)
-        left_card.pack(side="left", fill="both", expand=False, padx=(0, 20))
+        # --- Left: Settings (Scrollable) ---
+        left_container = tk.Frame(mid_frame, bg=self.color_bg, width=420)
+        left_container.pack(side="left", fill="both", expand=False, padx=(0, 10))
+        left_container.pack_propagate(False) # 고정 너비 유지
+
+        canvas = tk.Canvas(left_container, bg=self.color_bg, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(left_container, orient="vertical", command=canvas.yview)
+        scrollable_frame = tk.Frame(canvas, bg=self.color_bg)
+
+        scrollable_frame.bind(
+            "<Configure>",
+            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
+        )
+
+        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw", width=400)
+        canvas.configure(yscrollcommand=scrollbar.set)
+
+        canvas.pack(side="left", fill="both", expand=True)
+        scrollbar.pack(side="right", fill="y")
+
+        # 마우스 휠 지원
+        def _on_mousewheel(event):
+            canvas.yview_scroll(int(-1*(event.delta/120)), "units")
+        canvas.bind_all("<MouseWheel>", _on_mousewheel)
+
+        left_card = ttk.LabelFrame(scrollable_frame, text=" ⚙️ 기본 설정 ", padding=15)
+        left_card.pack(fill="x", padx=5, pady=5)
         
         # Target Buttons
         tk.Label(left_card, text="1. 화면 인식 영역 지정 (필수)", font=("Malgun Gothic", 11, "bold"), fg=self.color_text).pack(anchor="w", pady=(0, 5))
@@ -397,6 +431,32 @@ class FlowVisionApp:
         mode_map = {"typing": "⌨️ 타이핑", "paste": "📋 복사붙여넣기", "mixed": "🔀 혼용(랜덤)"}
         # 콤보박스 표시용 맵핑 (선택 사항)
         
+        # --- [NEW] Reference Image Settings ---
+        img_card = ttk.LabelFrame(left_card, text=" 🖼️ 레퍼런스 이미지 설정 ", padding=10)
+        img_card.pack(fill="x", pady=(20, 0))
+
+        img_op_f = tk.Frame(img_card, bg=self.color_bg)
+        img_op_f.pack(fill="x")
+        
+        self.use_ref_var = tk.BooleanVar(value=self.cfg.get("use_ref_images", False))
+        tk.Checkbutton(img_op_f, text="이미지 참조 사용", variable=self.use_ref_var, command=self.on_option_toggle, 
+                       bg=self.color_bg, font=("Malgun Gothic", 9, "bold")).pack(side="left")
+        
+        tk.Label(img_op_f, text="개수:", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left", padx=(10, 2))
+        self.ref_count_var = tk.IntVar(value=self.cfg.get("ref_image_count", 1))
+        tk.Spinbox(img_op_f, from_=1, to=3, width=2, textvariable=self.ref_count_var, command=self.on_option_toggle).pack(side="left")
+
+        img_btn_f = tk.Frame(img_card, bg=self.color_bg)
+        img_btn_f.pack(fill="x", pady=5)
+        
+        ttk.Button(img_btn_f, text="➕ 버튼 지정", width=10, command=lambda: self.start_capture("add_btn")).grid(row=0, column=0, padx=2, pady=2)
+        ttk.Button(img_btn_f, text="🖼️ 이미지1", width=10, command=lambda: self.start_capture("ref_img1")).grid(row=0, column=1, padx=2, pady=2)
+        ttk.Button(img_btn_f, text="🖼️ 이미지2", width=10, command=lambda: self.start_capture("ref_img2")).grid(row=1, column=0, padx=2, pady=2)
+        ttk.Button(img_btn_f, text="🖼️ 이미지3", width=10, command=lambda: self.start_capture("ref_img3")).grid(row=1, column=1, padx=2, pady=2)
+        
+        self.lbl_img_coords = tk.Label(img_card, text=self._get_img_coord_text(), font=("Consolas", 8), fg=self.color_text_sec, bg=self.color_bg)
+        self.lbl_img_coords.pack(fill="x")
+
         # Relay
         relay_f = tk.Frame(left_card, bg=self.color_bg)
         relay_f.pack(fill="x", pady=10)
@@ -426,8 +486,8 @@ class FlowVisionApp:
         right_panel.pack(side="right", fill="both", expand=True)
         
         # 1. Progress Card
-        prog_card = ttk.LabelFrame(right_panel, text=" 📊 진행 상황 ", padding=15)
-        prog_card.pack(fill="x", pady=(0, 15))
+        prog_card = ttk.LabelFrame(right_panel, text=" 📊 진행 상황 ", padding=10)
+        prog_card.pack(fill="x", pady=(0, 10))
         
         self.progress_var = tk.DoubleVar()
         self.progress_bar = ttk.Progressbar(prog_card, variable=self.progress_var, maximum=100, mode='determinate', style="Horizontal.TProgressbar")
@@ -495,7 +555,7 @@ class FlowVisionApp:
         self.traits_frame = tk.Frame(mon_card, bg="#F8F9FA", relief="sunken", borderwidth=1)
         self.traits_frame.pack(fill="both", expand=True)
         
-        self.list_traits = tk.Listbox(self.traits_frame, height=6, bg="#F8F9FA", fg="#495057", 
+        self.list_traits = tk.Listbox(self.traits_frame, height=4, bg="#F8F9FA", fg="#495057", 
                                       font=("Malgun Gothic", 9), relief="flat", highlightthickness=0, selectbackground="#E9ECEF")
         self.list_traits.pack(side="left", fill="both", expand=True, padx=5, pady=5)
         
@@ -505,7 +565,7 @@ class FlowVisionApp:
 
         # 3. Bottom
         bottom = tk.Frame(self.root, bg=self.color_bg)
-        bottom.pack(fill="both", expand=True, padx=30, pady=(0, 30))
+        bottom.pack(fill="x", expand=False, padx=30, pady=(0, 20))
         
         file_f = tk.Frame(bottom, bg=self.color_bg)
         file_f.pack(fill="x", pady=5)
@@ -575,6 +635,9 @@ class FlowVisionApp:
         self.cfg["relay_mode"] = self.relay_var.get()
         self.cfg["language_mode"] = "ko_en" if self.lang_var.get() else "en"
         self.cfg["input_mode"] = self.input_mode_var.get()
+        self.cfg["use_ref_images"] = self.use_ref_var.get()
+        try: self.cfg["ref_image_count"] = int(self.ref_count_var.get())
+        except: self.cfg["ref_image_count"] = 1
         try: self.cfg["relay_count"] = int(self.relay_cnt_var.get())
         except: self.cfg["relay_count"] = 1
         self.save_config()
@@ -586,6 +649,10 @@ class FlowVisionApp:
         ia, sa, aa = self.cfg.get('input_area'), self.cfg.get('submit_area'), self.cfg.get('afk_area')
         return f"입력창[{'✅' if ia else '❌'}] 버튼[{'✅' if sa else '❌'}] AFK[{'✅' if aa else '❌'}]"
 
+    def _get_img_coord_text(self):
+        c = self.cfg
+        return f"Btn[{'✅' if c.get('add_btn_area') else '❌'}] Img1[{'✅' if c.get('ref_img1_area') else '❌'}] Img2[{'✅' if c.get('ref_img2_area') else '❌'}] Img3[{'✅' if c.get('ref_img3_area') else '❌'}]"
+
     def log(self, msg):
         if hasattr(self, 'log_window'):
             self.log_window.log(msg)
@@ -595,6 +662,8 @@ class FlowVisionApp:
             self.cfg[f"{kind}_area"] = {"x1": x1, "y1": y1, "x2": x2, "y2": y2}
             self.save_config()
             self.lbl_coords.config(text=self._get_coord_text())
+            if hasattr(self, 'lbl_img_coords'):
+                self.lbl_img_coords.config(text=self._get_img_coord_text())
             messagebox.showinfo("성공", f"영역 저장 완료!")
         CaptureOverlay(self.root, on_captured, kind)
 
@@ -873,6 +942,30 @@ class FlowVisionApp:
             
             self.update_status_label("✅ 입력 완료!", self.color_success)
             time.sleep(0.5)
+
+            # [NEW] 레퍼런스 이미지 첨부 로직
+            if self.cfg.get("use_ref_images"):
+                count = self.cfg.get("ref_image_count", 1)
+                add_btn = self.cfg.get("add_btn_area")
+                if add_btn:
+                    for i in range(1, count + 1):
+                        img_area = self.cfg.get(f"ref_img{i}_area")
+                        if img_area:
+                            self.update_status_label(f"🖼️ 이미지 {i} 첨부 중...", self.color_info)
+                            # 1. + 버튼 클릭
+                            self.actor.move_to(random.randint(add_btn['x1'], add_btn['x2']), 
+                                              random.randint(add_btn['y1'], add_btn['y2']))
+                            pyautogui.click()
+                            time.sleep(1.0 + random.random()) # 메뉴 열리는 시간 대기
+                            
+                            # 2. 이미지 클릭
+                            self.actor.move_to(random.randint(img_area['x1'], img_area['x2']), 
+                                              random.randint(img_area['y1'], img_area['y2']))
+                            self.actor.smart_click()
+                            time.sleep(1.0 + random.random()) # 첨부 반영 대기
+                        else:
+                            self.log(f"⚠️ 이미지 {i} 영역이 설정되지 않아 건너뜁니다.")
+
             self.update_status_label("📖 검토 중...", self.color_info)
             self.actor.read_prompt_pause(prompt)
             
@@ -1021,12 +1114,15 @@ class FlowVisionApp:
             return
             
         # 설정 제거
-        removed = self.cfg["prompt_slots"].pop(idx)
+        self.cfg["prompt_slots"].pop(idx)
         
         # 인덱스 조정
         if self.cfg["active_prompt_slot"] >= len(self.cfg["prompt_slots"]):
             self.cfg["active_prompt_slot"] = len(self.cfg["prompt_slots"]) - 1
-        
+        elif self.cfg["active_prompt_slot"] == idx:
+            # 현재 활성화된 슬롯을 삭제한 경우
+            self.cfg["active_prompt_slot"] = 0
+            
         self.save_config()
         
         # UI 갱신
