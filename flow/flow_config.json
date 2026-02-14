@@ -1,5 +1,5 @@
 {
-    "prompts_file": "flow_prompts_slot8.txt",
+    "prompts_file": "flow_prompts_slot_1.txt",
     "prompts_separator": "|||",
     "check_interval_seconds": 120,
     "flow_base_url": "https://labs.google/fx/ko/tools/flow",
@@ -66,9 +66,13 @@
         {
             "name": "두쫀쿠_경제학",
             "file": "flow_prompts_slot10.txt"
+        },
+        {
+            "name": "중국의 AI",
+            "file": "flow_prompts_slot_1.txt"
         }
     ],
-    "active_prompt_slot": 7,
+    "active_prompt_slot": 10,
     "prompt_save_dir": "",
     "download_selector_main": "button[type=\"button\"]",
     "download_selector_quality": "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr",
@@ -80,7 +84,7 @@
         "x": 1452,
         "y": 1074
     },
-    "interval_seconds": 60,
+    "interval_seconds": 10,
     "input_area": {
         "x1": 1005,
         "y1": 1272,
@@ -103,5 +107,6 @@
     "sound_enabled": true,
     "relay_mode": false,
     "relay_count": 1,
-    "language_mode": "ko_en"
+    "language_mode": "ko_en",
+    "input_mode": "mixed"
 }

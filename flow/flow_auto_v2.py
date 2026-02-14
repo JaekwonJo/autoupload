@@ -53,7 +53,8 @@ DEFAULT_CONFIG = {
     "sound_enabled": True,
     "relay_mode": False,
     "relay_count": 1,
-    "language_mode": "en"
+    "language_mode": "en",
+    "input_mode": "typing" # typing, paste, mixed
 }
 
 # [TOOLTIP] 친절한 설명서 풍선 기능
@@ -169,8 +170,9 @@ def load_config_from_file(path):
     except: return DEFAULT_CONFIG.copy()
 
 class LogWindow:
-    def __init__(self, master):
+    def __init__(self, master, app=None):
         self.root = tk.Toplevel(master)
+        self.app = app
         self.root.title("📜 시스템 로그 & 프롬프트 모니터")
         self.root.geometry("800x850") # 더 크게!
         self.root.configure(bg="#212529")
@@ -183,8 +185,17 @@ class LogWindow:
         self.frame_top = tk.Frame(self.paned, bg="#212529")
         self.paned.add(self.frame_top, weight=1) # 비중 설정
 
-        lbl1 = tk.Label(self.frame_top, text="📝 현재 로드된 프롬프트 (미리보기)", font=("Malgun Gothic", 11, "bold"), bg="#212529", fg="#FFC107")
-        lbl1.pack(anchor="w", pady=(0, 5))
+        # 상단 레이블과 새로고침 버튼을 담을 프레임
+        top_f = tk.Frame(self.frame_top, bg="#212529")
+        top_f.pack(fill="x", pady=(0, 5))
+
+        lbl1 = tk.Label(top_f, text="📝 현재 로드된 프롬프트 (미리보기)", font=("Malgun Gothic", 11, "bold"), bg="#212529", fg="#FFC107")
+        lbl1.pack(side="left")
+
+        if self.app:
+            btn_refresh = tk.Button(top_f, text="🔄 즉시 새로고침 (Reload)", command=self.app.on_reload,
+                                     bg="#007AFF", fg="white", font=("Malgun Gothic", 9, "bold"), padx=10)
+            btn_refresh.pack(side="right")
         
         self.text_preview = ScrolledText(self.frame_top, bg="#343A40", fg="#F8F9FA", 
                                          font=("Consolas", 11), insertbackground="white", borderwidth=1, relief="solid")
@@ -247,7 +258,7 @@ class FlowVisionApp:
         self.root.configure(bg="#FFFFFF")
         
         # [NEW] Log Window Instance
-        self.log_window = LogWindow(self.root)
+        self.log_window = LogWindow(self.root, self)
         self.log_window.root.withdraw() # Start hidden
         
         try:
@@ -371,6 +382,20 @@ class FlowVisionApp:
         self.lang_var = tk.BooleanVar(value=(self.cfg.get("language_mode", "en") == "ko_en"))
         c_lang.config(variable=self.lang_var)
         c_lang.grid(row=1, column=0, columnspan=2, sticky="w", padx=5)
+        
+        # [NEW] Input Mode Selection
+        tk.Label(left_card, text="⌨️ 입력 방식 선택", font=("Malgun Gothic", 10, "bold"), bg=self.color_bg).pack(anchor="w", pady=(15, 0))
+        self.input_mode_var = tk.StringVar(value=self.cfg.get("input_mode", "typing"))
+        mode_f = tk.Frame(left_card, bg=self.color_bg)
+        mode_f.pack(fill="x", pady=5)
+        
+        self.combo_input_mode = ttk.Combobox(mode_f, textvariable=self.input_mode_var, state="readonly", font=("Malgun Gothic", 10))
+        self.combo_input_mode['values'] = ("typing", "paste", "mixed")
+        self.combo_input_mode.pack(side="left", fill="x", expand=True)
+        self.combo_input_mode.bind("<<ComboboxSelected>>", self.on_option_toggle)
+        
+        mode_map = {"typing": "⌨️ 타이핑", "paste": "📋 복사붙여넣기", "mixed": "🔀 혼용(랜덤)"}
+        # 콤보박스 표시용 맵핑 (선택 사항)
         
         # Relay
         relay_f = tk.Frame(left_card, bg=self.color_bg)
@@ -532,22 +557,30 @@ class FlowVisionApp:
         ttk.Button(file_f, text="📂 파일 열기", command=self.on_open_prompts).pack(side="right", padx=5)
         ttk.Button(file_f, text="🔄 새로고침", command=self.on_reload).pack(side="right")
 
-        # [NEW] Log Window Button (Replaces the old text boxes)
-        btn_log = tk.Button(bottom, text="📜 로그 및 미리보기 창 열기 (Log & Preview)", command=self.log_window.show, 
-                            bg="#343A40", fg="#00FF00", font=("Malgun Gothic", 12, "bold"), relief="raised", borderwidth=3)
-        btn_log.pack(fill="x", pady=20, ipady=10)
+        # [NEW] Log & Refresh Buttons
+        btn_f = tk.Frame(bottom, bg=self.color_bg)
+        btn_f.pack(fill="x", pady=20)
 
-    def on_option_toggle(self):
+        btn_log = tk.Button(btn_f, text="📜 로그 및 미리보기 창 열기", command=self.log_window.show, 
+                            bg="#343A40", fg="#00FF00", font=("Malgun Gothic", 12, "bold"), relief="raised", borderwidth=3)
+        btn_log.pack(side="left", fill="x", expand=True, padx=(0, 5), ipady=10)
+
+        btn_refresh_big = tk.Button(btn_f, text="🔄 프롬프트 새로고침 (Reload)", command=self.on_reload, 
+                                     bg="#007AFF", fg="white", font=("Malgun Gothic", 12, "bold"), relief="raised", borderwidth=3)
+        btn_refresh_big.pack(side="right", fill="x", expand=True, padx=(5, 0), ipady=10)
+
+    def on_option_toggle(self, event=None):
         self.cfg["afk_mode"] = self.afk_var.get()
         self.cfg["sound_enabled"] = self.sound_var.get()
         self.cfg["relay_mode"] = self.relay_var.get()
         self.cfg["language_mode"] = "ko_en" if self.lang_var.get() else "en"
+        self.cfg["input_mode"] = self.input_mode_var.get()
         try: self.cfg["relay_count"] = int(self.relay_cnt_var.get())
         except: self.cfg["relay_count"] = 1
         self.save_config()
         if hasattr(self, 'actor'):
             self.actor.language_mode = self.cfg["language_mode"]
-        self.log(f"⚙️ 설정 동기화 완료")
+        self.log(f"⚙️ 설정 동기화 완료 (입력방식: {self.cfg['input_mode']})")
 
     def _get_coord_text(self):
         ia, sa, aa = self.cfg.get('input_area'), self.cfg.get('submit_area'), self.cfg.get('afk_area')
@@ -673,6 +706,7 @@ class FlowVisionApp:
             print(f"Failed to update monitor UI: {e}")
 
     def on_start(self):
+        self.on_reload() # 시작 시 프롬프트 최신화
         try:
             self.cfg["interval_seconds"] = int(self.entry_interval.get())
             self.save_config()
@@ -762,7 +796,8 @@ class FlowVisionApp:
 
     def _run_task(self):
         print(f"[{datetime.now()}] Task started")
-        self.log("작업 스레드 시작")
+        self.on_reload() # 각 작업 시작 전 프롬프트 최신화
+        self.log("작업 스레드 시작 (프롬프트 동기화 완료)")
         ia, sa = self.cfg.get('input_area'), self.cfg.get('submit_area')
         if not self.prompts or self.index >= len(self.prompts):
             print("No prompts or index out of range")
@@ -817,8 +852,24 @@ class FlowVisionApp:
                 pyautogui.press("backspace")
             
             print(f"Typing prompt: {prompt[:20]}...")
-            self.update_status_label("✍️ 입력 중...", "white")
-            self.actor.type_text(prompt, speed_callback=lambda s: self.root.after(0, lambda: self.lbl_speed_val.config(text=f"x{s}")))
+            mode = self.cfg.get("input_mode", "typing")
+            
+            # [NEW] 입력 방식 분기 로직
+            current_action = "typing"
+            if mode == "paste":
+                current_action = "paste"
+            elif mode == "mixed":
+                current_action = random.choice(["typing", "paste"])
+            
+            if current_action == "paste":
+                self.update_status_label("📋 복사 붙여넣기 중...", "white")
+                pyperclip.copy(prompt)
+                time.sleep(random.uniform(0.3, 0.7))
+                pyautogui.hotkey("ctrl", "v")
+                time.sleep(0.5)
+            else:
+                self.update_status_label("✍️ 타이핑 중...", "white")
+                self.actor.type_text(prompt, speed_callback=lambda s: self.root.after(0, lambda: self.lbl_speed_val.config(text=f"x{s}")))
             
             self.update_status_label("✅ 입력 완료!", self.color_success)
             time.sleep(0.5)
