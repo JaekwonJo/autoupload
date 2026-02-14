@@ -88,7 +88,7 @@
         "x": 1452,
         "y": 1074
     },
-    "interval_seconds": 20,
+    "interval_seconds": 0,
     "input_area": {
         "x1": 1005,
         "y1": 1272,
@@ -112,7 +112,7 @@
     "relay_mode": false,
     "relay_count": 1,
     "language_mode": "ko_en",
-    "input_mode": "mixed",
+    "input_mode": "paste",
     "use_ref_images": true,
     "ref_image_count": 3,
     "add_btn_area": {
@@ -122,21 +122,41 @@
         "y2": 1338
     },
     "ref_img1_area": {
-        "x1": 1022,
-        "y1": 636,
-        "x2": 1078,
-        "y2": 683
+        "x1": 1035,
+        "y1": 719,
+        "x2": 1048,
+        "y2": 732
     },
     "ref_img2_area": {
-        "x1": 1162,
-        "y1": 645,
-        "x2": 1239,
-        "y2": 700
+        "x1": 1190,
+        "y1": 710,
+        "x2": 1207,
+        "y2": 723
     },
     "ref_img3_area": {
-        "x1": 1343,
-        "y1": 653,
-        "x2": 1382,
-        "y2": 692
-    }
+        "x1": 1341,
+        "y1": 702,
+        "x2": 1356,
+        "y2": 715
+    },
+    "add_btn1_area": {
+        "x1": 1010,
+        "y1": 1320,
+        "x2": 1025,
+        "y2": 1331
+    },
+    "add_btn2_area": {
+        "x1": 1081,
+        "y1": 1317,
+        "x2": 1094,
+        "y2": 1331
+    },
+    "add_btn3_area": {
+        "x1": 1150,
+        "y1": 1320,
+        "x2": 1161,
+        "y2": 1333
+    },
+    "add_btn4_area": null,
+    "ref_img4_area": null
 }

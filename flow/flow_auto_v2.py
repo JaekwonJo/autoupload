@@ -921,6 +921,30 @@ class FlowVisionApp:
             prompt = self.prompts[self.index]
             start_t = datetime.now()
             
+            # [ORDER CHANGE] 1. 레퍼런스 이미지 먼저 첨부 (텍스트 입력 전이 가장 안정적)
+            if self.cfg.get("use_ref_images"):
+                count = self.cfg.get("ref_image_count", 1)
+                for i in range(1, count + 1):
+                    add_btn = self.cfg.get(f"add_btn{i}_area")
+                    img_area = self.cfg.get(f"ref_img{i}_area")
+                    
+                    if add_btn and img_area:
+                        self.update_status_label(f"🖼️ 세트 {i} 첨부 중...", self.color_info)
+                        # 1. 해당 단계의 + 버튼 클릭
+                        self.actor.move_to(random.randint(add_btn['x1'], add_btn['x2']), 
+                                          random.randint(add_btn['y1'], add_btn['y2']))
+                        pyautogui.click()
+                        time.sleep(1.2 + random.random()) # 메뉴 열리는 시간 대기
+                        
+                        # 2. 해당 단계의 이미지 클릭
+                        self.actor.move_to(random.randint(img_area['x1'], img_area['x2']), 
+                                          random.randint(img_area['y1'], img_area['y2']))
+                        self.actor.smart_click()
+                        time.sleep(1.5 + random.random()) # 첨부 반영 대기
+                    else:
+                        self.log(f"⚠️ 세트 {i} 영역 설정 미비로 건너뜁니다.")
+
+            # [ORDER CHANGE] 2. 프롬프트 입력창으로 이동 및 입력
             if ia:
                 print(f"Moving to input area: {ia}")
                 self.update_status_label("🖱️ 이동 중...", "white")
@@ -933,7 +957,7 @@ class FlowVisionApp:
             print(f"Typing prompt: {prompt[:20]}...")
             mode = self.cfg.get("input_mode", "typing")
             
-            # [NEW] 입력 방식 분기 로직
+            # 입력 방식 분기 로직
             current_action = "typing"
             if mode == "paste":
                 current_action = "paste"
@@ -953,32 +977,10 @@ class FlowVisionApp:
             self.update_status_label("✅ 입력 완료!", self.color_success)
             time.sleep(0.5)
 
-            # [NEW] 레퍼런스 이미지 첨부 로직 (페어링 방식)
-            if self.cfg.get("use_ref_images"):
-                count = self.cfg.get("ref_image_count", 1)
-                for i in range(1, count + 1):
-                    add_btn = self.cfg.get(f"add_btn{i}_area")
-                    img_area = self.cfg.get(f"ref_img{i}_area")
-                    
-                    if add_btn and img_area:
-                        self.update_status_label(f"🖼️ 세트 {i} 첨부 중...", self.color_info)
-                        # 1. 해당 단계의 + 버튼 클릭
-                        self.actor.move_to(random.randint(add_btn['x1'], add_btn['x2']), 
-                                          random.randint(add_btn['y1'], add_btn['y2']))
-                        pyautogui.click()
-                        time.sleep(1.0 + random.random()) # 메뉴 열리는 시간 대기
-                        
-                        # 2. 해당 단계의 이미지 클릭
-                        self.actor.move_to(random.randint(img_area['x1'], img_area['x2']), 
-                                          random.randint(img_area['y1'], img_area['y2']))
-                        self.actor.smart_click()
-                        time.sleep(1.5 + random.random()) # 첨부 반영 대기 (조금 더 길게)
-                    else:
-                        self.log(f"⚠️ 세트 {i} 영역 설정 미비로 건너뜁니다.")
-
             self.update_status_label("📖 검토 중...", self.color_info)
             self.actor.read_prompt_pause(prompt)
             
+            # 3. 최종 제출
             print("Submitting...")
             self.update_status_label("🚀 제출 중...", self.color_accent)
             if random.random() < self.cfg.get("enter_submit_rate", 0.5):
