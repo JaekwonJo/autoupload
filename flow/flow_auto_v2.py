@@ -184,7 +184,14 @@ class LogWindow:
         self.root = tk.Toplevel(master)
         self.app = app
         self.root.title("📜 시스템 로그 & 프롬프트 모니터")
-        self.root.geometry("800x850") # 더 크게!
+        sw = self.root.winfo_screenwidth()
+        sh = self.root.winfo_screenheight()
+        w = min(920, max(640, int(sw * 0.62)))
+        h = min(760, max(480, int(sh * 0.72)))
+        x = max((sw - w) // 2 + 20, 0)
+        y = max((sh - h) // 2 + 20, 0)
+        self.root.geometry(f"{w}x{h}+{x}+{y}")
+        self.root.minsize(560, 420)
         self.root.configure(bg="#212529")
         
         # [NEW] 마법의 칸막이 (PanedWindow) 설치
@@ -264,7 +271,7 @@ class FlowVisionApp:
         
         self.root = tk.Tk()
         self.root.title(APP_NAME)
-        self.root.geometry("1100x920") # 1080p에서 가장 쾌적한 사이즈
+        self._set_initial_window_size()
         self.root.configure(bg="#FFFFFF")
         
         # [NEW] Responsive Grid Weight
@@ -315,6 +322,24 @@ class FlowVisionApp:
         self.on_reload()
         self.root.after(1000, self._tick)
 
+    def _set_initial_window_size(self):
+        sw = self.root.winfo_screenwidth()
+        sh = self.root.winfo_screenheight()
+        w = min(1260, max(980, int(sw * 0.94)))
+        h = min(920, max(680, int(sh * 0.86)))
+        x = max((sw - w) // 2, 0)
+        y = max((sh - h) // 2, 0)
+        self.root.geometry(f"{w}x{h}+{x}+{y}")
+        self.root.minsize(860, 620)
+
+    def _init_body_sash(self):
+        try:
+            total_w = self.body_pane.winfo_width()
+            if total_w > 0:
+                self.body_pane.sashpos(0, int(total_w * 0.44))
+        except:
+            pass
+
     def play_sound(self, category):
         if not self.cfg.get("sound_enabled", True) or not WINSOUND_AVAILABLE: return 
         try:
@@ -339,39 +364,38 @@ class FlowVisionApp:
 
     def _build_ui(self):
         # 1. Header (High Visibility)
-        header = tk.Frame(self.root, bg="#F8F9FA", height=80, highlightbackground="#DEE2E6", highlightthickness=1)
+        header = tk.Frame(self.root, bg="#F8F9FA", height=72, highlightbackground="#DEE2E6", highlightthickness=1)
         header.pack(fill="x", side="top")
         
         title_f = tk.Frame(header, bg="#F8F9FA")
         title_f.pack(side="left", padx=20, pady=10)
-        tk.Label(title_f, text="Flow Veo 자동화 봇", font=("Malgun Gothic", 24, "bold"), bg="#F8F9FA", fg="#343A40").pack(anchor="w")
+        tk.Label(title_f, text="Flow Veo 자동화 봇", font=("Malgun Gothic", 20, "bold"), bg="#F8F9FA", fg="#343A40").pack(anchor="w")
         tk.Label(title_f, text="Ultimate V2 High-Vis Edition", font=("Malgun Gothic", 10), bg="#F8F9FA", fg="#868E96").pack(anchor="w")
 
         status_f = tk.Frame(header, bg="#F8F9FA")
         status_f.pack(side="right", padx=30, fill="y")
         tk.Label(status_f, text="현재 상태", font=("Malgun Gothic", 10), bg="#F8F9FA", fg="#868E96").pack(anchor="e")
-        self.lbl_main_status = tk.Label(status_f, text="준비 완료", font=("Malgun Gothic", 20, "bold"), bg="#F8F9FA", fg=self.color_success)
+        self.lbl_main_status = tk.Label(status_f, text="준비 완료", font=("Malgun Gothic", 16, "bold"), bg="#F8F9FA", fg=self.color_success)
         self.lbl_main_status.pack(anchor="e")
 
         # 2. Body
         mid_frame = tk.Frame(self.root, bg=self.color_bg, pady=10)
-        mid_frame.pack(fill="both", expand=True, padx=20)
+        mid_frame.pack(fill="both", expand=True, padx=8)
+
+        self.body_pane = ttk.Panedwindow(mid_frame, orient="horizontal")
+        self.body_pane.pack(fill="both", expand=True)
 
         # --- Left: Settings (Scrollable) ---
-        left_container = tk.Frame(mid_frame, bg=self.color_bg, width=420)
-        left_container.pack(side="left", fill="both", expand=False, padx=(0, 10))
-        left_container.pack_propagate(False) # 고정 너비 유지
+        self.left_container = tk.Frame(self.body_pane, bg=self.color_bg, width=440)
+        self.left_container.pack_propagate(False) # 고정 너비 유지
 
-        canvas = tk.Canvas(left_container, bg=self.color_bg, highlightthickness=0)
-        scrollbar = ttk.Scrollbar(left_container, orient="vertical", command=canvas.yview)
+        canvas = tk.Canvas(self.left_container, bg=self.color_bg, highlightthickness=0)
+        scrollbar = ttk.Scrollbar(self.left_container, orient="vertical", command=canvas.yview)
         scrollable_frame = tk.Frame(canvas, bg=self.color_bg)
 
-        scrollable_frame.bind(
-            "<Configure>",
-            lambda e: canvas.configure(scrollregion=canvas.bbox("all"))
-        )
-
-        canvas.create_window((0, 0), window=scrollable_frame, anchor="nw", width=400)
+        scrollable_frame.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas_window = canvas.create_window((0, 0), window=scrollable_frame, anchor="nw")
+        canvas.bind("<Configure>", lambda e: canvas.itemconfigure(canvas_window, width=max(e.width - 2, 240)))
         canvas.configure(yscrollcommand=scrollbar.set)
 
         canvas.pack(side="left", fill="both", expand=True)
@@ -487,8 +511,11 @@ class FlowVisionApp:
         self.btn_stop.pack(fill="x", pady=10, ipady=5)
 
         # --- Right: Dashboard (HUD Design) ---
-        right_panel = tk.Frame(mid_frame, bg=self.color_bg)
-        right_panel.pack(side="right", fill="both", expand=True)
+        right_panel = tk.Frame(self.body_pane, bg=self.color_bg)
+
+        self.body_pane.add(self.left_container, weight=4)
+        self.body_pane.add(right_panel, weight=6)
+        self.root.after(120, self._init_body_sash)
         
         # 1. Progress Card
         prog_card = ttk.LabelFrame(right_panel, text=" 📊 진행 상황 ", padding=10)
@@ -570,32 +597,37 @@ class FlowVisionApp:
 
         # 3. Bottom
         bottom = tk.Frame(self.root, bg=self.color_bg)
-        bottom.pack(fill="x", expand=False, padx=30, pady=(0, 20))
+        bottom.pack(fill="x", expand=False, padx=20, pady=(0, 16))
         
-        file_f = tk.Frame(bottom, bg=self.color_bg)
-        file_f.pack(fill="x", pady=5)
-        tk.Label(file_f, text="📁 프롬프트 파일 선택:", font=("Malgun Gothic", 11, "bold"), fg=self.color_text).pack(side="left")
+        file_top = tk.Frame(bottom, bg=self.color_bg)
+        file_top.pack(fill="x", pady=5)
+        tk.Label(file_top, text="📁 프롬프트 파일 선택:", font=("Malgun Gothic", 11, "bold"), fg=self.color_text).pack(side="left")
         
         self.slot_var = tk.StringVar()
-        self.combo_slots = ttk.Combobox(file_f, textvariable=self.slot_var, state="readonly", width=15, font=("Malgun Gothic", 10))
+        self.combo_slots = ttk.Combobox(file_top, textvariable=self.slot_var, state="readonly", width=12, font=("Malgun Gothic", 10))
         self.combo_slots.pack(side="left", padx=10)
         self.combo_slots.bind("<<ComboboxSelected>>", self.on_slot_change)
         
         # [NEW] Rename Button
-        ttk.Button(file_f, text="✏️", width=3, command=self.on_rename_slot).pack(side="left", padx=2)
+        ttk.Button(file_top, text="✏️", width=3, command=self.on_rename_slot).pack(side="left", padx=2)
         
         # [NEW] Add Slot Button
-        btn_add = ttk.Button(file_f, text="➕", width=3, command=self.on_add_slot)
+        btn_add = ttk.Button(file_top, text="➕", width=3, command=self.on_add_slot)
         btn_add.pack(side="left", padx=2)
         ToolTip(btn_add, "새로운 프롬프트 슬롯 추가")
 
         # [NEW] Delete Slot Button
-        btn_del = ttk.Button(file_f, text="🗑️", width=3, command=self.on_delete_slot)
+        btn_del = ttk.Button(file_top, text="🗑️", width=3, command=self.on_delete_slot)
         btn_del.pack(side="left", padx=2)
         ToolTip(btn_del, "현재 프롬프트 슬롯 삭제")
-        
-        btn_nav = tk.Frame(file_f, bg=self.color_bg)
-        btn_nav.pack(side="left", padx=20)
+
+        ttk.Button(file_top, text="📂 파일 열기", command=self.on_open_prompts).pack(side="right", padx=5)
+        ttk.Button(file_top, text="🔄 새로고침", command=self.on_reload).pack(side="right")
+
+        file_nav = tk.Frame(bottom, bg=self.color_bg)
+        file_nav.pack(fill="x", pady=(2, 0))
+        btn_nav = tk.Frame(file_nav, bg=self.color_bg)
+        btn_nav.pack(side="left")
         
         # [NEW] First / Prev
         ttk.Button(btn_nav, text="⏮", width=3, command=self.on_first).pack(side="left", padx=1)
@@ -619,12 +651,9 @@ class FlowVisionApp:
         ttk.Button(btn_nav, text="▶", width=3, command=self.on_next).pack(side="left", padx=1)
         ttk.Button(btn_nav, text="⏭", width=3, command=self.on_last).pack(side="left", padx=1)
         
-        ttk.Button(file_f, text="📂 파일 열기", command=self.on_open_prompts).pack(side="right", padx=5)
-        ttk.Button(file_f, text="🔄 새로고침", command=self.on_reload).pack(side="right")
-
         # [NEW] Log & Refresh Buttons
         btn_f = tk.Frame(bottom, bg=self.color_bg)
-        btn_f.pack(fill="x", pady=20)
+        btn_f.pack(fill="x", pady=16)
 
         btn_log = tk.Button(btn_f, text="📜 로그 및 미리보기 창 열기", command=self.log_window.show, 
                             bg="#343A40", fg="#00FF00", font=("Malgun Gothic", 12, "bold"), relief="raised", borderwidth=3)
@@ -697,7 +726,14 @@ class FlowVisionApp:
             
             sep = self.cfg.get("prompts_separator", "|||")
             self.prompts = [p.strip() for p in raw.split(sep) if p.strip()]
-            self.index = 0 if self.index >= len(self.prompts) else self.index
+            if self.prompts:
+                if self.running and self.index >= len(self.prompts):
+                    # 완료 상태(index == len)를 유지해서 자동 재시작을 방지
+                    self.index = len(self.prompts)
+                else:
+                    self.index = min(self.index, len(self.prompts) - 1)
+            else:
+                self.index = 0
             self._update_progress_ui()
             self.log(f"로드 완료 ({len(self.prompts)}개)")
             slots = [s["name"] for s in self.cfg["prompt_slots"]]
@@ -708,11 +744,12 @@ class FlowVisionApp:
     def _update_progress_ui(self):
         total = len(self.prompts)
         current = self.index
-        self.lbl_nav_status.config(text=f"{current + 1} / {total}")
+        shown = 0 if total == 0 else min(current + 1, total)
+        self.lbl_nav_status.config(text=f"{shown} / {total}")
         if total > 0:
-            pct = (current / total) * 100
+            pct = (min(current, total) / total) * 100
             self.progress_var.set(pct)
-            self.lbl_prog_text.config(text=f"{current} / {total} ({pct:.1f}%)")
+            self.lbl_prog_text.config(text=f"{min(current, total)} / {total} ({pct:.1f}%)")
         else:
             self.progress_var.set(0)
             self.lbl_prog_text.config(text="0 / 0 (0%)")
@@ -797,6 +834,10 @@ class FlowVisionApp:
         if not self.prompts:
             messagebox.showwarning("주의", "프롬프트 파일이 비어있습니다!\n먼저 프롬프트를 입력하고 저장을 눌러주세요.")
             return
+        
+        if self.index >= len(self.prompts):
+            self.index = 0
+            self._update_progress_ui()
 
         if self.relay_progress == 0:
             self.session_start_time = datetime.now()
