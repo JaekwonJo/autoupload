@@ -61,10 +61,12 @@ DEFAULT_CONFIG = {
     "add_btn2_area": None,
     "add_btn3_area": None,
     "add_btn4_area": None,
+    "add_btn5_area": None,
     "ref_img1_area": None,
     "ref_img2_area": None,
     "ref_img3_area": None,
-    "ref_img4_area": None
+    "ref_img4_area": None,
+    "ref_img5_area": None
 }
 
 # [TOOLTIP] 친절한 설명서 풍선 기능
@@ -472,13 +474,13 @@ class FlowVisionApp:
         
         tk.Label(img_op_f, text="개수:", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left", padx=(10, 2))
         self.ref_count_var = tk.IntVar(value=self.cfg.get("ref_image_count", 1))
-        tk.Spinbox(img_op_f, from_=1, to=4, width=2, textvariable=self.ref_count_var, command=self.on_option_toggle).pack(side="left")
+        tk.Spinbox(img_op_f, from_=1, to=5, width=2, textvariable=self.ref_count_var, command=self.on_option_toggle).pack(side="left")
 
         img_btn_f = tk.Frame(img_card, bg=self.color_bg)
         img_btn_f.pack(fill="x", pady=5)
         
-        # 4개의 행으로 구성된 지정 버튼들
-        for i in range(1, 5):
+        # 5개의 행으로 구성된 지정 버튼들
+        for i in range(1, 6):
             tk.Label(img_btn_f, text=f"Set {i}:", font=("Consolas", 8, "bold"), bg=self.color_bg).grid(row=i-1, column=0, padx=2)
             ttk.Button(img_btn_f, text=f"➕{i} 지정", width=8, command=lambda x=i: self.start_capture(f"add_btn{x}")).grid(row=i-1, column=1, padx=2, pady=1)
             ttk.Button(img_btn_f, text=f"🖼️{i} 지정", width=8, command=lambda x=i: self.start_capture(f"ref_img{x}")).grid(row=i-1, column=2, padx=2, pady=1)
@@ -670,7 +672,7 @@ class FlowVisionApp:
         self.cfg["language_mode"] = "ko_en" if self.lang_var.get() else "en"
         self.cfg["input_mode"] = self.input_mode_var.get()
         self.cfg["use_ref_images"] = self.use_ref_var.get()
-        try: self.cfg["ref_image_count"] = int(self.ref_count_var.get())
+        try: self.cfg["ref_image_count"] = max(1, min(5, int(self.ref_count_var.get())))
         except: self.cfg["ref_image_count"] = 1
         try: self.cfg["relay_count"] = int(self.relay_cnt_var.get())
         except: self.cfg["relay_count"] = 1
@@ -686,7 +688,7 @@ class FlowVisionApp:
     def _get_img_coord_text(self):
         c = self.cfg
         res = []
-        for i in range(1, 5):
+        for i in range(1, 6):
             btn = "✅" if c.get(f"add_btn{i}_area") else "❌"
             img = "✅" if c.get(f"ref_img{i}_area") else "❌"
             res.append(f"{i}[{btn}/{img}]")
@@ -964,7 +966,10 @@ class FlowVisionApp:
             
             # [ORDER CHANGE] 1. 레퍼런스 이미지 먼저 첨부 (텍스트 입력 전이 가장 안정적)
             if self.cfg.get("use_ref_images"):
-                count = self.cfg.get("ref_image_count", 1)
+                try:
+                    count = max(1, min(5, int(self.cfg.get("ref_image_count", 1))))
+                except:
+                    count = 1
                 for i in range(1, count + 1):
                     add_btn = self.cfg.get(f"add_btn{i}_area")
                     img_area = self.cfg.get(f"ref_img{i}_area")

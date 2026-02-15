@@ -1,51 +1,27 @@
-S1 : <2D Shinkai Makoto anime style> A male office worker based on reference images looking shocked in a dark room, his face illuminated by a bright smartphone screen showing (korean)"결제예정금액 3,000,000원", ethereal lens flare. [한국어 의미: 300만 원 카드값을 확인하고 충격에 빠진 민준] [참조 이미지 선택: 민준]
+S1 : <2D Shinkai Makoto anime style> A male office worker based on reference images looking shocked in a dark room, his face illuminated by a bright smartphone screen showing (korean)"결제예정금액 3,000,000원", ethereal lens flare. |||
+S2 : <2D Shinkai Makoto anime style> Close-up of a smartphone screen showing a bank balance of (korean)"1,830,000원", high-detailed digital UI with realistic glass reflections and soft bokeh, cinematic lighting. |||
+S3 : <2D Shinkai Makoto anime style> A male office worker based on reference images staring at a 'Revolving' toggle switch on a finance app, hesitating finger, warm evening sunbeams with dancing dust motes. |||
+S4 : <2D Shinkai Makoto anime style> Close-up of a finger tapping the (korean)"승인" button on a screen, sparkling digital light effects spreading from the touch point, nostalgic atmosphere. |||
+S5 : <2D Shinkai Makoto anime style> A male office worker based on reference images sleeping peacefully in a dark bedroom, brilliant moonlight streaming through the window, deep blue color palette. |||
+S6 : <2D Shinkai Makoto anime style> A breathtaking time-lapse landscape of a city sky changing from sunset to a starry night, iconic Shinkai-style clouds, representing the passage of one month. |||
+S7 : <2D Shinkai Makoto anime style> A male office worker based on reference images looking at a new digital statement showing (korean)"이용잔액 2,780,000원", eyes wide with trembling pupils, dramatic shadows. |||
+S8 : <2D Shinkai Makoto anime style> Close-up of a smartphone screen highlighting (korean)"수수료 480,000원" in sharp red font, blurred background with emotional lens flare. |||
+S9 : <2D Shinkai Makoto anime style> A male office worker based on reference images dejectedly pressing the (korean)"최소결제" button on his phone, glowing screen reflected in his glistening, teary eyes. |||
+S10 : <2D Shinkai Makoto anime style> A vast city landscape at twilight with thousands of twinkling lights, symbolizing the cold and busy world, high-detailed aesthetic. |||
+S11 : <2D Shinkai Makoto anime style> A vibrant convenience store at night, neon signs reflected in rain puddles on the pavement, lonely urban atmosphere, deep contrast. |||
+S12 : <2D Shinkai Makoto anime style> Close-up of a card reader displaying (korean)"한도초과", sharp digital text, cold blue cinematic lighting. |||
+S13 : <2D Shinkai Makoto anime style> A male office worker based on reference images at a counter, his face turning red with embarrassment, beads of sweat, soft cinematic focus. |||
+S14 : <2D Shinkai Makoto anime style> A POV shot of people in a queue looking at the protagonist, blurred silhouettes with expressive and judgmental eyes, social pressure. |||
+S15 : <2D Shinkai Makoto anime style> A smartphone screen showing (korean)"이용한도 0원" and (korean)"리볼빙 잔액 4,120,000원", sharp digital text, heavy atmospheric lighting. |||
+S16 : <2D Shinkai Makoto anime style> A male office worker based on reference images on a phone call with a desperate expression, pacing in a small room filled with long, sharp evening shadows. |||
+S17 : <2D Shinkai Makoto anime style> Close-up of a smartphone screen showing (korean)"전환 불가능 (한도초과)", blurred reflection of a devastated male face on the glass. |||
+S18 : <2D Shinkai Makoto anime style> A male office worker based on reference images lying on a bed in a dark room, staring blankly at the ceiling, lit only by the cold blue light of a smartphone. |||
+S19 : <2D Shinkai Makoto anime style> A dramatic smartphone notification pop-up: (korean)"최소결제금액 890,000원 납부일 3일전", intense lighting contrast against a dark background. |||
+S20 : <2D Shinkai Makoto anime style> A male office worker based on reference images searching for (korean)"급전 대출" on a computer at 2 AM, monitor glow illuminating his tired face and messy hair. |||
+S21 : <2D Shinkai Makoto anime style> Close-up of a loan approval screen with (korean)"금리 연 19.9%" and (korean)"승인 완료", digital sparks and an ominous yet beautiful digital glow. |||
+S22 : <2D Shinkai Makoto anime style> A male office worker based on reference images sleeping fitfully while clutching his smartphone, a heavy atmosphere despite the beautiful morning light through the curtains. |||
+S23 : <2D Shinkai Makoto anime style> A series of floating notification bubbles in a dark space like bubbles in water: (korean)"카드A: 92만원", (korean)"카드B: 43만원", (korean)"대출: 27만원", emotional visualization. |||
+S24 : <2D Shinkai Makoto anime style> A trembling hand of a male office worker based on reference images reaching for a white envelope in a metallic mail slot, warm afternoon sunbeams and floating dust motes. |||
+S25 : <2D Shinkai Makoto anime style> Close-up of an official letter showing (korean)"연체 1회 발생" and (korean)"신용등급 하락", cold blue shadows, sense of a world falling apart in silence. |||
 
-|||
 
-S2 : <2D Shinkai Makoto anime style> Close-up of a smartphone screen showing a bank balance of (korean)"1,830,000원", high-detailed digital UI with realistic glass reflections and soft bokeh. [한국어 의미: 183만 원뿐인 통장 잔액이 찍힌 스마트폰 화면 클로즈업] [인물 없음]
-|||
-S3 : <2D Shinkai Makoto anime style> A male office worker based on reference images staring at a 'Revolving' toggle switch on a finance app, hesitating finger, warm evening sunbeams with dancing dust motes. [한국어 의미: 리볼빙 스위치를 켤지 말지 고민하며 망설이는 민준의 손가락] [참조 이미지 선택: 민준]
-|||
-S4 : <2D Shinkai Makoto anime style> Close-up of a finger tapping the (korean)"승인" button on a screen, sparkling digital light effects spreading from the touch point, nostalgic atmosphere. [한국어 의미: 리볼빙 승인 버튼을 누르는 순간 터져 나오는 감성적인 빛 효과] [인물 없음]
-|||
-S5 : <2D Shinkai Makoto anime style> A male office worker based on reference images sleeping peacefully in a dark bedroom, brilliant moonlight streaming through the window, deep blue color palette. [한국어 의미: 결제 고민 해결 후 달빛 아래서 평온하게 잠든 민준] [참조 이미지 선택: 민준]
-|||
-S6 : <2D Shinkai Makoto anime style> A breathtaking time-lapse landscape of a city sky changing from sunset to a starry night, iconic Shinkai-style clouds, representing the passage of one month. [한국어 의미: 노을에서 별밤으로 변하며 한 달의 시간이 흘러감을 보여주는 도시 하늘] [인물 없음]
-|||
-S7 : <2D Shinkai Makoto anime style> A male office worker based on reference images looking at a new digital statement on his phone, eyes wide with trembling pupils, dramatic shadows across his face. [한국어 의미: 두 번째 달 명세서를 보고 공포에 질린 민준의 떨리는 눈동자] [참조 이미지 선택: 민준]
-|||
-S8 : <2D Shinkai Makoto anime style> Close-up of a smartphone screen highlighting (korean)"수수료 480,000원" in sharp red font, blurred background with emotional lens flare. [한국어 의미: 48만 원의 수수료가 붉게 찍힌 명세서 화면 클로즈업] [인물 없음]
-|||
-S9 : <2D Shinkai Makoto anime style> A male office worker based on reference images dejectedly pressing the (korean)"최소결제" button on his phone, glowing screen reflected in his glistening eyes. [한국어 의미: 좌절하며 다시 최소결제 버튼을 누르는 민준의 눈에 맺힌 눈물] [참조 이미지 선택: 민준]
-|||
-S10 : <2D Shinkai Makoto anime style> A vibrant convenience store at night, neon signs reflected in rain puddles on the pavement, lonely urban atmosphere, high detail. [한국어 의미: 빗물에 네온사인이 반사되는 고독한 분위기의 밤 편의점 전경] [인물 없음]
-|||
-S11 : <2D Shinkai Makoto anime style> A male office worker based on reference images at a counter, card reader displaying (korean)"한도초과", his face turning red with embarrassment, soft cinematic focus. [한국어 의미: 편의점 계산대에서 한도 초과 메시지를 보고 얼굴이 붉어진 민준] [참조 이미지 선택: 민준]
-|||
-S12 : <2D Shinkai Makoto anime style> A POV shot of people in a queue looking at the protagonist, blurred silhouettes with expressive eyes, feeling of social pressure and anxiety. [한국어 의미: 줄 서 있는 사람들의 차가운 시선이 민준을 향하는 1인칭 시점] [인물 없음]
-|||
-S13 : <2D Shinkai Makoto anime style> A male office worker based on reference images walking home under a single brilliant streetlight, a long lonely silhouette on the wet ground, vast starry sky. [한국어 의미: 가로등 불빛 아래 홀로 귀가하는 민준의 길게 늘어진 그림자] [참조 이미지 선택: 민준]
-|||
-S14 : <2D Shinkai Makoto anime style> A smartphone screen showing (korean)"이용한도 0원" and (korean)"리볼빙 잔액 4,120,000원", sharp digital text, cold and heavy atmospheric lighting. [한국어 의미: 한도 0원과 리볼빙 잔액 412만 원이 찍힌 차가운 앱 화면] [인물 없음]
-|||
-S15 : <2D Shinkai Makoto anime style> A male office worker based on reference images on a phone call with a desperate expression, pacing in a small room filled with long evening shadows. [한국어 의미: 절박한 표정으로 고객센터에 전화를 걸며 방 안을 서성이는 민준] [참조 이미지 선택: 민준]
-|||
-S16 : <2D Shinkai Makoto anime style> Close up of a smartphone screen showing (korean)"전환 불가능", blurred silhouette of a male office worker based on reference images in the background, moody lighting. [한국어 의미: 할부 전환 불가능 문구가 뜬 화면과 배경에 흐릿하게 보이는 절망한 민준] [참조 이미지 선택: 민준]
-|||
-S17 : <2D Shinkai Makoto anime style> A male office worker based on reference images lying on a bed in a dark room, staring blankly at the ceiling, lit only by the cold blue light of a smartphone. [한국어 의미: 침대에 누워 스마트폰의 차가운 푸른 빛만 응시하는 민준의 허망한 눈빛] [참조 이미지 선택: 민준]
-|||
-S18 : <2D Shinkai Makoto anime style> A dramatic smartphone notification pop-up: (korean)"최소결제금액 890,000원", intense lighting contrast against a dark background. [한국어 의미: 어둠 속에서 번뜩이는 89만 원 결제 독촉 알림 팝업] [인물 없음]
-|||
-S19 : <2D Shinkai Makoto anime style> A symbolic scene of a small snowball turning into a giant icy boulder rolling down a hill, beautiful but terrifying snowy landscape, hyper-detailed. [한국어 의미: 눈덩이가 거대해져 굴러떨어지는 비유적 표현, 아름답고도 무서운 설경] [인물 없음]
-|||
-S20 : <2D Shinkai Makoto anime style> A male office worker based on reference images searching for (korean)"급전 대출" on a computer at 2 AM, monitor glow illuminating his tired face, dust motes in the light. [한국어 의미: 새벽 2시, 모니터 불빛에 의지해 대출을 검색하는 수척해진 민준] [참조 이미지 선택: 민준]
-|||
-S21 : <2D Shinkai Makoto anime style> Close-up of a loan approval screen with (korean)"금리 연 19.9%" and (korean)"승인 완료", digital sparks and an ominous feel. [한국어 의미: 19.9% 고금리 대출 승인 문구가 뜬 불길하고 화려한 화면] [인물 없음]
-|||
-S22 : <2D Shinkai Makoto anime style> A male office worker based on reference images sleeping fitfully while clutching his smartphone, heavy and suffocating atmosphere despite beautiful morning light. [한국어 의미: 아침 햇살이 비치지만 폰을 꼭 쥔 채 괴롭게 잠든 민준의 전신] [참조 이미지 선택: 민준]
-|||
-S23 : <2D Shinkai Makoto anime style> A series of floating notification bubbles in a dark space: (korean)"카드A: 92만원", (korean)"카드B: 43만원", (korean)"대출: 27만원", emotional visualization. [한국어 의미: 각종 카드값과 상환금 알림들이 공중에 떠올라 민준을 압박하는 모습] [인물 없음]
-|||
-S24 : <2D Shinkai Makoto anime style> A trembling hand of a male office worker based on reference images reaching for a white envelope in a mail slot, warm afternoon sunbeams and floating dust. [한국어 의미: 역광이 비치는 우편함에서 하얀 봉투를 꺼내는 민준의 떨리는 손] [참조 이미지 선택: 민준]
-|||
-S25 : <2D Shinkai Makoto anime style> Close-up of an official letter showing (korean)"신용등급 하락" and (korean)"연체 통보", cold blue shadows, sense of a world falling apart. [한국어 의미: '신용등급 하락' 문구가 선명한 우편물과 차갑게 가라앉은 분위기] [인물 없음]

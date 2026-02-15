@@ -1,153 +1,59 @@
+S1 : <2D Shinkai Makoto anime style> A close-up of an acoustic guitar and a grand piano in a cozy room, frost patterns on the window glass, warm indoor lighting contrasting with the blue winter dawn outside. |||
 
-S1 Prompt
-3d pixar studio style. Sepia tone, vintage film look. inside a dark secret room. A cute chubby fox wearing a white lab coat stands nervously. A cute chubby fox wearing a black business suit hands over a heavy bag filled with paper bills labelled "$" to the fox in lab coat. The lab coat fox receives it with shaking hands. Secret deal atmosphere. high fidelity cinematic sound effects, foley, ambience, heavy bag thud, whisper, no voice, no speech. kawaii style. |||
-S2 Prompt
-3d pixar studio style. A cute chubby golden-brown hamster wearing a red hoodie tries to run forward on a dark road. But a magical glowing golden rope is tied to its waist, pulling it backward. The hamster runs hard but stays in the same spot due to the magical rope. Struggle atmosphere. high fidelity cinematic sound effects, foley, ambience, rope tension sound, panting, no voice, no speech. kawaii style. |||
-S3 Prompt
-3d pixar studio style. A cute chubby golden-brown hamster wearing a red hoodie stands in a dark void. Glowing magical mathematical formulas and numbers magically float around him. The formulas suddenly magically morph into a glowing electric cage, trapping the hamster inside. Sci-fi horror atmosphere. high fidelity cinematic sound effects, foley, ambience, digital electric hum, cage lock sound, no voice, no speech. kawaii style. |||
-S4 Prompt
-3d pixar studio style. A cute chubby golden-brown hamster wearing a red hoodie holds a coin labelled "$". A bright beam of holy light shines down from the sky as if to heal him, but the light magically vaporizes the coin into smoke, leaving the hamster's hand empty. Magical disappearance VFX. high fidelity cinematic sound effects, foley, ambience, magical zap, smoke poof, no voice, no speech. kawaii style. |||
-S5 Prompt
-3d pixar studio style. Three cute chubby foxes wearing black business suits sit at a round table, toasting with wine glasses. The camera pans down to their shadows on the floor. The shadows are not foxes, but gigantic scary monsters with sharp teeth, looming large. Ominous atmosphere. high fidelity cinematic sound effects, foley, ambience, glass clink, monster growl, no voice, no speech. kawaii style. |||
-S6 Prompt
-3d pixar studio style. Camera pans magically from left to right. The left side shows a bright supermarket shelf with colorful juice bottles. As the camera moves to the right, the scene magically transitions to a dark horror version where the bottles turn into poison jars labelled with "SKULL" icons. Magical reveal transition. high fidelity cinematic sound effects, foley, ambience, magical whoosh, horror drone sound, no voice, no speech. |||
-S7 Prompt
-3d pixar studio style. Sepia tone. A cute chubby white bear wearing a formal suit stands at a podium with a US flag background. Suddenly, the bear clutches his chest in pain and freezes like a statue, while the camera shakes violently to simulate the shock. Dramatic impact. high fidelity cinematic sound effects, foley, ambience, heartbeat sound, thud, no voice, no speech. kawaii style. |||
-S8 Prompt
-3d pixar studio style. Sepia tone. A crowd of cute chubby golden-brown hamsters wearing red hoodies walking on a street. One by one, they magically turn into piles of grey dust and scatter in the wind. Disintegration VFX. Apocalyptic atmosphere. high fidelity cinematic sound effects, foley, ambience, wind blowing, disintegration sound, no voice, no speech. kawaii style. |||
-S9 Prompt
-3d pixar studio style. In a dark interrogation room. A bright spotlight turns on, revealing a shiny white crystal labelled "SUGAR". Another spotlight turns on, revealing a yellow wobbly liquid blob labelled "FAT". High contrast noir lighting. high fidelity cinematic sound effects, foley, ambience, light switch click, hum, no voice, no speech. |||
-S10 Prompt
-3d pixar studio style. Two cute chubby foxes wearing white lab coats are arguing intensely pointing fingers. Behind them, a gigantic shadow of a fox wearing a suit looms over the wall, watching them with glowing red eyes. Creepy surveillance atmosphere. high fidelity cinematic sound effects, foley, ambience, argument murmur, ominous bass, no voice, no speech. kawaii style. |||
-S11 Prompt
-3d pixar studio style. A magnificent castle made entirely of white sugar cubes stands tall. Suddenly, the walls start to crack, and the entire castle magically crumbles into fine white powder, collapsing completely. Destruction VFX. high fidelity cinematic sound effects, foley, ambience, crumbling sound, sand slide, no voice, no speech. |||
-S12 Prompt
-3d pixar studio style. A cute chubby fox wearing a black business suit stamps a red seal on a document. As soon as the seal touches the paper, thick black smoke magically erupts from the document, filling the screen. Magical darkness. high fidelity cinematic sound effects, foley, ambience, stamp thud, smoke hiss, no voice, no speech. kawaii style. |||
-S13 Prompt
+S2 : <2D Shinkai Makoto anime style> A wide shot of a peaceful village covered in deep white snow at dawn, soft blue shadows and amber lights glowing from windows. |||
 
-3d pixar studio style. A cute chubby fox wearing a black business suit opens his mouth to speak. Instead of words, a magical green smoke shaped like a snake comes out of his mouth and floats towards a fox wearing a white lab coat, tempting him. Magical smoke VFX. high fidelity cinematic sound effects, foley, ambience, snake hiss, magical whisper, no voice, no speech. kawaii style. |||
-S14 Prompt
-3d pixar studio style. A yellow liquid blob labelled "FAT" sits on a table. A magical black sludge falls from the ceiling, covering the yellow blob completely, turning it into a dirty, dark, ugly lump. Magical corruption VFX. high fidelity cinematic sound effects, foley, ambience, sludge splat, sizzling sound, no voice, no speech. |||
-S15 Prompt
-3d pixar studio style. Sepia tone. Extreme close-up. A cute chubby fox hand wearing a black suit sleeve places a stack of paper bills labelled "$" into a cute chubby fox hand wearing a white lab coat sleeve. Secret bribery. high fidelity cinematic sound effects, foley, ambience, paper rustle, no voice, no speech. kawaii style. |||
-S16 Prompt
-3d pixar studio style. A castle made of white sugar cubes. A transparent golden magical force field dome magically forms around the castle, enclosing it completely. The shield glows with a protective aura. Magical defense VFX. high fidelity cinematic sound effects, foley, ambience, shield hum, energy barrier sound, no voice, no speech. |||
-S17 Prompt
-3d pixar studio style. A heavy thick book labelled "NEJM" falls from the sky and hits the ground with a massive earth-shaking impact, creating a shockwave that blows away nearby papers. Blockbuster scale impact. high fidelity cinematic sound effects, foley, ambience, heavy boom, wind whoosh, no voice, no speech. |||
-S18 Prompt
-3d pixar studio style. A crowd of cute chubby golden-brown hamsters wearing red hoodies shoot magical blue energy beams from their hands at a giant yellow liquid monster labelled "FAT". The monster is hit and magically dissolves into nothingness. Battle victory. high fidelity cinematic sound effects, foley, ambience, laser zap, dissolving sound, no voice, no speech. kawaii style. |||
-S19 Prompt
-3d pixar studio style. A cute chubby fox wearing a wizard hat waves a wand at a glass bottle containing yellow liquid. The yellow liquid magically flies out of the bottle, and white sparkling powder magically fills the bottle instantly. The bottle label changes to "HEALTHY". Magical alchemy. high fidelity cinematic sound effects, foley, ambience, magic chime, liquid splash, no voice, no speech. kawaii style. |||
-S20 Prompt
-3d pixar studio style. A cute chubby golden-brown hamster wearing a red hoodie sits on the floor eating a white donut. Suddenly, with a 'poof' sound, his body instantly magically transforms, becoming extremely round and heavy like a giant ball, unable to move. Magical body transformation. high fidelity cinematic sound effects, foley, ambience, poof sound, balloon stretch sound, no voice, no speech. kawaii style. |||
- S21 Prompt
-3d pixar studio style. A group of cute chubby golden-brown hamsters wearing red hoodies lying on hospital beds in a row. They look very sick, heavy, and sweaty. Green magical sick fumes float around them. Gloomy atmosphere. high fidelity cinematic sound effects, foley, ambience, coughing sound, monitor beep, no voice, no speech. kawaii style. |||
-S22 Prompt
-3d pixar studio style. A heavy ancient medical book labelled "JAMA" lies in the dark. It opens by itself, and blindingly bright golden light beams shoot out from the pages, illuminating the darkness. Mystery revelation. high fidelity cinematic sound effects, foley, ambience, page turning, magical hum, no voice, no speech. |||
-S23 Prompt
-3d pixar studio style. A cute chubby golden-brown hamster wearing a red hoodie sitting in front of a mountain of colorful donuts and candies. The hamster is stuffing food into its mouth uncontrollably and frantically. Fast motion effect. Gluttony atmosphere. high fidelity cinematic sound effects, foley, ambience, eating sound, fast munching, no voice, no speech. kawaii style. |||
-S24 Prompt
-3d pixar studio style. A shiny colorful candy sits on the dark floor. A glowing red magical warning circle pulses around the candy. A cute chubby golden-brown hamster wearing a red hoodie walks towards it with swirling hypnotic eyes, ignoring the danger. high fidelity cinematic sound effects, foley, ambience, magical pulse, hypnotic hum, no voice, no speech. kawaii style. |||
-S25 Prompt
+S3 : <2D Shinkai Makoto anime style> Character 2 (based on reference images) wearing a thick scarf, walking through a snowy, grey city street at night, visible white breath in the cold air. |||
 
-3d pixar studio style. A cute chubby fox wearing a white lab coat mixes three floating magical liquid blobs labelled "SALT", "SUGAR", and "FAT". When they touch, a massive beautiful rainbow-colored explosion of sparkles bursts out. Magical alchemy. high fidelity cinematic sound effects, foley, ambience, liquid bubble, explosion boom, no voice, no speech. kawaii style. |||
-S26 Prompt
+S4 : <2D Shinkai Makoto anime style> Character 2 (based on reference images) standing under a streetlamp as heavy snowflakes fall, looking at a frozen crossroad, feeling isolated. |||
 
-3d pixar studio style. Extreme close-up of a semi-transparent silhouette of a hamster head. Inside the brain area, colorful magical fireworks are exploding continuously, symbolizing intense pleasure. Dark background. high fidelity cinematic sound effects, foley, ambience, fireworks popping, fizzing sound, no voice, no speech. |||
-S27 Prompt
+S5 : <2D Shinkai Makoto anime style> Character 1 (based on reference images) appearing with a thick winter coat, holding a glowing brass lantern that casts a warm orange glow on the surrounding snow. |||
 
-3d pixar studio style. A delicious warm bowl of noodles steaming with golden mist. Fast time-lapse effect. The food magically loses color and morphs into a cold, hard grey stone block instantly. Disappointment. high fidelity cinematic sound effects, foley, ambience, steam hiss, stone thud, no voice, no speech. |||
-S28 Prompt
+S6 : <2D Shinkai Makoto anime style> Character 1 and Character 2 (based on reference images) sitting on a snow-covered bench, shared warmth, Character 1 pointing to the brilliant winter stars. |||
 
-3d pixar studio style. A stone tablet labelled "LAW" floating in the air. A glowing red cola bottle flies rapidly and smashes the tablet into pieces with a loud crash. Debris flying. high fidelity cinematic sound effects, foley, ambience, glass breaking, stone crumble, no voice, no speech. |||
-S29 Prompt
+S7 : <2D Shinkai Makoto anime style> Silhouettes of many people holding lanterns, walking across a vast snowy field, creating a trail of warm light against the dark blue snow. |||
 
-3d pixar studio style. A cute chubby golden-brown hamster wearing a red hoodie with open mouth. A stream of colorful donuts magically levitates and flies continuously straight into the hamster's mouth. Infinite loop consumption. high fidelity cinematic sound effects, foley, ambience, whoosh, gulping sound, no voice, no speech. kawaii style. |||
-S30 Prompt
+S8 : <2D Shinkai Makoto anime style> A magical winter forest where frosted trees sparkle like diamonds, new green sprouts bravely pushing through the snow where they walk. |||
 
-3d pixar studio style. Top-down view of a dark maze. A glowing neon arrow appears on the floor, guiding a cute chubby golden-brown hamster wearing a red hoodie. A giant cute chubby fox wearing a suit watches from above. high fidelity cinematic sound effects, foley, ambience, neon hum, footsteps, no voice, no speech. kawaii style. |||
-S31 Prompt
+S9 : <2D Shinkai Makoto anime style> Character 1 and Character 2 (based on reference images) walking through a crystalline frozen forest as the first morning light hits the icicles. |||
 
-3d pixar studio style. A red apple sits on a table. A price tag labelled "$100" pops up. A cute chubby golden-brown hamster wearing a red hoodie instantly magically swaps the apple for a green pear with a poof effect. Smart choice. high fidelity cinematic sound effects, foley, ambience, magical poof, swap sound, no voice, no speech. kawaii style. |||
-S32 Prompt
+S10 : <2D Shinkai Makoto anime style> A breathtaking shot of a golden sun rising over a magnificent snowy mountain range, orange light reflecting off the white peaks. |||
 
-3d pixar studio style. A cute chubby golden-brown hamster wearing a red hoodie holding a red cola can. The cola can magically grows into a gigantic size, lifting the hamster high up into the air. The hamster holds onto the giant can tightly and does not let go. high fidelity cinematic sound effects, foley, ambience, growing sound, wind blowing, no voice, no speech. kawaii style. |||
-S33 Prompt
+S11 : <2D Shinkai Makoto anime style> Character 1 and Character 2 (based on reference images) on a small wooden boat, navigating a calm river surrounded by snow-covered banks and drifting ice. |||
 
-3d pixar studio style. A cute chubby golden-brown hamster wearing a red hoodie tries to walk away from a glowing red cola can. But a strong magical magnetic force pulls the hamster backwards, sliding its feet on the ground back to the cola. Struggle against attraction. high fidelity cinematic sound effects, foley, ambience, magnetic hum, sliding sound, no voice, no speech. kawaii style. |||
-S34 Prompt
+S12 : <2D Shinkai Makoto anime style> The boat reaching a wide, snowy plain that begins to melt into a golden meadow under the rising sun. |||
 
-3d pixar studio style. A cute chubby fox wearing a black business suit sitting comfortably on a sofa. Around the fox, many cute chubby golden-brown hamsters wearing red hoodies are happily drinking red cola cans. The fox smiles slyly. high fidelity cinematic sound effects, foley, ambience, drinking slurps, relaxed sigh, no voice, no speech. kawaii style. |||
-S35 Prompt
+S13 : <2D Shinkai Makoto anime style> A cinematic winter sky with a traditional banner labelled "새해 복 많이 받으세요" floating amidst gently falling snow. |||
 
-3d pixar studio style. Camera pans magically from left to right. The left side shows a cute chubby fox wearing a suit sitting on a pile of gold coins. As the camera moves right, the scene changes to a hospital room where a cute chubby golden-brown hamster wearing a red hoodie lies sick in bed. Contrast. high fidelity cinematic sound effects, foley, ambience, coin clinking, hospital monitor beep, no voice, no speech. kawaii style. |||
-S36 Prompt
+S14 : <2D Shinkai Makoto anime style> A time-lapse of a modern winter city, neon signs reflecting on icy pavements, blurred lights of cars in the snow. |||
 
-3d pixar studio style. Dark stormy sky. A gigantic glowing silver sword descends from the clouds, aiming at a pile of white sugar sacks on the ground. Epic blockbuster scale. Ominous atmosphere. high fidelity cinematic sound effects, foley, ambience, thunder, sword resonance, no voice, no speech. |||
-S37 Prompt
+S15 : <2D Shinkai Makoto anime style> Character 1 and Character 2 (based on reference images) standing still in a thick winter crowd, looking calm and connected. |||
 
-3d pixar studio style. A magical parchment scroll labelled "BILL" magically floats in the air inside a grand hall. Golden magical dust falls from the scroll like rain. Majestic atmosphere. high fidelity cinematic sound effects, foley, ambience, magical glitter sound, paper unrolling, no voice, no speech. |||
-S38 Prompt
+S16 : <2D Shinkai Makoto anime style> A close-up of Character 1's gloved hand holding Character 2's gloved hand (based on reference images), a sense of firm support. |||
 
-3d pixar studio style. Many glass bottles floating in the air. A magical red stamp labelled "TAX" flies around and stamps each bottle with a bang. Every time a bottle is stamped, it becomes heavy and drops down quickly. Weight visualization. high fidelity cinematic sound effects, foley, ambience, stamping thud, glass clink, no voice, no speech. |||
-S39 Prompt
+S17 : <2D Shinkai Makoto anime style> Character 1 and Character 2 (based on reference images) walking down a nostalgic road lined with snow-laden pine trees, golden sunlight filtering through. |||
 
-3d pixar studio style. A factory chimney releasing black smoke. A magical golden net falls from the sky covering the smoke. The black smoke magically transforms into beautiful white glowing butterflies flying away. Magical purification. high fidelity cinematic sound effects, foley, ambience, magic sparkle, wing flap, no voice, no speech. |||
-S40 Prompt
+S18 : <2D Shinkai Makoto anime style> Glowing memory frames floating in the cold winter air, showing warm moments of their journey together. |||
 
-3d pixar studio style. Black sludge and trash piling up high next to a factory. The pile grows continuously. The sky gets darker and filled with thick grey smog, choking the atmosphere. Gloomy and dirty environment. high fidelity cinematic sound effects, foley, ambience, sludge splat, wind howling, no voice, no speech. |||
-S41 Prompt
+S19 : <2D Shinkai Makoto anime style> Character 1 and Character 2 (based on reference images) looking into each other's eyes, their faces flushed slightly from the cold, filled with trust. |||
 
-3d pixar studio style. heavy black rain pouring down in a gloomy factory background. A cute chubby fox wearing a black business suit stands confidently under a magical glowing golden force field umbrella. The black rain bounces off the shield, keeping the fox perfectly dry and clean. Contrast between dirty rain and shiny shield. high fidelity cinematic sound effects, foley, ambience, rain pouring sound, magical shield hum, no voice, no speech. kawaii style. |||
-S42 Prompt
+S20 : <2D Shinkai Makoto anime style> Making a pinky promise under a giant frosted tree, their breath mingling in the air, white petals and snow falling together. |||
 
-3d pixar studio style. Extreme close-up of a single white sugar cube sitting on a table. The sugar cube suddenly dissolves and magically morphs into a dark ominous skull-shaped smoke cloud, rising into the air. Magical transformation VFX. high fidelity cinematic sound effects, foley, ambience, hissing sound, spooky drone, no voice, no speech. |||
-S43 Prompt
+S21 : <2D Shinkai Makoto anime style> Musical notes made of glowing ice crystals flowing like a river through a silent, snowy valley. |||
 
-3d pixar studio style. A gigantic golden ceramic pot labelled "FUND" stands in the dark. Large cracks magically appear on the surface of the pot. Golden coins labelled "$" magically pour out like water from the cracks, wasting away on the floor. Leaking effect. high fidelity cinematic sound effects, foley, ambience, cracking sound, coin spilling, no voice, no speech. |||
-S44 Prompt
+S22 : <2D Shinkai Makoto anime style> A wide shot of a winter valley at sunset, the snow turning pink and purple under the fading light. |||
 
-3d pixar studio style. Low angle shot looking up at a majestic white marble statue of a goddess holding a scale. The statue glows with blinding holy golden light, looking perfect and solid. Angelic atmosphere. high fidelity cinematic sound effects, foley, ambience, choir music, magical shine, no voice, no speech. |||
-S45 Prompt
+S23 : <2D Shinkai Makoto anime style> A silver harmonica resting on a wooden porch covered in light snow, catching the last amber rays of the sun. |||
 
-3d pixar studio style. The majestic marble statue from the previous scene suddenly magically crumbles into dry sand and dust, collapsing completely to the ground. The golden light turns off instantly, leaving only a pile of sand. Disillusionment. high fidelity cinematic sound effects, foley, ambience, crumbling sound, sand slide, no voice, no speech. |||
-S46 Prompt
+S24 : <2D Shinkai Makoto anime style> A majestic, brilliant golden sun standing high over a pristine, untouched white landscape. |||
 
-3d pixar studio style. A glowing red ball labelled "TAX" flies rapidly towards a cute chubby fox wearing a black business suit. The fox smiles and generates a transparent blue magical barrier. The red ball hits the barrier and bounces back with double speed towards the camera. Magical reflection. high fidelity cinematic sound effects, foley, ambience, magic ping, whoosh, no voice, no speech. kawaii style. |||
-S47 Prompt
+S25 : <2D Shinkai Makoto anime style> A vast field of winter wheat or frozen tall grass swaying under a clear, crisp winter sky. |||
 
-3d pixar studio style. A cute chubby fox wearing a black business suit uses magic to levitate a heavy black bomb labelled "TAX". The bomb flies through the air and lands heavily into the hands of a surprised cute chubby golden-brown hamster wearing a red hoodie. Transfer of burden. high fidelity cinematic sound effects, foley, ambience, magic hum, heavy thud, no voice, no speech. kawaii style. |||
-S48 Prompt
+S26 : <2D Shinkai Makoto anime style> Character 1 and Character 2 (based on reference images) running joyfully toward a horizon where the snow ends and a golden spring begins. |||
 
-3d pixar studio style. A cute chubby golden-brown hamster wearing a red hoodie holding a black bomb labelled "TAX". The bomb magically grows into a gigantic size, becoming heavier. The hamster is crushed by the weight and sinks into the magical quicksand floor, disappearing slowly. high fidelity cinematic sound effects, foley, ambience, growing sound, sinking squish, no voice, no speech. kawaii style. |||
-S49 Prompt
+S27 : <2D Shinkai Makoto anime style> Colorful New Year fireworks exploding over a snow-covered town, reflecting in the characters' eyes. |||
 
-3d pixar studio style. Pitch black darkness. A bright spotlight beam moves around and focuses on a lonely cute chubby golden-brown hamster wearing a red hoodie. The hamster is sitting on the floor surrounded by empty cheap soda cans and snack wrappers. Sad and lonely atmosphere. high fidelity cinematic sound effects, foley, ambience, light switch sound, wind blowing, no voice, no speech. kawaii style. |||
-S50 Prompt
+S28 : <2D Shinkai Makoto anime style> An old guitar leaning against a frost-covered window, a steaming cup of tea nearby, warm interior glow. |||
 
-3d pixar studio style. A cute chubby fox wearing a black business suit walking in a luxurious department store. A shopping cart made of solid gold magically floats and follows the fox. The cart is clean and empty. High class atmosphere. high fidelity cinematic sound effects, foley, ambience, magical floating hum, store background noise, no voice, no speech. kawaii style. |||
-S51 Prompt
+S29 : <2D Shinkai Makoto anime style> A long road carved through deep snow, leading toward a distant, eternal golden light. |||
 
-3d pixar studio style. A glowing premium mango and a bottle of green kale juice magically fly from the shelf and land gently into the golden cart. These items emit a fresh green magical aura. Freshness visualization. high fidelity cinematic sound effects, foley, ambience, magical ding, fresh sparkle sound, no voice, no speech. |||
-S52 Prompt
-
-3d pixar studio style. Red arrows labelled "TAX" rain down from the sky towards the golden cart. However, a transparent magical dome shield covers the mango and kale juice. The arrows bounce off the shield harmlessly. Invincible defense. high fidelity cinematic sound effects, foley, ambience, arrow hitting glass sound, shield hum, no voice, no speech. |||
-S53 Prompt
-
-3d pixar studio style. Extreme close-up on the hands of a cute chubby golden-brown hamster wearing a red hoodie. The hamster is tightly holding a dented, old cheap coffee can. The metal texture is rusty and cold. Snowflakes fall in the background. Cold reality. high fidelity cinematic sound effects, foley, ambience, metal clink, cold wind, no voice, no speech. kawaii style. |||
-S54 Prompt
-
-3d pixar studio style. A cute chubby golden-brown hamster wearing a red hoodie drinks an energy drink. Blue electrical sparks magically explode from its body for a second, creating a bright flash. But immediately, the light fades and the hamster looks exhausted again. Fleeting energy. high fidelity cinematic sound effects, foley, ambience, electric zap, power down sound, no voice, no speech. kawaii style. |||
-S55 Prompt
-
-3d pixar studio style. A pile of white sugar cubes sits next to a cute chubby golden-brown hamster wearing a red hoodie. A dark magical vortex opens in the sky above. The sugar cubes are magically sucked up and fly into the vortex one by one, leaving the hamster with nothing. Loss of resources. high fidelity cinematic sound effects, foley, ambience, wind suction, flying objects, no voice, no speech. kawaii style. |||
-S56 Prompt
-
-3d pixar studio style. Split composition using a window. Inside a warm restaurant, a cute chubby fox wearing a black business suit drinks red wine happily. Outside the window, a dark storm rages and price graphs are skyrocketing. The fox ignores the outside completely. Contrast. high fidelity cinematic sound effects, foley, ambience, jazz music inside, storm thunder outside, no voice, no speech. kawaii style. |||
-S57 Prompt
-
-3d pixar studio style. A cute chubby golden-brown hamster wearing a red hoodie climbs a ladder made of sugar cubes out of a dark pit. A bolt of red lightning strikes the ladder, shattering it into powder. The hamster falls back into the darkness. Despair. high fidelity cinematic sound effects, foley, ambience, lightning crack, crumbling sound, falling scream effect, no voice, no speech. kawaii style. |||
-S58 Prompt
-
-3d pixar studio style. A large piece of paper labelled "BILL" flutters down from the sky. As soon as it touches the ground, it instantly morphs into a heavy solid steel plate with a loud metallic slam, trapping a cute chubby golden-brown hamster wearing a red hoodie underneath. Fade to black. high fidelity cinematic sound effects, foley, ambience, heavy metal slam, prison door sound, no voice, no speech. kawaii style. |||
-
+S30 : <2D Shinkai Makoto anime style> A final cozy indoor shot of a wooden table with a card labelled "똑똑즈와 함께해주셔서 감사합니다. 새해 복 많이 받으세요." next to a warm lantern. |||

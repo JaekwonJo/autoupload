@@ -1,5 +1,5 @@
 {
-    "prompts_file": "flow_prompts.txt",
+    "prompts_file": "flow_prompts_slot2.txt",
     "prompts_separator": "|||",
     "check_interval_seconds": 120,
     "flow_base_url": "https://labs.google/fx/ko/tools/flow",
@@ -32,7 +32,7 @@
             "file": "flow_prompts.txt"
         },
         {
-            "name": "설탕세 진실",
+            "name": "새해복많이받으세요",
             "file": "flow_prompts_slot2.txt"
         },
         {
@@ -76,7 +76,7 @@
             "file": "flow_prompts_slot_2.txt"
         }
     ],
-    "active_prompt_slot": 0,
+    "active_prompt_slot": 1,
     "prompt_save_dir": "",
     "download_selector_main": "button[type=\"button\"]",
     "download_selector_quality": "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr",
@@ -90,22 +90,22 @@
     },
     "interval_seconds": 0,
     "input_area": {
-        "x1": 1005,
-        "y1": 1272,
-        "x2": 1258,
-        "y2": 1281
+        "x1": 223,
+        "y1": 1486,
+        "x2": 648,
+        "y2": 1499
     },
     "submit_area": {
-        "x1": 1549,
-        "y1": 1320,
-        "x2": 1557,
-        "y2": 1332
+        "x1": 1195,
+        "y1": 1570,
+        "x2": 1221,
+        "y2": 1592
     },
     "afk_area": {
-        "x1": 2125,
-        "y1": 389,
-        "x2": 2514,
-        "y2": 1270
+        "x1": 53,
+        "y1": 360,
+        "x2": 1380,
+        "y2": 592
     },
     "afk_mode": true,
     "sound_enabled": true,
@@ -114,7 +114,7 @@
     "language_mode": "ko_en",
     "input_mode": "paste",
     "use_ref_images": true,
-    "ref_image_count": 3,
+    "ref_image_count": 2,
     "add_btn_area": {
         "x1": 1011,
         "y1": 1319,
@@ -122,40 +122,40 @@
         "y2": 1338
     },
     "ref_img1_area": {
-        "x1": 1035,
-        "y1": 719,
-        "x2": 1048,
-        "y2": 732
+        "x1": 420,
+        "y1": 520,
+        "x2": 490,
+        "y2": 587
     },
     "ref_img2_area": {
-        "x1": 1190,
-        "y1": 710,
-        "x2": 1207,
-        "y2": 723
+        "x1": 679,
+        "y1": 549,
+        "x2": 749,
+        "y2": 609
     },
     "ref_img3_area": {
-        "x1": 1341,
-        "y1": 702,
-        "x2": 1356,
-        "y2": 715
+        "x1": 967,
+        "y1": 538,
+        "x2": 1013,
+        "y2": 583
     },
     "add_btn1_area": {
-        "x1": 1010,
-        "y1": 1320,
-        "x2": 1025,
-        "y2": 1331
+        "x1": 238,
+        "y1": 1571,
+        "x2": 264,
+        "y2": 1591
     },
     "add_btn2_area": {
-        "x1": 1081,
-        "y1": 1317,
-        "x2": 1094,
-        "y2": 1331
+        "x1": 356,
+        "y1": 1566,
+        "x2": 381,
+        "y2": 1596
     },
     "add_btn3_area": {
-        "x1": 1150,
-        "y1": 1320,
-        "x2": 1161,
-        "y2": 1333
+        "x1": 481,
+        "y1": 1566,
+        "x2": 509,
+        "y2": 1595
     },
     "add_btn4_area": null,
     "ref_img4_area": null
