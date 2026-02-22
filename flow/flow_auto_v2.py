@@ -55,6 +55,8 @@ DEFAULT_CONFIG = {
     "relay_count": 1,
     "relay_start_slot": None,
     "relay_end_slot": None,
+    "relay_use_selection": False,
+    "relay_selected_slots": [],
     "language_mode": "en",
     "input_mode": "typing", # typing, paste, mixed
     "use_ref_images": False,
@@ -381,6 +383,12 @@ class FlowVisionApp:
                     self.cfg[key] = clamped
                     changed = True
 
+        selected_before = self.cfg.get("relay_selected_slots", [])
+        selected_after = self._normalize_relay_selected_slots(selected_before)
+        if selected_before != selected_after:
+            self.cfg["relay_selected_slots"] = selected_after
+            changed = True
+
         if changed:
             self.save_config()
 
@@ -416,6 +424,37 @@ class FlowVisionApp:
                 start, end = end, start
         return start, end
 
+    def _normalize_relay_selected_slots(self, selected):
+        slots = self.cfg.get("prompt_slots", [])
+        total = len(slots)
+        if total <= 0:
+            return []
+        if not isinstance(selected, (list, tuple)):
+            return []
+        seen = set()
+        out = []
+        for raw in selected:
+            try:
+                idx = int(raw)
+            except (TypeError, ValueError):
+                continue
+            if 0 <= idx < total and idx not in seen:
+                out.append(idx)
+                seen.add(idx)
+        out.sort()
+        return out
+
+    def _get_effective_relay_sequence(self):
+        slots = self.cfg.get("prompt_slots", [])
+        if not slots:
+            return []
+        if self.cfg.get("relay_use_selection"):
+            selected = self._normalize_relay_selected_slots(self.cfg.get("relay_selected_slots", []))
+            if selected:
+                return selected
+        start, end = self._get_effective_relay_range()
+        return list(range(start, end + 1))
+
     def _sync_relay_range_controls(self):
         if not hasattr(self, "combo_relay_start") or not hasattr(self, "combo_relay_end"):
             return
@@ -427,6 +466,22 @@ class FlowVisionApp:
         start, end = self._get_effective_relay_range()
         self.combo_relay_start.current(start)
         self.combo_relay_end.current(end)
+        self._sync_relay_selection_label()
+
+    def _sync_relay_selection_label(self):
+        if not hasattr(self, "lbl_relay_pick"):
+            return
+        selected = self._normalize_relay_selected_slots(self.cfg.get("relay_selected_slots", []))
+        slot_names = [self.cfg["prompt_slots"][i]["name"] for i in selected]
+        mode_txt = "체크사용" if self.cfg.get("relay_use_selection") else "체크미사용"
+        if slot_names:
+            preview = ", ".join(slot_names[:2])
+            if len(slot_names) > 2:
+                preview += f" 외 {len(slot_names) - 2}개"
+            txt = f"{mode_txt} | {preview}"
+        else:
+            txt = f"{mode_txt} | 선택 없음(범위 실행)"
+        self.lbl_relay_pick.config(text=txt)
 
     def _show_completion_popup(self):
         def _done_ui():
@@ -589,6 +644,24 @@ class FlowVisionApp:
         self.combo_relay_end.pack(side="left")
         self.combo_relay_end.bind("<<ComboboxSelected>>", self.on_option_toggle)
         self._sync_relay_range_controls()
+
+        relay_pick_f = tk.Frame(left_card, bg=self.color_bg)
+        relay_pick_f.pack(fill="x", pady=(0, 8))
+        self.relay_pick_var = tk.BooleanVar(value=self.cfg.get("relay_use_selection", False))
+        tk.Checkbutton(
+            relay_pick_f,
+            text="문서 체크 선택 사용",
+            variable=self.relay_pick_var,
+            command=self.on_option_toggle,
+            bg=self.color_bg,
+            font=("Malgun Gothic", 9),
+            activebackground=self.color_bg
+        ).pack(side="left")
+        ttk.Button(relay_pick_f, text="문서 선택...", command=self.on_open_relay_selector).pack(side="left", padx=6)
+
+        self.lbl_relay_pick = tk.Label(left_card, text="", font=("Malgun Gothic", 9), fg=self.color_text_sec, bg=self.color_bg)
+        self.lbl_relay_pick.pack(anchor="w", pady=(0, 8))
+        self._sync_relay_selection_label()
 
         tk.Label(left_card, text="3. 작업 간격 (초)", font=("Malgun Gothic", 11, "bold"), fg=self.color_text).pack(anchor="w", pady=(20, 5))
         self.entry_interval = tk.Entry(left_card, bg="#FFFFFF", fg="black", font=("Consolas", 16, "bold"), justify="center", relief="solid", borderwidth=1)
@@ -766,14 +839,76 @@ class FlowVisionApp:
         except: self.cfg["ref_image_count"] = 1
         try: self.cfg["relay_count"] = int(self.relay_cnt_var.get())
         except: self.cfg["relay_count"] = 1
+        self.cfg["relay_use_selection"] = self.relay_pick_var.get() if hasattr(self, "relay_pick_var") else self.cfg.get("relay_use_selection", False)
         if hasattr(self, "combo_relay_start") and self.combo_relay_start.current() >= 0:
             self.cfg["relay_start_slot"] = self.combo_relay_start.current()
         if hasattr(self, "combo_relay_end") and self.combo_relay_end.current() >= 0:
             self.cfg["relay_end_slot"] = self.combo_relay_end.current()
+        self.cfg["relay_selected_slots"] = self._normalize_relay_selected_slots(self.cfg.get("relay_selected_slots", []))
         self.save_config()
+        self._sync_relay_selection_label()
         if hasattr(self, 'actor'):
             self.actor.language_mode = self.cfg["language_mode"]
         self.log(f"⚙️ 설정 동기화 완료 (입력방식: {self.cfg['input_mode']})")
+
+    def on_open_relay_selector(self):
+        slots = self.cfg.get("prompt_slots", [])
+        if not slots:
+            messagebox.showwarning("주의", "선택할 문서가 없습니다.")
+            return
+
+        selected = set(self._normalize_relay_selected_slots(self.cfg.get("relay_selected_slots", [])))
+        win = tk.Toplevel(self.root)
+        win.title("이어달리기 문서 선택")
+        win.transient(self.root)
+        win.grab_set()
+        win.configure(bg="#FFFFFF")
+        win.geometry("420x520")
+
+        tk.Label(win, text="실행할 문서를 체크하세요", font=("Malgun Gothic", 11, "bold"), bg="#FFFFFF").pack(anchor="w", padx=12, pady=(12, 6))
+
+        list_frame = tk.Frame(win, bg="#FFFFFF")
+        list_frame.pack(fill="both", expand=True, padx=12, pady=6)
+
+        canvas = tk.Canvas(list_frame, bg="#FFFFFF", highlightthickness=0)
+        scrolly = ttk.Scrollbar(list_frame, orient="vertical", command=canvas.yview)
+        inner = tk.Frame(canvas, bg="#FFFFFF")
+        inner.bind("<Configure>", lambda e: canvas.configure(scrollregion=canvas.bbox("all")))
+        canvas.create_window((0, 0), window=inner, anchor="nw")
+        canvas.configure(yscrollcommand=scrolly.set)
+        canvas.pack(side="left", fill="both", expand=True)
+        scrolly.pack(side="right", fill="y")
+
+        vars_selected = []
+        for i, slot in enumerate(slots):
+            v = tk.BooleanVar(value=(i in selected))
+            vars_selected.append(v)
+            text = f"{i+1}. {slot['name']} ({slot['file']})"
+            tk.Checkbutton(inner, text=text, variable=v, bg="#FFFFFF", font=("Malgun Gothic", 10), anchor="w").pack(fill="x", pady=2)
+
+        btn_f = tk.Frame(win, bg="#FFFFFF")
+        btn_f.pack(fill="x", padx=12, pady=10)
+
+        def _set_all(flag):
+            for var in vars_selected:
+                var.set(flag)
+
+        def _save():
+            picked = [i for i, var in enumerate(vars_selected) if var.get()]
+            self.cfg["relay_selected_slots"] = picked
+            self.cfg["relay_use_selection"] = bool(picked)
+            self.relay_pick_var.set(bool(picked))
+            self.save_config()
+            self._sync_relay_selection_label()
+            if picked:
+                self.log(f"✅ 체크 문서 저장 완료 ({len(picked)}개)")
+            else:
+                self.log("ℹ️ 체크 문서가 비어 있어 기존 범위 방식으로 실행됩니다.")
+            win.destroy()
+
+        ttk.Button(btn_f, text="전체선택", command=lambda: _set_all(True)).pack(side="left")
+        ttk.Button(btn_f, text="전체해제", command=lambda: _set_all(False)).pack(side="left", padx=6)
+        ttk.Button(btn_f, text="저장", command=_save).pack(side="right")
 
     def _get_coord_text(self):
         ia, sa, aa = self.cfg.get('input_area'), self.cfg.get('submit_area'), self.cfg.get('afk_area')
@@ -836,6 +971,7 @@ class FlowVisionApp:
             self.combo_slots["values"] = slots
             self.combo_slots.current(self.cfg["active_prompt_slot"])
             self._sync_relay_range_controls()
+            self._sync_relay_selection_label()
         except: pass
 
     def _update_progress_ui(self):
@@ -926,7 +1062,11 @@ class FlowVisionApp:
         except: pass
 
         if self.cfg.get("relay_mode"):
-            start_slot, end_slot = self._get_effective_relay_range()
+            seq = self._get_effective_relay_sequence()
+            if not seq:
+                messagebox.showwarning("주의", "이어달리기 대상 문서가 없습니다.")
+                return
+            start_slot, end_slot = seq[0], seq[-1]
             if self.cfg.get("active_prompt_slot") != start_slot:
                 self.cfg["active_prompt_slot"] = start_slot
                 self.cfg["prompts_file"] = self.cfg["prompt_slots"][start_slot]["file"]
@@ -934,7 +1074,10 @@ class FlowVisionApp:
                 self.on_reload()
             self.index = 0
             self._update_progress_ui()
-            self.log(f"🏃 이어달리기 범위: {self.cfg['prompt_slots'][start_slot]['name']} → {self.cfg['prompt_slots'][end_slot]['name']}")
+            if self.cfg.get("relay_use_selection") and self.cfg.get("relay_selected_slots"):
+                self.log(f"🏃 체크 문서 이어달리기 시작 ({len(seq)}개)")
+            else:
+                self.log(f"🏃 이어달리기 범위: {self.cfg['prompt_slots'][start_slot]['name']} → {self.cfg['prompt_slots'][end_slot]['name']}")
 
         if not (self.cfg.get('input_area') and self.cfg.get('submit_area')):
             messagebox.showwarning("주의", "먼저 영역을 설정해주세요.")
@@ -1033,19 +1176,35 @@ class FlowVisionApp:
             self.log("프롬프트 없음 또는 범위 초과")
             self.save_session_report()
             if self.cfg.get("relay_mode"):
-                start_slot, end_slot = self._get_effective_relay_range()
+                seq = self._get_effective_relay_sequence()
+                if not seq:
+                    self._show_completion_popup()
+                    return
                 curr_slot = self._clamp_slot_index(self.cfg.get("active_prompt_slot", 0))
-                if curr_slot < start_slot:
-                    curr_slot = start_slot
-                if curr_slot < end_slot:
-                    next_slot = curr_slot + 1
+                try:
+                    pos = seq.index(curr_slot)
+                except ValueError:
+                    pos = -1
+                    for i, slot_idx in enumerate(seq):
+                        if slot_idx > curr_slot:
+                            pos = i - 1
+                            break
+                    else:
+                        pos = len(seq) - 1
+                next_pos = pos + 1
+                if next_pos < len(seq):
+                    next_slot = seq[next_pos]
                     self.cfg["active_prompt_slot"] = next_slot
                     self.cfg["prompts_file"] = self.cfg["prompt_slots"][next_slot]["file"]
                     self.save_config()
                     self.relay_progress += 1
                     self.index = 0
                     self.root.after(0, self.on_reload)
-                    self.log(f"🏃 이어달리기 이동: {self.cfg['prompt_slots'][next_slot - 1]['name']} → {self.cfg['prompt_slots'][next_slot]['name']}")
+                    if 0 <= pos < len(seq):
+                        prev_name = self.cfg["prompt_slots"][seq[pos]]["name"]
+                    else:
+                        prev_name = "시작"
+                    self.log(f"🏃 이어달리기 이동: {prev_name} → {self.cfg['prompt_slots'][next_slot]['name']}")
                     self.play_sound("success")
                     self.t_next = time.time() + 10
                     return
@@ -1238,6 +1397,7 @@ class FlowVisionApp:
             self.combo_slots["values"] = slots
             self.combo_slots.current(idx)
             self._sync_relay_range_controls()
+            self._sync_relay_selection_label()
             self.log(f"📝 슬롯 이름 변경: {current_name} -> {new_name}")
 
     def on_add_slot(self):
@@ -1269,6 +1429,7 @@ class FlowVisionApp:
         new_idx = len(self.cfg["prompt_slots"]) - 1
         self.combo_slots.current(new_idx)
         self._sync_relay_range_controls()
+        self._sync_relay_selection_label()
         self.on_slot_change()
         self.log(f"➕ 새 슬롯 추가됨: {new_name} ({new_file})")
         messagebox.showinfo("성공", f"'{new_name}' 슬롯이 추가되었습니다!")
@@ -1286,6 +1447,7 @@ class FlowVisionApp:
             return
             
         # 설정 제거
+        old_selected = self._normalize_relay_selected_slots(self.cfg.get("relay_selected_slots", []))
         self.cfg["prompt_slots"].pop(idx)
         
         # 인덱스 조정
@@ -1299,6 +1461,20 @@ class FlowVisionApp:
             val = self.cfg.get(key)
             if val is not None and val >= len(self.cfg["prompt_slots"]):
                 self.cfg[key] = len(self.cfg["prompt_slots"]) - 1
+
+        new_selected = []
+        for sidx in old_selected:
+            if sidx == idx:
+                continue
+            if sidx > idx:
+                new_selected.append(sidx - 1)
+            else:
+                new_selected.append(sidx)
+        self.cfg["relay_selected_slots"] = self._normalize_relay_selected_slots(new_selected)
+        if self.cfg.get("relay_use_selection") and not self.cfg["relay_selected_slots"]:
+            self.cfg["relay_use_selection"] = False
+            if hasattr(self, "relay_pick_var"):
+                self.relay_pick_var.set(False)
             
         self.save_config()
         
@@ -1307,6 +1483,7 @@ class FlowVisionApp:
         self.combo_slots["values"] = slots
         self.combo_slots.current(self.cfg["active_prompt_slot"])
         self._sync_relay_range_controls()
+        self._sync_relay_selection_label()
         self.on_slot_change()
         self.log(f"🗑️ 슬롯 삭제됨: {slot_name}")
         messagebox.showinfo("성공", f"'{slot_name}' 슬롯이 목록에서 제거되었습니다.")
