@@ -1,5 +1,5 @@
 {
-    "prompts_file": "flow_prompts_slot2.txt",
+    "prompts_file": "flow_prompts_slot3.txt",
     "prompts_separator": "|||",
     "check_interval_seconds": 120,
     "flow_base_url": "https://labs.google/fx/ko/tools/flow",
@@ -36,7 +36,7 @@
             "file": "flow_prompts_slot2.txt"
         },
         {
-            "name": "나스닥 정석",
+            "name": "코스피 5800",
             "file": "flow_prompts_slot3.txt"
         },
         {
@@ -76,7 +76,7 @@
             "file": "flow_prompts_slot_2.txt"
         }
     ],
-    "active_prompt_slot": 1,
+    "active_prompt_slot": 2,
     "prompt_save_dir": "",
     "download_selector_main": "button[type=\"button\"]",
     "download_selector_quality": "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr",
@@ -88,33 +88,33 @@
         "x": 1452,
         "y": 1074
     },
-    "interval_seconds": 0,
+    "interval_seconds": 60,
     "input_area": {
-        "x1": 223,
-        "y1": 1486,
-        "x2": 648,
-        "y2": 1499
+        "x1": 1020,
+        "y1": 1273,
+        "x2": 1242,
+        "y2": 1280
     },
     "submit_area": {
-        "x1": 1195,
-        "y1": 1570,
-        "x2": 1221,
-        "y2": 1592
+        "x1": 1546,
+        "y1": 1319,
+        "x2": 1556,
+        "y2": 1332
     },
     "afk_area": {
-        "x1": 53,
-        "y1": 360,
-        "x2": 1380,
-        "y2": 592
+        "x1": 2208,
+        "y1": 349,
+        "x2": 2504,
+        "y2": 1212
     },
     "afk_mode": true,
     "sound_enabled": true,
     "relay_mode": false,
     "relay_count": 1,
     "language_mode": "ko_en",
-    "input_mode": "paste",
-    "use_ref_images": true,
-    "ref_image_count": 2,
+    "input_mode": "mixed",
+    "use_ref_images": false,
+    "ref_image_count": 3,
     "add_btn_area": {
         "x1": 1011,
         "y1": 1319,
