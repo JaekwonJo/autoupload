@@ -4,9 +4,11 @@ import time
 import random
 import threading
 import math
+import re
+import calendar
 import traceback 
 from pathlib import Path
-from datetime import datetime
+from datetime import datetime, timedelta
 import ctypes
 import importlib 
 
@@ -57,6 +59,8 @@ DEFAULT_CONFIG = {
     "relay_end_slot": None,
     "relay_use_selection": False,
     "relay_selected_slots": [],
+    "scheduled_start_enabled": False,
+    "scheduled_start_at": "",
     "language_mode": "en",
     "input_mode": "typing", # typing, paste, mixed
     "use_ref_images": False,
@@ -72,6 +76,8 @@ DEFAULT_CONFIG = {
     "ref_img4_area": None,
     "ref_img5_area": None
 }
+
+SLOT_FILE_REGEX = re.compile(r"^flow_prompts_slot_?(\d+)\.txt$", re.IGNORECASE)
 
 # [TOOLTIP] 친절한 설명서 풍선 기능
 class ToolTip:
@@ -270,6 +276,8 @@ class FlowVisionApp:
         self.prompts = []
         self.index = 0
         self.t_next = None
+        self.scheduled_waiting = False
+        self.scheduled_start_ts = None
         self.alert_window = None
         self.relay_progress = 0 
         self.actor = HumanActor()
@@ -483,6 +491,34 @@ class FlowVisionApp:
             txt = f"{mode_txt} | 선택 없음(범위 실행)"
         self.lbl_relay_pick.config(text=txt)
 
+    def _make_unique_slot_name(self, base_name):
+        existing = {s.get("name", "") for s in self.cfg.get("prompt_slots", [])}
+        if base_name not in existing:
+            return base_name
+        suffix = 2
+        while True:
+            candidate = f"{base_name} ({suffix})"
+            if candidate not in existing:
+                return candidate
+            suffix += 1
+
+    def _parse_schedule_datetime(self, raw_text):
+        txt = (raw_text or "").strip()
+        if not txt:
+            return None
+        fmts = (
+            "%Y-%m-%d %H:%M",
+            "%Y/%m/%d %H:%M",
+            "%Y-%m-%d %H:%M:%S",
+            "%Y/%m/%d %H:%M:%S",
+        )
+        for fmt in fmts:
+            try:
+                return datetime.strptime(txt, fmt)
+            except ValueError:
+                continue
+        return None
+
     def _show_completion_popup(self):
         def _done_ui():
             self.on_stop()
@@ -669,6 +705,46 @@ class FlowVisionApp:
         self.entry_interval.pack(fill="x", ipady=5)
         tk.Label(left_card, text="※ 설정한 시간마다 봇이 작동합니다.", font=("Malgun Gothic", 9), fg=self.color_text_sec).pack(anchor="w")
 
+        sched_card = tk.Frame(left_card, bg=self.color_bg)
+        sched_card.pack(fill="x", pady=(14, 2))
+        tk.Label(sched_card, text="4. 1회 예약 시작 (특정 날짜/시간)", font=("Malgun Gothic", 11, "bold"), fg=self.color_text).pack(anchor="w")
+        self.schedule_var = tk.BooleanVar(value=self.cfg.get("scheduled_start_enabled", False))
+        tk.Checkbutton(
+            sched_card,
+            text="예약 시작 사용",
+            variable=self.schedule_var,
+            command=self.on_option_toggle,
+            bg=self.color_bg,
+            font=("Malgun Gothic", 10),
+            activebackground=self.color_bg
+        ).pack(anchor="w", pady=(4, 2))
+        self.schedule_text_var = tk.StringVar(value=self.cfg.get("scheduled_start_at", ""))
+        self.entry_schedule_display = tk.Entry(
+            sched_card,
+            bg="#FFFFFF",
+            fg="black",
+            font=("Consolas", 11),
+            justify="center",
+            relief="solid",
+            borderwidth=1,
+            textvariable=self.schedule_text_var,
+            state="readonly"
+        )
+        self.entry_schedule_display.pack(fill="x", ipady=4)
+        tk.Label(
+            sched_card,
+            text="타이핑 없이 달력 버튼으로 선택하세요 👇",
+            font=("Malgun Gothic", 9),
+            fg=self.color_text_sec,
+            bg=self.color_bg
+        ).pack(anchor="w", pady=(2, 0))
+        quick_f = tk.Frame(sched_card, bg=self.color_bg)
+        quick_f.pack(fill="x", pady=(6, 0))
+        ttk.Button(quick_f, text="📅 달력 선택", command=self.on_open_schedule_picker).pack(side="left")
+        ttk.Button(quick_f, text="현재+5분", command=lambda: self.on_fill_schedule_time(5)).pack(side="left")
+        ttk.Button(quick_f, text="현재+30분", command=lambda: self.on_fill_schedule_time(30)).pack(side="left", padx=6)
+        ttk.Button(quick_f, text="예약 지우기", command=self.on_clear_schedule_time).pack(side="left")
+
         tk.Frame(left_card, height=30, bg=self.color_bg).pack()
         self.btn_start = ttk.Button(left_card, text="▶ 자동화 시작", style="Action.TButton", command=self.on_start)
         self.btn_start.pack(fill="x", ipady=15)
@@ -786,6 +862,10 @@ class FlowVisionApp:
         btn_del.pack(side="left", padx=2)
         ToolTip(btn_del, "현재 프롬프트 슬롯 삭제")
 
+        btn_sync = ttk.Button(file_top, text="🔄 슬롯 동기화", command=self.on_sync_slots)
+        btn_sync.pack(side="left", padx=(6, 2))
+        ToolTip(btn_sync, "flow_prompts_slot 숫자 파일을 자동으로 슬롯에 추가")
+
         ttk.Button(file_top, text="📂 파일 열기", command=self.on_open_prompts).pack(side="right", padx=5)
         ttk.Button(file_top, text="🔄 새로고침", command=self.on_reload).pack(side="right")
 
@@ -828,10 +908,200 @@ class FlowVisionApp:
                                      bg="#007AFF", fg="white", font=("Malgun Gothic", 12, "bold"), relief="raised", borderwidth=3)
         btn_refresh_big.pack(side="right", fill="x", expand=True, padx=(5, 0), ipady=10)
 
+    def on_fill_schedule_time(self, plus_minutes):
+        try:
+            dt = datetime.now() + timedelta(minutes=int(plus_minutes))
+            txt = dt.strftime("%Y-%m-%d %H:%M")
+            self.schedule_text_var.set(txt)
+            self.schedule_var.set(True)
+            self.on_option_toggle()
+            self.log(f"⏰ 예약 시간 입력: {txt}")
+        except Exception as e:
+            messagebox.showerror("오류", f"예약 시간 입력 실패: {e}")
+
+    def on_clear_schedule_time(self):
+        self.schedule_text_var.set("")
+        self.schedule_var.set(False)
+        self.on_option_toggle()
+        self.log("🧹 예약 시간이 초기화되었습니다.")
+
+    def on_open_schedule_picker(self):
+        base_dt = self._parse_schedule_datetime(self.schedule_text_var.get())
+        if base_dt is None:
+            base_dt = datetime.now() + timedelta(minutes=5)
+
+        state = {"year": base_dt.year, "month": base_dt.month, "day": base_dt.day}
+        hour_var = tk.IntVar(value=base_dt.hour)
+        min_var = tk.IntVar(value=base_dt.minute)
+
+        win = tk.Toplevel(self.root)
+        win.title("📅 예약 날짜/시간 선택")
+        win.configure(bg="#FFFFFF")
+        win.transient(self.root)
+        win.grab_set()
+        win.geometry("360x430")
+        win.resizable(False, False)
+
+        top = tk.Frame(win, bg="#FFFFFF")
+        top.pack(fill="x", padx=12, pady=(12, 6))
+
+        month_title = tk.Label(top, text="", font=("Malgun Gothic", 12, "bold"), bg="#FFFFFF", fg="#212529")
+        month_title.pack(side="left", expand=True)
+
+        cal_frame = tk.Frame(win, bg="#FFFFFF")
+        cal_frame.pack(fill="x", padx=12, pady=6)
+
+        week_names = ["월", "화", "수", "목", "금", "토", "일"]
+
+        def _move_month(delta):
+            y, m = state["year"], state["month"] + delta
+            if m <= 0:
+                y -= 1
+                m = 12
+            elif m >= 13:
+                y += 1
+                m = 1
+            state["year"], state["month"] = y, m
+            max_day = calendar.monthrange(y, m)[1]
+            state["day"] = min(state["day"], max_day)
+            _render_calendar()
+
+        ttk.Button(top, text="◀", width=3, command=lambda: _move_month(-1)).pack(side="left")
+        ttk.Button(top, text="▶", width=3, command=lambda: _move_month(1)).pack(side="right")
+
+        def _select_day(day):
+            state["day"] = day
+            _render_calendar()
+
+        def _render_calendar():
+            for w in cal_frame.winfo_children():
+                w.destroy()
+            month_title.config(text=f"{state['year']}년 {state['month']}월")
+
+            for col, wd in enumerate(week_names):
+                fg = "#DC3545" if col == 6 else "#212529"
+                tk.Label(
+                    cal_frame,
+                    text=wd,
+                    width=4,
+                    bg="#FFFFFF",
+                    fg=fg,
+                    font=("Malgun Gothic", 10, "bold")
+                ).grid(row=0, column=col, padx=1, pady=2)
+
+            month_weeks = calendar.monthcalendar(state["year"], state["month"])
+            for row, week in enumerate(month_weeks, start=1):
+                for col, day in enumerate(week):
+                    if day == 0:
+                        tk.Label(cal_frame, text=" ", width=4, bg="#FFFFFF").grid(row=row, column=col, padx=1, pady=1)
+                        continue
+                    selected = (day == state["day"])
+                    bg = "#007AFF" if selected else "#F1F3F5"
+                    fg = "white" if selected else ("#DC3545" if col == 6 else "#212529")
+                    tk.Button(
+                        cal_frame,
+                        text=str(day),
+                        width=4,
+                        bg=bg,
+                        fg=fg,
+                        relief="flat",
+                        activebackground="#0056b3" if selected else "#DEE2E6",
+                        command=lambda d=day: _select_day(d)
+                    ).grid(row=row, column=col, padx=1, pady=1)
+
+        _render_calendar()
+
+        time_frame = tk.Frame(win, bg="#FFFFFF")
+        time_frame.pack(fill="x", padx=12, pady=(10, 4))
+        tk.Label(time_frame, text="시간", bg="#FFFFFF", font=("Malgun Gothic", 10)).pack(side="left")
+        tk.Spinbox(time_frame, from_=0, to=23, wrap=True, width=4, textvariable=hour_var, format="%02.0f").pack(side="left", padx=(6, 10))
+        tk.Label(time_frame, text="분", bg="#FFFFFF", font=("Malgun Gothic", 10)).pack(side="left")
+        tk.Spinbox(time_frame, from_=0, to=59, wrap=True, width=4, textvariable=min_var, format="%02.0f").pack(side="left", padx=(6, 0))
+
+        btns = tk.Frame(win, bg="#FFFFFF")
+        btns.pack(fill="x", padx=12, pady=(14, 12))
+
+        def _pick_now():
+            now = datetime.now()
+            state["year"], state["month"], state["day"] = now.year, now.month, now.day
+            hour_var.set(now.hour)
+            min_var.set(now.minute)
+            _render_calendar()
+
+        def _confirm():
+            try:
+                picked = datetime(
+                    year=state["year"],
+                    month=state["month"],
+                    day=state["day"],
+                    hour=max(0, min(23, int(hour_var.get()))),
+                    minute=max(0, min(59, int(min_var.get())))
+                )
+            except Exception:
+                messagebox.showwarning("입력 오류", "날짜/시간을 다시 선택해주세요.")
+                return
+
+            txt = picked.strftime("%Y-%m-%d %H:%M")
+            self.schedule_text_var.set(txt)
+            self.schedule_var.set(True)
+            self.on_option_toggle()
+            self.log(f"📅 달력에서 예약 선택: {txt}")
+            win.destroy()
+
+        ttk.Button(btns, text="오늘", command=_pick_now).pack(side="left")
+        ttk.Button(btns, text="취소", command=win.destroy).pack(side="right")
+        ttk.Button(btns, text="선택 완료", command=_confirm).pack(side="right", padx=6)
+
+    def on_sync_slots(self):
+        existing_files = {s.get("file") for s in self.cfg.get("prompt_slots", [])}
+        discovered = []
+        for path in self.base.iterdir():
+            if not path.is_file():
+                continue
+            name = path.name
+            m = SLOT_FILE_REGEX.match(name)
+            if not m:
+                continue
+            discovered.append((int(m.group(1)), name))
+
+        if not discovered:
+            messagebox.showinfo("동기화", "동기화할 슬롯 파일이 없습니다.")
+            self.log("ℹ️ 슬롯 동기화: 신규 파일 없음")
+            return
+
+        discovered.sort(key=lambda x: (x[0], x[1]))
+        added = []
+        for slot_num, file_name in discovered:
+            if file_name in existing_files:
+                continue
+            slot_name = self._make_unique_slot_name(f"자동 슬롯 {slot_num}")
+            self.cfg["prompt_slots"].append({"name": slot_name, "file": file_name})
+            existing_files.add(file_name)
+            added.append((slot_name, file_name))
+
+        if not added:
+            messagebox.showinfo("동기화", "이미 모든 슬롯이 등록되어 있습니다.")
+            self.log("✅ 슬롯 동기화: 이미 최신 상태")
+            return
+
+        self.save_config()
+        slots = [s["name"] for s in self.cfg["prompt_slots"]]
+        self.combo_slots["values"] = slots
+        self.combo_slots.current(self._clamp_slot_index(self.cfg.get("active_prompt_slot", 0)))
+        self._sync_relay_range_controls()
+        self._sync_relay_selection_label()
+        added_preview = ", ".join([f"{n}({f})" for n, f in added[:3]])
+        if len(added) > 3:
+            added_preview += f" 외 {len(added) - 3}개"
+        self.log(f"🔄 슬롯 동기화 완료: {len(added)}개 추가")
+        messagebox.showinfo("동기화 완료", f"{len(added)}개 슬롯을 추가했습니다.\n{added_preview}")
+
     def on_option_toggle(self, event=None):
         self.cfg["afk_mode"] = self.afk_var.get()
         self.cfg["sound_enabled"] = self.sound_var.get()
         self.cfg["relay_mode"] = self.relay_var.get()
+        self.cfg["scheduled_start_enabled"] = self.schedule_var.get() if hasattr(self, "schedule_var") else self.cfg.get("scheduled_start_enabled", False)
+        self.cfg["scheduled_start_at"] = self.schedule_text_var.get().strip() if hasattr(self, "schedule_text_var") else self.cfg.get("scheduled_start_at", "")
         self.cfg["language_mode"] = "ko_en" if self.lang_var.get() else "en"
         self.cfg["input_mode"] = self.input_mode_var.get()
         self.cfg["use_ref_images"] = self.use_ref_var.get()
@@ -1058,8 +1328,10 @@ class FlowVisionApp:
         self.on_reload() # 시작 시 프롬프트 최신화
         try:
             self.cfg["interval_seconds"] = int(self.entry_interval.get())
-            self.save_config()
         except: pass
+        self.cfg["scheduled_start_enabled"] = self.schedule_var.get() if hasattr(self, "schedule_var") else self.cfg.get("scheduled_start_enabled", False)
+        self.cfg["scheduled_start_at"] = self.schedule_text_var.get().strip() if hasattr(self, "schedule_text_var") else self.cfg.get("scheduled_start_at", "")
+        self.save_config()
 
         if self.cfg.get("relay_mode"):
             seq = self._get_effective_relay_sequence()
@@ -1091,6 +1363,20 @@ class FlowVisionApp:
             self.index = 0
             self._update_progress_ui()
 
+        scheduled_dt = None
+        if self.cfg.get("scheduled_start_enabled"):
+            raw = self.cfg.get("scheduled_start_at", "")
+            scheduled_dt = self._parse_schedule_datetime(raw)
+            if not scheduled_dt:
+                messagebox.showwarning(
+                    "예약 시간 형식 오류",
+                    "예약 시간 형식이 잘못되었습니다.\n예시처럼 입력해주세요: 2026-02-26 21:30"
+                )
+                return
+            if scheduled_dt <= datetime.now():
+                messagebox.showwarning("예약 시간 오류", "예약 시간은 현재 시각보다 미래여야 합니다.")
+                return
+
         if self.relay_progress == 0:
             self.session_start_time = datetime.now()
             self.session_log = []
@@ -1103,7 +1389,16 @@ class FlowVisionApp:
             self.actor.update_batch_size()
             self.actor.processed_count = 0
         except: pass
-        self.t_next = time.time() # 즉시 시작
+        if scheduled_dt:
+            self.scheduled_waiting = True
+            self.scheduled_start_ts = scheduled_dt.timestamp()
+            self.t_next = self.scheduled_start_ts
+            self.update_status_label(f"⏰ 예약 대기: {scheduled_dt.strftime('%Y-%m-%d %H:%M')}", self.color_info)
+            self.log(f"⏰ 1회 예약 설정 완료: {scheduled_dt.strftime('%Y-%m-%d %H:%M')}")
+        else:
+            self.scheduled_waiting = False
+            self.scheduled_start_ts = None
+            self.t_next = time.time() # 즉시 시작
 
     def on_stop(self):
         self.running = False
@@ -1112,6 +1407,8 @@ class FlowVisionApp:
         self.update_status_label("중지됨", self.color_error)
         self.is_processing = False
         self.relay_progress = 0
+        self.scheduled_waiting = False
+        self.scheduled_start_ts = None
         if self.alert_window:
             self.alert_window.close()
             self.alert_window = None
@@ -1121,7 +1418,10 @@ class FlowVisionApp:
             remain = self.t_next - time.time()
             if remain > 0:
                 if not self.is_processing:
-                    self.update_status_label(f"⏳ 대기 중... {int(remain)}초 (비상은 마우스 구석으로!)", "#FFC107") # Amber
+                    if self.scheduled_waiting:
+                        self.update_status_label(f"⏰ 예약 대기 중... {int(remain)}초", self.color_info)
+                    else:
+                        self.update_status_label(f"⏳ 대기 중... {int(remain)}초 (비상은 마우스 구석으로!)", "#FFC107") # Amber
                     
                     # [NEW] 대기 중 마우스 산책 (클릭 절대 금지!)
                     if random.random() < 0.3: # 30% 확률로 조금씩 움직임
@@ -1157,6 +1457,10 @@ class FlowVisionApp:
                     self.alert_window.close()
                     self.alert_window = None
                 if not self.is_processing:
+                    if self.scheduled_waiting:
+                        self.scheduled_waiting = False
+                        self.scheduled_start_ts = None
+                        self.log("⏰ 예약 시각 도달! 자동화를 시작합니다.")
                     self.is_processing = True
                     threading.Thread(target=self._run_task, daemon=True).start()
                 try:

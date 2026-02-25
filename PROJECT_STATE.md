@@ -1,7 +1,7 @@
 # 🏗️ Project State: Flow Veo Vision Bot
 
-> **Last Updated:** 2026-01-28 (Wed) - Final Gold Edition
-> **Current Stage:** 🏆 Project Complete (Final Gold Master)
+> **Last Updated:** 2026-02-25 (Wed) - Slot Sync + Calendar Reservation
+> **Current Stage:** 🛠️ Enhanced Usability + Scheduling
 
 ## 📊 Project Overview
 - **Type:** Desktop Automation Tool (Python, Tkinter, PyAutoGUI)
@@ -15,16 +15,31 @@
   - **Zero-Click Typing**: Clicks are strictly forbidden during the typing phase.
   - **IME-Safe Keys**: `Shift+Space` for spaces and `Shift+Enter` for newlines to prevent common automation errors.
 - **HUD Interface**: Real-time monitoring of internal humanization metrics (Fatigue, Typo Probability, etc.).
+- **Prompt Slot Auto Sync**:
+  - New button scans `flow` folder for `flow_prompts_slot_숫자.txt` and `flow_prompts_slot숫자.txt`.
+  - Newly found files are automatically added to `prompt_slots`.
+- **One-time Reservation Start (Specific Date/Time)**:
+  - Supports delayed start at exact reserved datetime.
+  - Reservation is persisted in config and resumed on app restart.
+- **Calendar-based Reservation UX**:
+  - Removed hard manual typing dependency.
+  - Date is picked from calendar, time via hour/minute selectors.
 
 ## ✅ Resolved (Today's Fixes)
+- **[Feature] Slot File Auto Sync:** Added one-click sync to register newly added slot files automatically.
+- **[Feature] One-time Reserved Start:** Added wait-until-reserved-time execution mode.
+- **[UX] Calendar Reservation Picker:** Added calendar popup to select date/time without typing format manually.
 - **[Feature] Jump to Number:** Clicking the navigation status label now opens a dialog to jump to any specific prompt number.
 - **[Feature] First/Last Navigation:** Added ⏮ and ⏭ buttons for quick boundary navigation.
 - **[Feature] Slot Renaming:** Added a ✏️ button to rename prompt slots, updating both the config and the UI.
 - **[Fix] Input Safety Logic:** Verified that all random clicks are removed from typing/idle routines. Newline now correctly uses `Shift+Enter`.
 
 ## 🚧 Next Steps
-- **Enjoy:** The project is in a complete and stable state. Use as intended!
-- **Maintenance:** Update prompt files as needed.
+- **Optional UX**:
+  - Increase calendar button/font size for accessibility.
+  - Add "everyday repeating reservation" as separate mode if requested.
+- **Maintenance**:
+  - Continue prompt file updates and use slot sync button when new files are added.
 
 ## 🐛 Known Issues
 - None. This is the Final Gold Edition.
