@@ -1,5 +1,20 @@
 # 🔨 Build Log
 
+## 2026-02-28 (Sat) - Reserved Start Strict Wait (No Mouse Move Before Time)
+- **Success**:
+  - Added strict reservation wait behavior exactly as requested.
+  - Before reserved time, mouse no longer moves and automation does not begin.
+- **Changes**:
+  - **Reserved Wait Runtime (`flow_auto_v2.py`)**:
+    - In `_tick()`, idle mouse wandering now runs only when `scheduled_waiting == False`.
+    - During reservation waiting, 30s countdown alert popup is also suppressed.
+    - At reserved timestamp, existing start flow proceeds normally.
+- **Documentation**:
+  - Added Korean update guide: `기능_업데이트_설명서.md`.
+- **Validation**:
+  - Syntax compile check passed:
+    - `python3 -m py_compile flow/flow_auto_v2.py`
+
 ## 2026-02-25 (Wed) - Slot Auto Sync + Calendar Scheduler UX
 - **Success**:
   - Added requested "auto sync newly added prompt slot files" workflow.

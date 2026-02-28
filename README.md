@@ -46,6 +46,7 @@ Double-click **`Flow_Start.vbs`**.
 
 ### 🎭 Human-Like Behavior
 - **AFK Mode**: Mouse moves and scrolls (no clicks) during wait times.
+- **Reserved Start Safety**: If one-time reservation is enabled, mouse stays still until the reserved time is reached.
 - **Random Speed**: Typing speed varies naturally.
 - **Reporting**: Detailed session logs saved to `logs/`.
 

@@ -1,7 +1,7 @@
 # 🏗️ Project State: Flow Veo Vision Bot
 
-> **Last Updated:** 2026-02-25 (Wed) - Slot Sync + Calendar Reservation
-> **Current Stage:** 🛠️ Enhanced Usability + Scheduling
+> **Last Updated:** 2026-02-28 (Sat) - Reserved Start Strict Wait
+> **Current Stage:** 🛠️ Scheduling Precision Update
 
 ## 📊 Project Overview
 - **Type:** Desktop Automation Tool (Python, Tkinter, PyAutoGUI)
@@ -21,11 +21,13 @@
 - **One-time Reservation Start (Specific Date/Time)**:
   - Supports delayed start at exact reserved datetime.
   - Reservation is persisted in config and resumed on app restart.
+  - While waiting for reserved time, mouse stays still (no AFK wander before start).
 - **Calendar-based Reservation UX**:
   - Removed hard manual typing dependency.
   - Date is picked from calendar, time via hour/minute selectors.
 
 ## ✅ Resolved (Today's Fixes)
+- **[Fix] Reserved Start Strict Wait:** During reservation wait, no mouse movement occurs; automation starts only at reserved time.
 - **[Feature] Slot File Auto Sync:** Added one-click sync to register newly added slot files automatically.
 - **[Feature] One-time Reserved Start:** Added wait-until-reserved-time execution mode.
 - **[UX] Calendar Reservation Picker:** Added calendar popup to select date/time without typing format manually.

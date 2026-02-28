@@ -1423,21 +1423,23 @@ class FlowVisionApp:
                     else:
                         self.update_status_label(f"⏳ 대기 중... {int(remain)}초 (비상은 마우스 구석으로!)", "#FFC107") # Amber
                     
-                    # [NEW] 대기 중 마우스 산책 (클릭 절대 금지!)
-                    if random.random() < 0.3: # 30% 확률로 조금씩 움직임
-                        try:
-                            # AFK 영역이 있으면 그 안에서, 없으면 화면 전체에서 살짝 산책
-                            area = self.cfg.get("afk_area")
-                            if area:
-                                tx = random.randint(area['x1'], area['x2'])
-                                ty = random.randint(area['y1'], area['y2'])
-                            else:
-                                sw, sh = pyautogui.size()
-                                tx, ty = random.randint(100, sw-100), random.randint(100, sh-100)
-                            
-                            # 아주 천천히 부드럽게 이동
-                            self.actor.move_to(tx, ty, overshoot=False)
-                        except: pass
+                    # 예약 대기 중에는 마우스를 절대 움직이지 않음
+                    if not self.scheduled_waiting:
+                        # [NEW] 대기 중 마우스 산책 (클릭 절대 금지!)
+                        if random.random() < 0.3: # 30% 확률로 조금씩 움직임
+                            try:
+                                # AFK 영역이 있으면 그 안에서, 없으면 화면 전체에서 살짝 산책
+                                area = self.cfg.get("afk_area")
+                                if area:
+                                    tx = random.randint(area['x1'], area['x2'])
+                                    ty = random.randint(area['y1'], area['y2'])
+                                else:
+                                    sw, sh = pyautogui.size()
+                                    tx, ty = random.randint(100, sw-100), random.randint(100, sh-100)
+                                
+                                # 아주 천천히 부드럽게 이동
+                                self.actor.move_to(tx, ty, overshoot=False)
+                            except: pass
             
             try: base = int(self.entry_interval.get())
             except: base = 180
@@ -1446,7 +1448,11 @@ class FlowVisionApp:
             finish_time = datetime.fromtimestamp(time.time() + total_sec).strftime("%p %I:%M")
             self.lbl_eta.config(text=f"🏁 종료 예정: {finish_time}")
 
-            if not self.is_processing and 0 < remain <= 30:
+            if self.scheduled_waiting:
+                if self.alert_window:
+                    self.alert_window.close()
+                    self.alert_window = None
+            elif not self.is_processing and 0 < remain <= 30:
                 if self.alert_window is None:
                     self.alert_window = CountdownAlert(self.root, remain, self.cfg.get("sound_enabled"))
                 else:
