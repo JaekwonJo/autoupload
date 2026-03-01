@@ -1,5 +1,5 @@
 {
-    "prompts_file": "flow_prompts_slot4.txt",
+    "prompts_file": "flow_prompts_slot2.txt",
     "prompts_separator": "|||",
     "check_interval_seconds": 120,
     "flow_base_url": "https://labs.google/fx/ko/tools/flow",
@@ -28,11 +28,11 @@
     ],
     "prompt_slots": [
         {
-            "name": "리볼빙 에피소드",
+            "name": "반도체1위_영상",
             "file": "flow_prompts.txt"
         },
         {
-            "name": "새해복많이받으세요",
+            "name": "삼성메모리_1부",
             "file": "flow_prompts_slot2.txt"
         },
         {
@@ -44,7 +44,7 @@
             "file": "flow_prompts_slot4.txt"
         },
         {
-            "name": "채권의 비밀",
+            "name": "방산_영상",
             "file": "flow_prompts_slot5.txt"
         },
         {
@@ -80,7 +80,7 @@
             "file": "flow_prompts_slot11.txt"
         }
     ],
-    "active_prompt_slot": 3,
+    "active_prompt_slot": 1,
     "prompt_save_dir": "",
     "download_selector_main": "button[type=\"button\"]",
     "download_selector_quality": "div:nth-of-type(5) > div.sc-93fd5d6e-0.lgqRRf > div.sc-93fd5d6e-2.jqFZVr",
@@ -92,31 +92,31 @@
         "x": 1452,
         "y": 1074
     },
-    "interval_seconds": 60,
+    "interval_seconds": 100,
     "input_area": {
-        "x1": 1020,
-        "y1": 1273,
-        "x2": 1242,
-        "y2": 1280
+        "x1": 1008,
+        "y1": 1293,
+        "x2": 1146,
+        "y2": 1300
     },
     "submit_area": {
-        "x1": 1546,
-        "y1": 1319,
-        "x2": 1556,
-        "y2": 1332
+        "x1": 1550,
+        "y1": 1326,
+        "x2": 1560,
+        "y2": 1339
     },
     "afk_area": {
-        "x1": 2208,
-        "y1": 349,
-        "x2": 2504,
-        "y2": 1212
+        "x1": 295,
+        "y1": 220,
+        "x2": 2310,
+        "y2": 871
     },
     "afk_mode": true,
     "sound_enabled": true,
     "relay_mode": false,
     "relay_count": 1,
     "language_mode": "ko_en",
-    "input_mode": "mixed",
+    "input_mode": "paste",
     "use_ref_images": false,
     "ref_image_count": 3,
     "add_btn_area": {
@@ -170,5 +170,14 @@
     "add_btn5_area": null,
     "ref_img5_area": null,
     "scheduled_start_enabled": false,
-    "scheduled_start_at": ""
+    "scheduled_start_at": "2026-03-01 06:00",
+    "start_url": "https://labs.google/fx/ko/tools/flow/project/58825f2e-40d2-455b-8c98-57b9641aba49",
+    "input_selector": "[contenteditable='true']",
+    "submit_selector": "button:has-text('생성')",
+    "browser_headless": false,
+    "browser_channel": "chrome",
+    "browser_profile_dir": "flow_human_profile_pw",
+    "enter_submit_rate": 0.5,
+    "auto_open_new_project": false,
+    "new_project_selector": ""
 }

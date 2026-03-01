@@ -3,13 +3,12 @@ import os
 import time
 import random
 import threading
-import math
+import queue
 import re
 import calendar
 import traceback 
 from pathlib import Path
 from datetime import datetime, timedelta
-import ctypes
 import importlib 
 
 # [CRITICAL] 윈도우/리눅스(WSL) 호환성 체크
@@ -23,9 +22,26 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from tkinter.scrolledtext import ScrolledText
 
-# [비전 봇 핵심 모듈]
-import pyautogui
-import pyperclip
+# [Playwright 핵심 모듈]
+from playwright.sync_api import (
+    Error as PlaywrightError,
+    TimeoutError as PlaywrightTimeoutError,
+    sync_playwright,
+)
+try:
+    from playwright_stealth import stealth_sync
+except ImportError:
+    try:
+        from playwright_stealth import Stealth
+
+        def stealth_sync(page):
+            try:
+                Stealth().apply_stealth_sync(page)
+            except Exception:
+                return None
+    except ImportError:
+        def stealth_sync(_page):
+            return None
 
 # [NEW] 인간 행동 엔진 탑재
 try:
@@ -46,9 +62,17 @@ DEFAULT_CONFIG = {
     "prompts_file": "flow_prompts.txt",
     "prompts_separator": "|||",
     "interval_seconds": 180,
-    "input_area": None,
-    "submit_area": None,
-    "afk_area": None,
+    "start_url": "https://labs.google/flow",
+    "input_selector": "textarea, [contenteditable='true']",
+    "submit_selector": "button[type='submit']",
+    "auto_open_new_project": True,
+    "new_project_selector": "",
+    "browser_headless": False,
+    "browser_channel": "chrome",
+    "browser_profile_dir": "flow_human_profile_pw",
+    "input_area": None,  # 구버전 호환용(미사용)
+    "submit_area": None,  # 구버전 호환용(미사용)
+    "afk_area": None,  # 구버전 호환용(미사용)
     "afk_mode": False,
     "prompt_slots": [],
     "active_prompt_slot": 0,
@@ -63,6 +87,7 @@ DEFAULT_CONFIG = {
     "scheduled_start_at": "",
     "language_mode": "en",
     "input_mode": "typing", # typing, paste, mixed
+    "enter_submit_rate": 0.5,
     "use_ref_images": False,
     "ref_image_count": 1,
     "add_btn1_area": None,
@@ -270,6 +295,8 @@ class FlowVisionApp:
         self.base = Path(__file__).resolve().parent
         self.cfg_path = self.base / CONFIG_FILE
         self.cfg = load_config_from_file(self.cfg_path)
+        self.logs_dir = self.base.parent / "logs"
+        self.logs_dir.mkdir(parents=True, exist_ok=True)
         
         self.running = False
         self.is_processing = False 
@@ -280,7 +307,19 @@ class FlowVisionApp:
         self.scheduled_start_ts = None
         self.alert_window = None
         self.relay_progress = 0 
-        self.actor = HumanActor()
+        self.playwright = None
+        self.browser_context = None
+        self.page = None
+        self.action_log_path = None
+        self.action_log_fp = None
+        self.session_report_path = None
+        self.task_queue = queue.Queue()
+        self.worker_thread = None
+        self.worker_stop_event = threading.Event()
+        self.run_input_mode = None
+        self.enter_only_submit = True
+
+        self.actor = HumanActor(action_logger=self._action_log, status_callback=self._actor_status)
         self.actor.language_mode = self.cfg.get("language_mode", "en")
         
         self.root = tk.Tk()
@@ -291,6 +330,7 @@ class FlowVisionApp:
         # [NEW] Responsive Grid Weight
         self.root.grid_columnconfigure(0, weight=1)
         self.root.grid_rowconfigure(1, weight=1)
+        self.root.protocol("WM_DELETE_WINDOW", self.on_exit)
         
         # [NEW] Log Window Instance
         self.log_window = LogWindow(self.root, self)
@@ -365,6 +405,169 @@ class FlowVisionApp:
     def save_config(self):
         try: self.cfg_path.write_text(json.dumps(self.cfg, indent=4, ensure_ascii=False), encoding='utf-8')
         except: pass
+
+    def _actor_status(self, text):
+        self.root.after(0, lambda: self.update_status_label(text, self.color_info))
+
+    def _action_log(self, msg):
+        if not self.action_log_fp:
+            return
+        try:
+            self.action_log_fp.write(f"{msg}\n")
+            self.action_log_fp.flush()
+        except Exception:
+            pass
+
+    def _open_action_log(self):
+        if self.action_log_fp:
+            return
+        stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        self.action_log_path = self.logs_dir / f"action_trace_{stamp}.log"
+        self.action_log_fp = self.action_log_path.open("a", encoding="utf-8")
+        self._action_log(f"[{datetime.now().strftime('%H:%M:%S')}] 액션 로그 파일 생성: {self.action_log_path}")
+        self.log(f"🧾 행동 로그 저장 시작: {self.action_log_path.name}")
+
+    def _close_action_log(self):
+        if not self.action_log_fp:
+            return
+        try:
+            self._action_log(f"[{datetime.now().strftime('%H:%M:%S')}] 액션 로그 종료")
+            self.action_log_fp.close()
+        except Exception:
+            pass
+        finally:
+            self.action_log_fp = None
+
+    def _resolve_profile_dir(self):
+        profile_dir = (self.cfg.get("browser_profile_dir") or "flow_human_profile_pw").strip()
+        profile_path = self.base / profile_dir
+        profile_path.mkdir(parents=True, exist_ok=True)
+        return profile_path
+
+    def _ensure_browser_session(self):
+        if self.page and not self.page.is_closed():
+            return
+        if self.playwright is None:
+            self.playwright = sync_playwright().start()
+        if self.browser_context:
+            try:
+                self.browser_context.close()
+            except Exception:
+                pass
+            self.browser_context = None
+
+        profile_path = self._resolve_profile_dir()
+        # Windows에서 남아있는 profile lock 파일이 있으면 launch가 즉시 죽는 경우가 있어 정리
+        for lock_name in ("SingletonLock", "SingletonCookie", "SingletonSocket"):
+            try:
+                p = profile_path / lock_name
+                if p.exists():
+                    p.unlink()
+            except Exception:
+                pass
+
+        channel = (self.cfg.get("browser_channel") or "chrome").strip() or None
+        headless = bool(self.cfg.get("browser_headless", False))
+        viewport_w = random.randint(1366, 1720)
+        viewport_h = random.randint(820, 980)
+
+        def _launch_with(_profile_path, _channel):
+            return self.playwright.chromium.launch_persistent_context(
+                user_data_dir=str(_profile_path),
+                channel=_channel,
+                headless=headless,
+                viewport={"width": viewport_w, "height": viewport_h},
+                args=[
+                    "--disable-blink-features=AutomationControlled",
+                    "--disable-dev-shm-usage",
+                    "--start-maximized",
+                ],
+            )
+
+        try:
+            self.browser_context = _launch_with(profile_path, channel)
+        except Exception as e1:
+            # 1차 폴백: 채널 미지정(Playwright Chromium)
+            self.log(f"⚠️ 브라우저 실행 1차 실패, Chromium 폴백 시도: {e1}")
+            try:
+                self.browser_context = _launch_with(profile_path, None)
+            except Exception as e2:
+                # 2차 폴백: 임시 프로필 디렉토리
+                runtime_profile = self.base / f"flow_human_profile_pw_runtime_{int(time.time())}"
+                runtime_profile.mkdir(parents=True, exist_ok=True)
+                self.log(f"⚠️ 브라우저 실행 2차 실패, 임시 프로필 폴백 시도: {e2}")
+                self.browser_context = _launch_with(runtime_profile, None)
+
+        if self.browser_context.pages:
+            self.page = self.browser_context.pages[0]
+        else:
+            self.page = self.browser_context.new_page()
+
+        try:
+            stealth_sync(self.page)
+        except Exception as e:
+            self.log(f"⚠️ stealth 적용 실패(계속 진행): {e}")
+
+        self.actor.set_page(self.page)
+        self.log("🌐 Playwright 브라우저 세션 연결 완료")
+        self._action_log(f"[{datetime.now().strftime('%H:%M:%S')}] 브라우저 세션 생성")
+
+    def _shutdown_browser(self):
+        try:
+            if self.browser_context:
+                self.browser_context.close()
+        except Exception:
+            pass
+        self.browser_context = None
+        self.page = None
+
+        try:
+            if self.playwright:
+                self.playwright.stop()
+        except Exception:
+            pass
+        self.playwright = None
+
+    def _ensure_worker_thread(self):
+        if self.worker_thread and self.worker_thread.is_alive():
+            return
+        self.worker_stop_event.clear()
+        self.worker_thread = threading.Thread(target=self._worker_loop, daemon=True)
+        self.worker_thread.start()
+        self.log("🧵 자동화 작업 스레드 시작")
+
+    def _stop_worker_thread(self):
+        self.worker_stop_event.set()
+        try:
+            self.task_queue.put_nowait("stop")
+        except Exception:
+            pass
+        if self.worker_thread and self.worker_thread.is_alive():
+            try:
+                self.worker_thread.join(timeout=2.0)
+            except Exception:
+                pass
+        self.worker_thread = None
+        # 남은 큐를 비워 다음 시작 시 중복 실행 방지
+        try:
+            while True:
+                self.task_queue.get_nowait()
+        except queue.Empty:
+            pass
+
+    def _worker_loop(self):
+        while not self.worker_stop_event.is_set():
+            try:
+                cmd = self.task_queue.get(timeout=0.5)
+            except queue.Empty:
+                continue
+            if cmd == "stop":
+                break
+            if cmd == "run":
+                try:
+                    self._run_task()
+                except Exception as e:
+                    self.log(f"❌ 작업 스레드 예외: {e}")
 
     def _ensure_prompt_slots(self):
         changed = False
@@ -578,20 +781,79 @@ class FlowVisionApp:
         left_card = ttk.LabelFrame(scrollable_frame, text=" ⚙️ 기본 설정 ", padding=15)
         left_card.pack(fill="x", padx=5, pady=5)
         
-        # Target Buttons
-        tk.Label(left_card, text="1. 화면 인식 영역 지정 (필수)", font=("Malgun Gothic", 11, "bold"), fg=self.color_text).pack(anchor="w", pady=(0, 5))
-        btn_area = tk.Frame(left_card, bg=self.color_bg)
-        btn_area.pack(fill="x", pady=5)
-        
-        b1 = ttk.Button(btn_area, text="🟦 입력창 지정", width=12, command=lambda: self.start_capture("input"))
-        b1.pack(side="left", padx=5)
-        b2 = ttk.Button(btn_area, text="🟩 버튼 지정", width=12, command=lambda: self.start_capture("submit"))
-        b2.pack(side="left", padx=5)
-        b3 = ttk.Button(btn_area, text="⬜ 딴짓 영역", width=12, command=lambda: self.start_capture("afk"))
-        b3.pack(side="left", padx=5)
-        
-        self.lbl_coords = tk.Label(left_card, text=self._get_coord_text(), font=("Consolas", 10), fg=self.color_accent, bg="#F1F3F5", padx=5, pady=2)
-        self.lbl_coords.pack(fill="x", pady=(5, 20))
+        # Playwright Target Settings
+        tk.Label(left_card, text="1. 브라우저 대상 설정 (필수)", font=("Malgun Gothic", 11, "bold"), fg=self.color_text).pack(anchor="w", pady=(0, 5))
+
+        tk.Label(left_card, text="시작 URL", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(anchor="w")
+        self.start_url_var = tk.StringVar(value=self.cfg.get("start_url", "https://labs.google/flow"))
+        self.entry_start_url = tk.Entry(left_card, textvariable=self.start_url_var, bg="#FFFFFF", fg="black", font=("Consolas", 10))
+        self.entry_start_url.pack(fill="x", ipady=4, pady=(2, 8))
+        self.entry_start_url.bind("<FocusOut>", self.on_option_toggle)
+
+        tk.Label(left_card, text="입력창 CSS Selector", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(anchor="w")
+        self.input_selector_var = tk.StringVar(value=self.cfg.get("input_selector", "textarea, [contenteditable='true']"))
+        self.entry_input_selector = tk.Entry(left_card, textvariable=self.input_selector_var, bg="#FFFFFF", fg="black", font=("Consolas", 10))
+        self.entry_input_selector.pack(fill="x", ipady=4, pady=(2, 8))
+        self.entry_input_selector.bind("<FocusOut>", self.on_option_toggle)
+
+        tk.Label(left_card, text="제출 버튼 CSS Selector", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(anchor="w")
+        self.submit_selector_var = tk.StringVar(value=self.cfg.get("submit_selector", "button[type='submit']"))
+        self.entry_submit_selector = tk.Entry(left_card, textvariable=self.submit_selector_var, bg="#FFFFFF", fg="black", font=("Consolas", 10))
+        self.entry_submit_selector.pack(fill="x", ipady=4, pady=(2, 8))
+        self.entry_submit_selector.bind("<FocusOut>", self.on_option_toggle)
+
+        selector_tool_f = tk.Frame(left_card, bg=self.color_bg)
+        selector_tool_f.pack(fill="x", pady=(0, 8))
+        ttk.Button(selector_tool_f, text="🔍 Selector 자동 찾기", command=self.on_auto_detect_selectors).pack(side="left")
+        ttk.Button(selector_tool_f, text="🧪 Selector 테스트", command=self.on_test_selectors).pack(side="left", padx=6)
+
+        browser_f = tk.Frame(left_card, bg=self.color_bg)
+        browser_f.pack(fill="x", pady=(0, 10))
+        self.browser_headless_var = tk.BooleanVar(value=self.cfg.get("browser_headless", False))
+        tk.Checkbutton(
+            browser_f,
+            text="헤드리스(화면 숨김)",
+            variable=self.browser_headless_var,
+            command=self.on_option_toggle,
+            bg=self.color_bg,
+            font=("Malgun Gothic", 9),
+            activebackground=self.color_bg,
+        ).pack(side="left")
+
+        tk.Label(browser_f, text="채널:", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left", padx=(10, 4))
+        self.browser_channel_var = tk.StringVar(value=self.cfg.get("browser_channel", "chrome"))
+        self.combo_browser_channel = ttk.Combobox(
+            browser_f,
+            textvariable=self.browser_channel_var,
+            state="readonly",
+            width=10,
+            font=("Malgun Gothic", 9),
+            values=("chrome", "msedge", "chromium"),
+        )
+        self.combo_browser_channel.pack(side="left")
+        self.combo_browser_channel.bind("<<ComboboxSelected>>", self.on_option_toggle)
+
+        new_project_f = tk.Frame(left_card, bg=self.color_bg)
+        new_project_f.pack(fill="x", pady=(0, 8))
+        self.auto_new_project_var = tk.BooleanVar(value=self.cfg.get("auto_open_new_project", True))
+        tk.Checkbutton(
+            new_project_f,
+            text="홈 화면이면 '새 프로젝트' 자동 클릭",
+            variable=self.auto_new_project_var,
+            command=self.on_option_toggle,
+            bg=self.color_bg,
+            font=("Malgun Gothic", 9),
+            activebackground=self.color_bg,
+        ).pack(side="left")
+
+        tk.Label(left_card, text="새 프로젝트 버튼 selector(선택)", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(anchor="w")
+        self.new_project_selector_var = tk.StringVar(value=self.cfg.get("new_project_selector", ""))
+        self.entry_new_project_selector = tk.Entry(left_card, textvariable=self.new_project_selector_var, bg="#FFFFFF", fg="black", font=("Consolas", 10))
+        self.entry_new_project_selector.pack(fill="x", ipady=4, pady=(2, 8))
+        self.entry_new_project_selector.bind("<FocusOut>", self.on_option_toggle)
+
+        self.lbl_coords = tk.Label(left_card, text=self._get_coord_text(), font=("Consolas", 9), fg=self.color_accent, bg="#F1F3F5", padx=5, pady=4)
+        self.lbl_coords.pack(fill="x", pady=(5, 16))
         
         # Options
         tk.Label(left_card, text="2. 옵션 설정", font=("Malgun Gothic", 11, "bold"), fg=self.color_text).pack(anchor="w", pady=(0, 5))
@@ -604,7 +866,7 @@ class FlowVisionApp:
         c1.config(variable=self.sound_var)
         c1.grid(row=0, column=0, sticky="w", padx=5)
         
-        c2 = tk.Checkbutton(op_f, text="AFK(딴짓) 모드", variable=tk.BooleanVar(), command=self.on_option_toggle, bg=self.color_bg, fg="#D63384", selectcolor=self.color_bg, activebackground=self.color_bg, font=("Malgun Gothic", 10, "bold"))
+        c2 = tk.Checkbutton(op_f, text="대기 중 랜덤 행동", variable=tk.BooleanVar(), command=self.on_option_toggle, bg=self.color_bg, fg="#D63384", selectcolor=self.color_bg, activebackground=self.color_bg, font=("Malgun Gothic", 10, "bold"))
         self.afk_var = tk.BooleanVar(value=self.cfg.get("afk_mode", False))
         c2.config(variable=self.afk_var)
         c2.grid(row=0, column=1, sticky="w", padx=5)
@@ -626,34 +888,6 @@ class FlowVisionApp:
         self.combo_input_mode.bind("<<ComboboxSelected>>", self.on_option_toggle)
         
         mode_map = {"typing": "⌨️ 타이핑", "paste": "📋 복사붙여넣기", "mixed": "🔀 혼용(랜덤)"}
-        # 콤보박스 표시용 맵핑 (선택 사항)
-        
-        # --- [NEW] Reference Image Settings ---
-        img_card = ttk.LabelFrame(left_card, text=" 🖼️ 레퍼런스 이미지 설정 ", padding=10)
-        img_card.pack(fill="x", pady=(20, 0))
-
-        img_op_f = tk.Frame(img_card, bg=self.color_bg)
-        img_op_f.pack(fill="x")
-        
-        self.use_ref_var = tk.BooleanVar(value=self.cfg.get("use_ref_images", False))
-        tk.Checkbutton(img_op_f, text="이미지 참조 사용", variable=self.use_ref_var, command=self.on_option_toggle, 
-                       bg=self.color_bg, font=("Malgun Gothic", 9, "bold")).pack(side="left")
-        
-        tk.Label(img_op_f, text="개수:", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left", padx=(10, 2))
-        self.ref_count_var = tk.IntVar(value=self.cfg.get("ref_image_count", 1))
-        tk.Spinbox(img_op_f, from_=1, to=5, width=2, textvariable=self.ref_count_var, command=self.on_option_toggle).pack(side="left")
-
-        img_btn_f = tk.Frame(img_card, bg=self.color_bg)
-        img_btn_f.pack(fill="x", pady=5)
-        
-        # 5개의 행으로 구성된 지정 버튼들
-        for i in range(1, 6):
-            tk.Label(img_btn_f, text=f"Set {i}:", font=("Consolas", 8, "bold"), bg=self.color_bg).grid(row=i-1, column=0, padx=2)
-            ttk.Button(img_btn_f, text=f"➕{i} 지정", width=8, command=lambda x=i: self.start_capture(f"add_btn{x}")).grid(row=i-1, column=1, padx=2, pady=1)
-            ttk.Button(img_btn_f, text=f"🖼️{i} 지정", width=8, command=lambda x=i: self.start_capture(f"ref_img{x}")).grid(row=i-1, column=2, padx=2, pady=1)
-        
-        self.lbl_img_coords = tk.Label(img_card, text=self._get_img_coord_text(), font=("Consolas", 8), fg=self.color_text_sec, bg=self.color_bg)
-        self.lbl_img_coords.pack(fill="x")
 
         # Relay
         relay_f = tk.Frame(left_card, bg=self.color_bg)
@@ -1103,10 +1337,25 @@ class FlowVisionApp:
         self.cfg["scheduled_start_enabled"] = self.schedule_var.get() if hasattr(self, "schedule_var") else self.cfg.get("scheduled_start_enabled", False)
         self.cfg["scheduled_start_at"] = self.schedule_text_var.get().strip() if hasattr(self, "schedule_text_var") else self.cfg.get("scheduled_start_at", "")
         self.cfg["language_mode"] = "ko_en" if self.lang_var.get() else "en"
-        self.cfg["input_mode"] = self.input_mode_var.get()
-        self.cfg["use_ref_images"] = self.use_ref_var.get()
-        try: self.cfg["ref_image_count"] = max(1, min(5, int(self.ref_count_var.get())))
-        except: self.cfg["ref_image_count"] = 1
+        # 실행 중에는 시작 시 확정한 입력방식을 유지(중간 변경으로 typing/paste 뒤바뀜 방지)
+        if self.running and self.run_input_mode in ("typing", "paste", "mixed"):
+            self.cfg["input_mode"] = self.run_input_mode
+            try:
+                if self.input_mode_var.get() != self.run_input_mode:
+                    self.input_mode_var.set(self.run_input_mode)
+            except Exception:
+                pass
+        else:
+            self.cfg["input_mode"] = self.input_mode_var.get()
+        self.cfg["start_url"] = self.start_url_var.get().strip() if hasattr(self, "start_url_var") else self.cfg.get("start_url", "")
+        self.cfg["input_selector"] = self.input_selector_var.get().strip() if hasattr(self, "input_selector_var") else self.cfg.get("input_selector", "")
+        self.cfg["submit_selector"] = self.submit_selector_var.get().strip() if hasattr(self, "submit_selector_var") else self.cfg.get("submit_selector", "")
+        self.cfg["auto_open_new_project"] = self.auto_new_project_var.get() if hasattr(self, "auto_new_project_var") else self.cfg.get("auto_open_new_project", True)
+        self.cfg["new_project_selector"] = self.new_project_selector_var.get().strip() if hasattr(self, "new_project_selector_var") else self.cfg.get("new_project_selector", "")
+        self.cfg["browser_headless"] = self.browser_headless_var.get() if hasattr(self, "browser_headless_var") else self.cfg.get("browser_headless", False)
+        self.cfg["browser_channel"] = self.browser_channel_var.get().strip() if hasattr(self, "browser_channel_var") else self.cfg.get("browser_channel", "chrome")
+        if hasattr(self, "lbl_coords"):
+            self.lbl_coords.config(text=self._get_coord_text())
         try: self.cfg["relay_count"] = int(self.relay_cnt_var.get())
         except: self.cfg["relay_count"] = 1
         self.cfg["relay_use_selection"] = self.relay_pick_var.get() if hasattr(self, "relay_pick_var") else self.cfg.get("relay_use_selection", False)
@@ -1120,6 +1369,631 @@ class FlowVisionApp:
         if hasattr(self, 'actor'):
             self.actor.language_mode = self.cfg["language_mode"]
         self.log(f"⚙️ 설정 동기화 완료 (입력방식: {self.cfg['input_mode']})")
+
+    def _pick_first_visible_selector(self, candidates):
+        if not self.page:
+            return None
+        for sel in candidates:
+            try:
+                loc = self.page.locator(sel).first
+                if loc.count() <= 0:
+                    continue
+                if loc.is_visible(timeout=1200):
+                    return sel
+            except Exception:
+                continue
+        return None
+
+    def _normalize_candidate_list(self, value):
+        out = []
+        if isinstance(value, str):
+            v = value.strip()
+            if v:
+                out.append(v)
+        elif isinstance(value, (list, tuple)):
+            for x in value:
+                if isinstance(x, str):
+                    v = x.strip()
+                    if v:
+                        out.append(v)
+        return out
+
+    def _input_candidates(self):
+        cands = []
+        cands.extend(self._normalize_candidate_list(self.cfg.get("input_selector", "")))
+        cands.extend(self._normalize_candidate_list(self.cfg.get("input_selectors", [])))
+        cands.extend([
+            "#PINHOLE_TEXT_AREA_ELEMENT_ID",
+            "textarea#PINHOLE_TEXT_AREA_ELEMENT_ID",
+            "[id*='PINHOLE' i]",
+            "textarea",
+            "[contenteditable='true']",
+            "[contenteditable='plaintext-only']",
+            "div[contenteditable='true']",
+            "div[contenteditable='plaintext-only']",
+            "[role='textbox']",
+            "div.ProseMirror[contenteditable='true']",
+            "div[data-lexical-editor='true']",
+            "textarea[placeholder*='prompt' i]",
+            "textarea[placeholder*='message' i]",
+            "textarea[placeholder*='메시지' i]",
+            "textarea[aria-label*='prompt' i]",
+            "textarea[aria-label*='message' i]",
+        ])
+        # 중복 제거(순서 유지)
+        seen = set()
+        uniq = []
+        for x in cands:
+            if x not in seen:
+                uniq.append(x)
+                seen.add(x)
+        return uniq
+
+    def _submit_candidates(self):
+        cands = []
+        cands.extend(self._normalize_candidate_list(self.cfg.get("submit_selector", "")))
+        cands.extend(self._normalize_candidate_list(self.cfg.get("submit_selectors", [])))
+        cands.extend([
+            "button[type='submit']",
+            "button[aria-label*='generate' i]",
+            "button[aria-label*='생성' i]",
+            "button[aria-label*='보내' i]",
+            "button[aria-label*='send' i]",
+            "button[aria-label*='submit' i]",
+            "[role='button'][aria-label*='생성' i]",
+            "[role='button'][aria-label*='보내' i]",
+            "[role='button'][aria-label*='send' i]",
+            "button:has-text('Generate')",
+            "button:has-text('생성')",
+            "button:has-text('보내기')",
+            # 마지막 fallback으로만 사용
+            "button[aria-label*='create' i]",
+            "button:has-text('Create')",
+        ])
+        seen = set()
+        uniq = []
+        for x in cands:
+            if x not in seen:
+                uniq.append(x)
+                seen.add(x)
+        return uniq
+
+    def _resolve_submit_by_geometry(self, input_locator, timeout_ms=1200):
+        """
+        텍스트 기반 selector가 부정확할 때, 입력창 오른쪽의 실제 전송 버튼을 기하학적으로 추정한다.
+        """
+        if (not self.page) or (input_locator is None):
+            return None
+        try:
+            ib = input_locator.bounding_box()
+        except Exception:
+            ib = None
+        if not ib:
+            return None
+
+        ix = ib["x"]
+        iy = ib["y"]
+        iw = ib["width"]
+        ih = ib["height"]
+        input_cx = ix + iw / 2.0
+        input_cy = iy + ih / 2.0
+        input_right = ix + iw
+
+        best = None
+        best_score = float("inf")
+        try:
+            loc = self.page.locator("button, [role='button']")
+            total = loc.count()
+        except Exception:
+            return None
+
+        upper = min(total, 250)
+        for i in range(upper):
+            cand = loc.nth(i)
+            try:
+                if not cand.is_visible(timeout=timeout_ms):
+                    continue
+            except Exception:
+                continue
+            try:
+                if not cand.is_enabled(timeout=200):
+                    continue
+            except Exception:
+                pass
+            try:
+                b = cand.bounding_box()
+            except Exception:
+                b = None
+            if not b:
+                continue
+            if b["width"] < 18 or b["height"] < 18:
+                continue
+
+            cx = b["x"] + b["width"] / 2.0
+            cy = b["y"] + b["height"] / 2.0
+            score = 0.0
+
+            # 입력창 행과 가까운 버튼(특히 우측)을 선호
+            score += abs(cy - input_cy) * 3.0
+            score += abs(cx - (input_right - 24.0)) * 1.5
+
+            # 입력창보다 너무 위쪽(상단바)은 강한 패널티
+            if cy < (iy - 180):
+                score += 3000.0
+            # 입력창 왼쪽에 있는 버튼(+) 등은 패널티
+            if cx < (ix + iw * 0.45):
+                score += 900.0
+
+            try:
+                meta = cand.evaluate(
+                    """(el) => ((el.getAttribute('aria-label') || '') + ' ' + (el.innerText || '')).toLowerCase()"""
+                )
+            except Exception:
+                meta = ""
+            if meta:
+                if any(x in meta for x in ("menu", "메뉴", "설정", "setting", "도움", "help", "프로젝트")):
+                    score += 1600.0
+                if any(x in meta for x in ("생성", "generate", "send", "보내")):
+                    score -= 350.0
+
+            if score < best_score:
+                best_score = score
+                best = cand
+
+        return best
+
+    def _resolve_visible_locator(self, candidates, timeout_ms=1200):
+        if not self.page:
+            return None, None
+        # main frame 우선
+        for sel in candidates:
+            try:
+                loc = self.page.locator(sel).first
+                if loc.count() > 0 and loc.is_visible(timeout=timeout_ms):
+                    return loc, sel
+            except Exception:
+                continue
+        # iframe 탐색
+        try:
+            for fr in self.page.frames:
+                if fr == self.page.main_frame:
+                    continue
+                for sel in candidates:
+                    try:
+                        loc = fr.locator(sel).first
+                        if loc.count() > 0 and loc.is_visible(timeout=timeout_ms):
+                            return loc, sel
+                    except Exception:
+                        continue
+        except Exception:
+            pass
+        return None, None
+
+    def _resolve_best_locator(self, candidates, near_locator=None, timeout_ms=1200, prefer_enabled=True):
+        """
+        selector가 여러 개 매칭될 때 가장 적절한 요소를 고르는 함수.
+        - near_locator가 있으면 그 근처의 요소를 우선 선택
+        - 비활성(disabled) 요소는 강한 패널티
+        """
+        if not self.page:
+            return None, None
+
+        near_cx = None
+        near_cy = None
+        if near_locator is not None:
+            try:
+                nb = near_locator.bounding_box()
+                if nb:
+                    near_cx = nb["x"] + nb["width"] / 2.0
+                    near_cy = nb["y"] + nb["height"] / 2.0
+            except Exception:
+                pass
+
+        best = None
+        best_selector = None
+        best_score = float("inf")
+
+        def _consider(loc, sel):
+            nonlocal best, best_selector, best_score
+            try:
+                total = loc.count()
+            except Exception:
+                return
+            if total <= 0:
+                return
+            # 너무 많은 요소일 때 과도한 탐색 방지
+            upper = min(total, 20)
+            for i in range(upper):
+                cand = loc.nth(i)
+                try:
+                    if not cand.is_visible(timeout=timeout_ms):
+                        continue
+                except Exception:
+                    continue
+                try:
+                    box = cand.bounding_box()
+                except Exception:
+                    box = None
+                if not box:
+                    continue
+
+                score = 0.0
+                try:
+                    enabled = cand.is_enabled(timeout=300)
+                except Exception:
+                    enabled = True
+                # 입력 전 단계에서는 제출 버튼이 disabled일 수 있어 과도 패널티를 피한다.
+                if not enabled and prefer_enabled:
+                    score += 1200.0
+
+                # 너무 작은 요소는 오탐 가능성이 큼
+                if box["width"] < 20 or box["height"] < 12:
+                    score += 3000.0
+
+                if near_cx is not None and near_cy is not None:
+                    cx = box["x"] + box["width"] / 2.0
+                    cy = box["y"] + box["height"] / 2.0
+                    dx = cx - near_cx
+                    dy = cy - near_cy
+                    score += (dx * dx + dy * dy) ** 0.5
+                else:
+                    score += float(i)
+
+                if score < best_score:
+                    best_score = score
+                    best = cand
+                    best_selector = sel
+
+        # main frame
+        for sel in candidates:
+            try:
+                _consider(self.page.locator(sel), sel)
+            except Exception:
+                continue
+
+        # iframes
+        try:
+            for fr in self.page.frames:
+                if fr == self.page.main_frame:
+                    continue
+                for sel in candidates:
+                    try:
+                        _consider(fr.locator(sel), sel)
+                    except Exception:
+                        continue
+        except Exception:
+            pass
+
+        return best, best_selector
+
+    def _read_input_text(self, input_locator):
+        if input_locator is None:
+            return ""
+        try:
+            val = input_locator.evaluate(
+                """(el) => {
+                    if (!el) return "";
+                    if ("value" in el && typeof el.value === "string") return el.value;
+                    return (el.innerText || el.textContent || "");
+                }"""
+            )
+            return (val or "").strip()
+        except Exception:
+            return ""
+
+    def _is_generation_indicator_visible(self):
+        if not self.page:
+            return False
+        indicators = [
+            "button:has-text('생성 중')",
+            "button:has-text('처리 중')",
+            "button:has-text('중지')",
+            "button:has-text('취소')",
+            "button:has-text('Stop')",
+            "button:has-text('Cancel')",
+            "text=/생성 중|Generating/i",
+        ]
+        for sel in indicators:
+            try:
+                loc = self.page.locator(sel).first
+                if loc.count() > 0 and loc.is_visible(timeout=250):
+                    return True
+            except Exception:
+                continue
+        return False
+
+    def _confirm_submission_started(self, input_locator, before_text, timeout_sec=12):
+        """
+        제출 직후 실제로 동작이 시작됐는지 검증.
+        """
+        end_ts = time.time() + max(2, timeout_sec)
+        before_text = (before_text or "").strip()
+        while time.time() < end_ts:
+            if self._is_generation_indicator_visible():
+                return True
+            current = self._read_input_text(input_locator)
+            # 입력창이 비워졌거나 크게 변하면 제출 성공으로 판단
+            if before_text and current != before_text:
+                if len(current) <= max(2, int(len(before_text) * 0.4)):
+                    return True
+                # 완전히 같은 프롬프트가 아니면 일부 변형도 성공으로 인정
+                if current[:40] != before_text[:40]:
+                    return True
+            time.sleep(0.5)
+        return False
+
+    def _is_input_visible(self, input_selector):
+        if not self.page:
+            return False
+        # 사용자 지정 selector + 기본 후보를 함께 확인(동적 UI 변화 대응)
+        cands = self._normalize_candidate_list(input_selector)
+        for sel in self._input_candidates():
+            if sel not in cands:
+                cands.append(sel)
+        loc, _ = self._resolve_visible_locator(cands, timeout_ms=1200)
+        return loc is not None
+
+    def _wait_until_input_visible(self, input_selector, timeout_sec=18):
+        if not self.page:
+            return False
+        end_ts = time.time() + max(1, timeout_sec)
+        while time.time() < end_ts:
+            if self._is_input_visible(input_selector):
+                return True
+            time.sleep(0.6)
+        return False
+
+    def _try_open_new_project_if_needed(self, input_selector):
+        if not self.page:
+            return False
+        if self._is_input_visible(input_selector):
+            return True
+        if not self.cfg.get("auto_open_new_project", True):
+            return False
+
+        custom_selector = (self.cfg.get("new_project_selector") or "").strip()
+        candidates = []
+        if custom_selector:
+            candidates.append(custom_selector)
+
+        candidates.extend([
+            "button:has-text('새 프로젝트')",
+            "button:has-text('새 프로젝트 만들기')",
+            "[role='button']:has-text('새 프로젝트')",
+            "a:has-text('새 프로젝트')",
+            "button:has-text('Create')",
+            "[role='button']:has-text('Create')",
+            "button:has-text('New project')",
+            "button:has-text('New Project')",
+            "button:has-text('Create new')",
+            "[role='button']:has-text('New project')",
+            "a:has-text('New project')",
+        ])
+
+        clicked = False
+        for sel in candidates:
+            try:
+                loc = self.page.locator(sel).first
+                if loc.count() <= 0:
+                    continue
+                if not loc.is_visible(timeout=1000):
+                    continue
+                self.log(f"🧭 새 프로젝트 버튼 감지: {sel}")
+                try:
+                    self.actor.move_to_locator(loc, label="새 프로젝트 버튼")
+                    self.actor.smart_click(label="새 프로젝트 버튼 클릭")
+                except Exception:
+                    loc.click(timeout=3000)
+                try:
+                    # 랜덤 클릭 실패 대비해서 Playwright 직접 클릭 한 번 더 시도
+                    loc.click(timeout=2500)
+                except Exception:
+                    pass
+                clicked = True
+                break
+            except Exception:
+                continue
+
+        if not clicked:
+            return False
+
+        try:
+            self.page.wait_for_load_state("domcontentloaded", timeout=15000)
+        except Exception:
+            pass
+        return self._wait_until_input_visible(input_selector, timeout_sec=20)
+
+    def _pick_input_selector_by_dom_heuristic(self):
+        if not self.page:
+            return None
+        try:
+            return self.page.evaluate(
+                """() => {
+                    const isVisible = (el) => {
+                        if (!el) return false;
+                        const rect = el.getBoundingClientRect();
+                        if (rect.width < 20 || rect.height < 12) return false;
+                        const style = window.getComputedStyle(el);
+                        return style.visibility !== 'hidden' && style.display !== 'none' && style.opacity !== '0';
+                    };
+                    const all = Array.from(document.querySelectorAll("textarea, [contenteditable='true'], [role='textbox']"));
+                    const visible = all.filter(isVisible);
+                    if (!visible.length) return null;
+
+                    const score = (el) => {
+                        const tag = (el.tagName || '').toLowerCase();
+                        const ph = (el.getAttribute('placeholder') || '').toLowerCase();
+                        const ar = (el.getAttribute('aria-label') || '').toLowerCase();
+                        const ce = el.getAttribute('contenteditable');
+                        const r = el.getBoundingClientRect();
+                        let s = r.width * r.height;
+                        if (tag === 'textarea') s += 100000;
+                        if (ce === 'true' || ce === 'plaintext-only') s += 20000;
+                        if (ph.includes('prompt') || ph.includes('message') || ph.includes('메시지')) s += 80000;
+                        if (ar.includes('prompt') || ar.includes('message') || ar.includes('메시지')) s += 80000;
+                        return s;
+                    };
+                    visible.sort((a, b) => score(b) - score(a));
+                    const el = visible[0];
+
+                    const id = el.getAttribute('id');
+                    if (id) return `#${CSS.escape(id)}`;
+
+                    const name = el.getAttribute('name');
+                    if (name) {
+                        const tag = el.tagName.toLowerCase();
+                        return `${tag}[name="${name.replace(/"/g, '\\\\"')}"]`;
+                    }
+
+                    const ar = el.getAttribute('aria-label');
+                    if (ar) {
+                        const tag = el.tagName.toLowerCase();
+                        return `${tag}[aria-label*="${ar.replace(/"/g, '\\\\"')}"]`;
+                    }
+
+                    const ph = el.getAttribute('placeholder');
+                    if (ph) {
+                        const tag = el.tagName.toLowerCase();
+                        return `${tag}[placeholder*="${ph.replace(/"/g, '\\\\"')}"]`;
+                    }
+
+                    const tag = el.tagName.toLowerCase();
+                    if (el.getAttribute('contenteditable') === 'true') return `${tag}[contenteditable='true']`;
+                    if (el.getAttribute('contenteditable') === 'plaintext-only') return `${tag}[contenteditable='plaintext-only']`;
+                    if (el.getAttribute('role') === 'textbox') return `${tag}[role='textbox']`;
+                    return tag;
+                }"""
+            )
+        except Exception:
+            return None
+
+    def on_auto_detect_selectors(self):
+        if self.running:
+            messagebox.showwarning("안내", "자동화 실행 중에는 selector 탐색을 할 수 없습니다.\n먼저 중지 후 시도해주세요.")
+            return
+        self.on_option_toggle()
+        self._auto_detect_selectors_worker()
+
+    def _auto_detect_selectors_worker(self):
+        try:
+            self.update_status_label("🔍 selector 자동 탐색 중...", self.color_info)
+            self._ensure_browser_session()
+            self.actor.set_page(self.page)
+
+            start_url = (self.cfg.get("start_url") or "").strip()
+            if start_url:
+                if start_url not in (self.page.url or ""):
+                    self.page.goto(start_url, wait_until="domcontentloaded", timeout=45000)
+                time.sleep(random.uniform(1.0, 2.5))
+            input_hint = (self.cfg.get("input_selector") or "").strip() or "#PINHOLE_TEXT_AREA_ELEMENT_ID, textarea, [contenteditable='true'], [role='textbox']"
+            self._try_open_new_project_if_needed(input_hint)
+
+            input_candidates = self._input_candidates()
+            submit_candidates = self._submit_candidates()
+
+            found_input_loc, found_input = self._resolve_best_locator(input_candidates, timeout_ms=1200)
+            if not found_input:
+                found_input = self._pick_input_selector_by_dom_heuristic()
+                if found_input:
+                    found_input_loc, _ = self._resolve_best_locator(
+                        self._normalize_candidate_list(found_input),
+                        timeout_ms=1200,
+                    )
+            found_submit = None
+            # 입력창을 찾은 경우에만 제출 버튼을 확정(홈 화면 Create 오탐 방지)
+            if found_input:
+                _, found_submit = self._resolve_best_locator(
+                    submit_candidates,
+                    near_locator=found_input_loc,
+                    timeout_ms=1200,
+                )
+                if not found_submit:
+                    # 근접 기준으로 못 찾으면 일반 visible 기준으로 1회 폴백
+                    _, found_submit = self._resolve_visible_locator(submit_candidates, timeout_ms=1200)
+
+            if found_input:
+                self.input_selector_var.set(found_input)
+                self.cfg["input_selector"] = found_input
+            if found_submit:
+                self.submit_selector_var.set(found_submit)
+                self.cfg["submit_selector"] = found_submit
+            self.save_config()
+            self.lbl_coords.config(text=self._get_coord_text())
+            if found_input and found_submit:
+                self.log(f"✅ 자동 탐색 성공 | 입력: {found_input} | 제출: {found_submit}")
+                self.update_status_label("✅ selector 자동 탐색 완료", self.color_success)
+            else:
+                self.log(f"⚠️ 자동 탐색 부분 성공 | 입력: {found_input or '미탐지'} | 제출: {found_submit or '미탐지'}")
+                self.update_status_label("⚠️ 일부 selector 미탐지", self.color_error)
+        except Exception as e:
+            self.log(f"❌ selector 자동 탐색 실패: {e}")
+            self.update_status_label("❌ selector 자동 탐색 실패", self.color_error)
+
+    def on_test_selectors(self):
+        if self.running:
+            messagebox.showwarning("안내", "자동화 실행 중에는 selector 테스트를 할 수 없습니다.\n먼저 중지 후 시도해주세요.")
+            return
+        self.on_option_toggle()
+        self._test_selectors_worker()
+
+    def _test_selectors_worker(self):
+        try:
+            self.update_status_label("🧪 selector 테스트 중...", self.color_info)
+            self._ensure_browser_session()
+            self.actor.set_page(self.page)
+
+            start_url = (self.cfg.get("start_url") or "").strip()
+            input_selector = (self.cfg.get("input_selector") or "").strip()
+            submit_selector = (self.cfg.get("submit_selector") or "").strip()
+
+            def _check_once():
+                try:
+                    input_loc, _ = self._resolve_best_locator(
+                        self._normalize_candidate_list(input_selector) or self._input_candidates(),
+                        timeout_ms=2200,
+                    )
+                    input_ok_local = input_loc is not None
+                except Exception:
+                    input_ok_local = False
+                try:
+                    submit_loc, _ = self._resolve_best_locator(
+                        self._normalize_candidate_list(submit_selector) or self._submit_candidates(),
+                        near_locator=input_loc if input_ok_local else None,
+                        timeout_ms=2200,
+                    )
+                    submit_ok_local = submit_loc is not None
+                except Exception:
+                    submit_ok_local = False
+                return input_ok_local, submit_ok_local
+
+            # 1차: 현재 화면에서 바로 검사 (사용자가 이미 편집화면일 수 있음)
+            input_ok, submit_ok = _check_once()
+
+            # 2차: 실패 시에만 시작 URL 이동 + 새 프로젝트 자동 진입 시도 후 재검사
+            if not (input_ok and submit_ok):
+                if start_url:
+                    self.page.goto(start_url, wait_until="domcontentloaded", timeout=45000)
+                self._try_open_new_project_if_needed(
+                    input_selector or "#PINHOLE_TEXT_AREA_ELEMENT_ID, textarea, [contenteditable='true'], [role='textbox']"
+                )
+                # 동적 렌더링 대기 후 재검사
+                for _ in range(6):
+                    time.sleep(0.7)
+                    input_ok, submit_ok = _check_once()
+                    if input_ok and submit_ok:
+                        break
+
+            self.log(
+                f"🧪 selector 테스트 결과 | URL({self.page.url}) | 입력({input_selector}): {'OK' if input_ok else 'FAIL'} | "
+                f"제출({submit_selector}): {'OK' if submit_ok else 'FAIL'}"
+            )
+            if input_ok and submit_ok:
+                self.update_status_label("✅ selector 테스트 통과", self.color_success)
+            else:
+                self.update_status_label("⚠️ selector 확인 필요", self.color_error)
+        except Exception as e:
+            self.log(f"❌ selector 테스트 실패: {e}")
+            self.update_status_label("❌ selector 테스트 실패", self.color_error)
 
     def on_open_relay_selector(self):
         slots = self.cfg.get("prompt_slots", [])
@@ -1181,31 +2055,21 @@ class FlowVisionApp:
         ttk.Button(btn_f, text="저장", command=_save).pack(side="right")
 
     def _get_coord_text(self):
-        ia, sa, aa = self.cfg.get('input_area'), self.cfg.get('submit_area'), self.cfg.get('afk_area')
-        return f"입력창[{'✅' if ia else '❌'}] 버튼[{'✅' if sa else '❌'}] AFK[{'✅' if aa else '❌'}]"
+        url_ok = bool((self.cfg.get("start_url") or "").strip())
+        input_ok = bool((self.cfg.get("input_selector") or "").strip())
+        submit_ok = bool((self.cfg.get("submit_selector") or "").strip())
+        return f"URL[{'✅' if url_ok else '❌'}] 입력Selector[{'✅' if input_ok else '❌'}] 제출Selector[{'✅' if submit_ok else '❌'}]"
 
     def _get_img_coord_text(self):
-        c = self.cfg
-        res = []
-        for i in range(1, 6):
-            btn = "✅" if c.get(f"add_btn{i}_area") else "❌"
-            img = "✅" if c.get(f"ref_img{i}_area") else "❌"
-            res.append(f"{i}[{btn}/{img}]")
-        return " | ".join(res)
+        return "Playwright 모드에서는 이미지 좌표 지정 기능을 사용하지 않습니다."
 
     def log(self, msg):
         if hasattr(self, 'log_window'):
             self.log_window.log(msg)
+        self._action_log(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}")
 
     def start_capture(self, kind):
-        def on_captured(x1, y1, x2, y2):
-            self.cfg[f"{kind}_area"] = {"x1": x1, "y1": y1, "x2": x2, "y2": y2}
-            self.save_config()
-            self.lbl_coords.config(text=self._get_coord_text())
-            if hasattr(self, 'lbl_img_coords'):
-                self.lbl_img_coords.config(text=self._get_img_coord_text())
-            messagebox.showinfo("성공", f"영역 저장 완료!")
-        CaptureOverlay(self.root, on_captured, kind)
+        messagebox.showinfo("안내", "Playwright 전환 버전에서는 화면 좌표 캡처를 사용하지 않습니다.\nURL/Selector 입력값을 사용해주세요.")
 
     def on_slot_change(self, event=None):
         idx = self.combo_slots.current()
@@ -1351,8 +2215,8 @@ class FlowVisionApp:
             else:
                 self.log(f"🏃 이어달리기 범위: {self.cfg['prompt_slots'][start_slot]['name']} → {self.cfg['prompt_slots'][end_slot]['name']}")
 
-        if not (self.cfg.get('input_area') and self.cfg.get('submit_area')):
-            messagebox.showwarning("주의", "먼저 영역을 설정해주세요.")
+        if not (self.cfg.get("start_url", "").strip() and self.cfg.get("input_selector", "").strip()):
+            messagebox.showwarning("주의", "시작 URL / 입력 셀렉터를 먼저 입력해주세요.")
             return
         
         if not self.prompts and not self.cfg.get("relay_mode"):
@@ -1380,11 +2244,29 @@ class FlowVisionApp:
         if self.relay_progress == 0:
             self.session_start_time = datetime.now()
             self.session_log = []
+            self._open_action_log()
+            self.session_report_path = self.logs_dir / f"session_report_{self.session_start_time.strftime('%Y%m%d_%H%M%S')}.json"
         self.running = True
         self.btn_start.config(state="disabled")
         self.btn_stop.config(state="normal")
         self.update_status_label("🚀 시작 중...", self.color_success)
         self.play_sound("start")
+        self.on_option_toggle()
+        # 실행 시점 입력방식 고정: 중간에 설정이 바뀌어도 현재 런에는 영향 없게 한다.
+        self.run_input_mode = (self.cfg.get("input_mode", "paste") or "paste").strip().lower()
+        if self.run_input_mode not in ("typing", "paste", "mixed"):
+            self.run_input_mode = "paste"
+        self.cfg["input_mode"] = self.run_input_mode
+        self.input_mode_var.set(self.run_input_mode)
+        self.save_config()
+        try:
+            self.combo_input_mode.config(state="disabled")
+        except Exception:
+            pass
+        self.log(f"🔒 실행 입력방식 고정: {self.run_input_mode}")
+        # selector 테스트 등에서 열려 있던 세션은 시작 전에 같은(UI) 스레드에서 안전 종료
+        self._shutdown_browser()
+        self._ensure_worker_thread()
         try:
             self.actor.update_batch_size()
             self.actor.processed_count = 0
@@ -1412,6 +2294,26 @@ class FlowVisionApp:
         if self.alert_window:
             self.alert_window.close()
             self.alert_window = None
+        self.save_session_report()
+        self._stop_worker_thread()
+        self._shutdown_browser()
+        self._close_action_log()
+        self.run_input_mode = None
+        try:
+            self.combo_input_mode.config(state="readonly")
+        except Exception:
+            pass
+
+    def on_exit(self):
+        self.running = False
+        self._stop_worker_thread()
+        self._shutdown_browser()
+        self._close_action_log()
+        self.run_input_mode = None
+        try:
+            self.root.destroy()
+        except Exception:
+            pass
 
     def _tick(self):
         if self.running and self.t_next:
@@ -1421,25 +2323,14 @@ class FlowVisionApp:
                     if self.scheduled_waiting:
                         self.update_status_label(f"⏰ 예약 대기 중... {int(remain)}초", self.color_info)
                     else:
-                        self.update_status_label(f"⏳ 대기 중... {int(remain)}초 (비상은 마우스 구석으로!)", "#FFC107") # Amber
-                    
-                    # 예약 대기 중에는 마우스를 절대 움직이지 않음
-                    if not self.scheduled_waiting:
-                        # [NEW] 대기 중 마우스 산책 (클릭 절대 금지!)
-                        if random.random() < 0.3: # 30% 확률로 조금씩 움직임
-                            try:
-                                # AFK 영역이 있으면 그 안에서, 없으면 화면 전체에서 살짝 산책
-                                area = self.cfg.get("afk_area")
-                                if area:
-                                    tx = random.randint(area['x1'], area['x2'])
-                                    ty = random.randint(area['y1'], area['y2'])
-                                else:
-                                    sw, sh = pyautogui.size()
-                                    tx, ty = random.randint(100, sw-100), random.randint(100, sh-100)
-                                
-                                # 아주 천천히 부드럽게 이동
-                                self.actor.move_to(tx, ty, overshoot=False)
-                            except: pass
+                        self.update_status_label(f"⏳ 대기 중... {int(remain)}초", "#FFC107")
+
+                    # 예약 대기 중이 아니고, 랜덤 행동 옵션이 켜져 있으면 페이지 내부에서 가벼운 행동 수행
+                    if (not self.scheduled_waiting) and self.cfg.get("afk_mode") and random.random() < 0.3:
+                        try:
+                            self.actor.random_behavior_routine()
+                        except Exception:
+                            pass
             
             try: base = int(self.entry_interval.get())
             except: base = 180
@@ -1468,7 +2359,8 @@ class FlowVisionApp:
                         self.scheduled_start_ts = None
                         self.log("⏰ 예약 시각 도달! 자동화를 시작합니다.")
                     self.is_processing = True
-                    threading.Thread(target=self._run_task, daemon=True).start()
+                    self._ensure_worker_thread()
+                    self.task_queue.put("run")
                 try:
                     speed = self.actor.cfg.get('speed_multiplier', 1.0)
                 except: speed = 1.0
@@ -1480,7 +2372,6 @@ class FlowVisionApp:
         print(f"[{datetime.now()}] Task started")
         self.on_reload() # 각 작업 시작 전 프롬프트 최신화
         self.log("작업 스레드 시작 (프롬프트 동기화 완료)")
-        ia, sa = self.cfg.get('input_area'), self.cfg.get('submit_area')
         if not self.prompts or self.index >= len(self.prompts):
             print("No prompts or index out of range")
             self.log("프롬프트 없음 또는 범위 초과")
@@ -1534,6 +2425,40 @@ class FlowVisionApp:
             self.log(f"⚠️ 휴식 체크 오류: {e}")
 
         try:
+            # 작업 스레드 전용 세션 생성
+            self._ensure_browser_session()
+            self.actor.set_page(self.page)
+            start_url = (self.cfg.get("start_url") or "").strip()
+            input_selector = (self.cfg.get("input_selector") or "").strip()
+            input_mode = self.run_input_mode if self.run_input_mode in ("typing", "paste", "mixed") else self.cfg.get("input_mode", "paste")
+
+            if not (start_url and input_selector):
+                raise RuntimeError("URL 또는 입력 selector 설정이 비어 있습니다.")
+
+            # 현재 URL이 다르면 시작 페이지로 이동
+            current_url = self.page.url or ""
+            if (not current_url) or (start_url not in current_url):
+                self.log(f"🌐 페이지 이동: {start_url}")
+                self.page.goto(start_url, wait_until="domcontentloaded", timeout=45000)
+                self.actor.random_action_delay("페이지 로딩 안정화", 1.0, 3.0)
+            # 실행 시점 안정화: 입력창이 늦게 뜨는 경우를 대비해 충분히 대기
+            input_probe = self._normalize_candidate_list(input_selector)
+            for sel in self._input_candidates():
+                if sel not in input_probe:
+                    input_probe.append(sel)
+
+            already_ready = self._wait_until_input_visible(input_probe, timeout_sec=12)
+            if not already_ready:
+                opened = self._try_open_new_project_if_needed(input_probe)
+                if opened:
+                    self.log("✅ 편집 화면 감지(입력창 확인)")
+                else:
+                    self.log("ℹ️ 새 프로젝트 자동 진입 실패 또는 불필요 - 현재 화면에서 계속 진행")
+                # 새 프로젝트 클릭 후 렌더링 대기
+                self._wait_until_input_visible(input_probe, timeout_sec=15)
+            else:
+                self.log("✅ 편집 화면 감지(입력창 확인)")
+
             print("Randomizing persona...")
             try:
                 self.actor.randomize_persona()
@@ -1544,80 +2469,89 @@ class FlowVisionApp:
 
             prompt = self.prompts[self.index]
             start_t = datetime.now()
-            
-            # [ORDER CHANGE] 1. 레퍼런스 이미지 먼저 첨부 (텍스트 입력 전이 가장 안정적)
-            if self.cfg.get("use_ref_images"):
-                try:
-                    count = max(1, min(5, int(self.cfg.get("ref_image_count", 1))))
-                except:
-                    count = 1
-                for i in range(1, count + 1):
-                    add_btn = self.cfg.get(f"add_btn{i}_area")
-                    img_area = self.cfg.get(f"ref_img{i}_area")
-                    
-                    if add_btn and img_area:
-                        self.update_status_label(f"🖼️ 세트 {i} 첨부 중...", self.color_info)
-                        # 1. 해당 단계의 + 버튼 클릭
-                        self.actor.move_to(random.randint(add_btn['x1'], add_btn['x2']), 
-                                          random.randint(add_btn['y1'], add_btn['y2']))
-                        pyautogui.click()
-                        time.sleep(1.2 + random.random()) # 메뉴 열리는 시간 대기
-                        
-                        # 2. 해당 단계의 이미지 클릭
-                        self.actor.move_to(random.randint(img_area['x1'], img_area['x2']), 
-                                          random.randint(img_area['y1'], img_area['y2']))
-                        self.actor.smart_click()
-                        time.sleep(1.5 + random.random()) # 첨부 반영 대기
-                    else:
-                        self.log(f"⚠️ 세트 {i} 영역 설정 미비로 건너뜁니다.")
 
-            # [ORDER CHANGE] 2. 프롬프트 입력창으로 이동 및 입력
-            if ia:
-                print(f"Moving to input area: {ia}")
-                self.update_status_label("🖱️ 이동 중...", "white")
-                self.actor.move_to(random.randint(ia['x1'], ia['x2']), random.randint(ia['y1'], ia['y2']))
-                pyautogui.click()
-                time.sleep(0.5)
-                pyautogui.hotkey("ctrl", "a")
-                pyautogui.press("backspace")
-            
+            input_candidates = self._normalize_candidate_list(input_selector)
+            for sel in self._input_candidates():
+                if sel not in input_candidates:
+                    input_candidates.append(sel)
+
+            input_locator, resolved_input_selector = self._resolve_best_locator(
+                input_candidates,
+                timeout_ms=2500,
+            )
+            if input_locator is None:
+                raise RuntimeError("입력창 요소를 찾지 못했습니다. selector 자동찾기/테스트를 다시 실행해주세요.")
+
+            # 자동으로 더 좋은 selector를 찾았으면 설정 동기화
+            if resolved_input_selector and resolved_input_selector != input_selector:
+                self.cfg["input_selector"] = resolved_input_selector
+                self.root.after(0, lambda v=resolved_input_selector: self.input_selector_var.set(v))
+            self.save_config()
+
+            if self.cfg.get("afk_mode") and random.random() < 0.5:
+                self.actor.random_behavior_routine()
+
+            self.update_status_label("🧹 입력창 초기화 중...", "white")
+            self.actor.clear_input_field(input_locator, label="입력창")
+
             print(f"Typing prompt: {prompt[:20]}...")
-            mode = self.cfg.get("input_mode", "typing")
-            
-            # 입력 방식 분기 로직
-            current_action = "typing"
-            if mode == "paste":
-                current_action = "paste"
-            elif mode == "mixed":
-                current_action = random.choice(["typing", "paste"])
-            
-            if current_action == "paste":
-                self.update_status_label("📋 복사 붙여넣기 중...", "white")
-                pyperclip.copy(prompt)
-                time.sleep(random.uniform(0.3, 0.7))
-                pyautogui.hotkey("ctrl", "v")
-                time.sleep(0.5)
-            else:
-                self.update_status_label("✍️ 타이핑 중...", "white")
-                self.actor.type_text(prompt, speed_callback=lambda s: self.root.after(0, lambda: self.lbl_speed_val.config(text=f"x{s}")))
-            
-            self.update_status_label("✅ 입력 완료!", self.color_success)
-            time.sleep(0.5)
+            self.update_status_label("✍️ 프롬프트 입력 중...", "white")
+            self.actor.type_text(prompt, input_locator=input_locator, mode=input_mode)
 
+            self.update_status_label("✅ 입력 완료!", self.color_success)
             self.update_status_label("📖 검토 중...", self.color_info)
             self.actor.read_prompt_pause(prompt)
-            
-            # 3. 최종 제출
+            before_submit_text = self._read_input_text(input_locator)
+
+            # 전체 흐름 불규칙성을 위해 가끔 예측 불가 행동 추가
+            if random.random() < 0.35:
+                self.actor.hesitate_on_submit()
+
+            # 최종 제출
             print("Submitting...")
             self.update_status_label("🚀 제출 중...", self.color_accent)
-            if random.random() < self.cfg.get("enter_submit_rate", 0.5):
-                time.sleep(0.5)
-                pyautogui.press('enter')
-            else:
-                if sa:
-                    self.actor.move_to(random.randint(sa['x1'], sa['x2']), random.randint(sa['y1'], sa['y2']))
-                    self.actor.smart_click()
-            
+            submitted = False
+            attempt_notes = []
+            self._action_log(f"[{datetime.now().strftime('%H:%M:%S')}] 제출 정책: Enter 전용")
+
+            def _attempt_enter():
+                try:
+                    input_locator.click(timeout=1200)
+                except Exception:
+                    pass
+                self.actor.random_action_delay("Enter 제출 전 딜레이", 0.3, 2.0)
+                self.page.keyboard.press("Enter")
+                self._action_log(f"[{datetime.now().strftime('%H:%M:%S')}] 제출 시도: Enter")
+                ok = self._confirm_submission_started(input_locator, before_submit_text, timeout_sec=12)
+                if not ok:
+                    self.page.keyboard.press("Control+Enter")
+                    self._action_log(f"[{datetime.now().strftime('%H:%M:%S')}] 제출 시도: Ctrl+Enter")
+                    ok = self._confirm_submission_started(input_locator, before_submit_text, timeout_sec=8)
+                attempt_notes.append(f"Enter={'OK' if ok else 'FAIL'}")
+                return ok
+
+            submitted = _attempt_enter()
+            if not submitted:
+                self.actor.random_action_delay("Enter 재시도 전 딜레이", 0.3, 1.4)
+                submitted = _attempt_enter()
+            if not submitted:
+                try:
+                    input_locator.focus()
+                except Exception:
+                    pass
+                self.actor.random_action_delay("최종 Enter 재시도 전 딜레이", 0.3, 1.4)
+                self.page.keyboard.press("Enter")
+                self._action_log(f"[{datetime.now().strftime('%H:%M:%S')}] 제출 시도: Enter(최종)")
+                submitted = self._confirm_submission_started(input_locator, before_submit_text, timeout_sec=8)
+                attempt_notes.append(f"EnterFinal={'OK' if submitted else 'FAIL'}")
+
+            if not submitted:
+                raise RuntimeError(f"제출 확인 실패(생성 시작 신호 없음): {', '.join(attempt_notes)}")
+
+            self._action_log(
+                f"[{datetime.now().strftime('%H:%M:%S')}] 제출 검증 완료: {', '.join(attempt_notes) if attempt_notes else 'OK'}"
+            )
+
             print("Task success")
             self.log(f"성공 #{self.index+1}")
             self.update_status_label("🎉 작업 완료!", self.color_success)
@@ -1625,12 +2559,18 @@ class FlowVisionApp:
             self.session_log.append({"index": self.index + 1, "prompt": prompt, "duration": f"{(datetime.now()-start_t).total_seconds():.1f}초"})
             self.actor.processed_count += 1
             self.index += 1
-            
-        except pyautogui.FailSafeException:
-            print("FAILSAFE TRIGGERED")
-            self.log("🚨 FAILSAFE 작동됨!")
-            self.update_status_label("🚨 비상 정지", self.color_error)
-            self.on_stop()
+            self._action_log(f"[{datetime.now().strftime('%H:%M:%S')}] 프롬프트 #{self.index} 처리 완료")
+        except PlaywrightTimeoutError as e:
+            print(f"TIMEOUT in run_task: {e}")
+            self.log(f"⏳ 요소 대기 시간 초과: {e}")
+            self.update_status_label("⚠️ 요소 탐색 시간 초과", self.color_error)
+            self.t_next = time.time() + 5
+        except PlaywrightError as e:
+            print(f"PLAYWRIGHT ERROR in run_task: {e}")
+            self.log(f"❌ Playwright 오류: {e}")
+            self.update_status_label("⚠️ 브라우저 오류 재시도...", self.color_error)
+            self.t_next = time.time() + 5
+            self._shutdown_browser()
         except Exception as e:
             print(f"ERROR in run_task: {e}")
             traceback.print_exc()
@@ -1638,6 +2578,8 @@ class FlowVisionApp:
             self.update_status_label("⚠️ 재시도 대기...", self.color_error)
             self.t_next = time.time() + 5
         finally:
+            # 같은 worker 스레드에서 연속 작업을 수행하므로 브라우저 세션을 유지한다.
+            # (중지/종료/치명 오류 시에만 세션 종료)
             self.root.after(0, self._update_progress_ui)
             self.is_processing = False
 
@@ -1798,7 +2740,24 @@ class FlowVisionApp:
         self.log(f"🗑️ 슬롯 삭제됨: {slot_name}")
         messagebox.showinfo("성공", f"'{slot_name}' 슬롯이 목록에서 제거되었습니다.")
 
-    def save_session_report(self): pass
+    def save_session_report(self):
+        if not hasattr(self, "session_log"):
+            return
+        if self.session_report_path is None:
+            stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            self.session_report_path = self.logs_dir / f"session_report_{stamp}.json"
+        try:
+            payload = {
+                "created_at": datetime.now().isoformat(),
+                "started_at": getattr(self, "session_start_time", datetime.now()).isoformat() if hasattr(getattr(self, "session_start_time", None), "isoformat") else str(getattr(self, "session_start_time", "")),
+                "prompt_file": self.cfg.get("prompts_file"),
+                "total_processed": len(self.session_log),
+                "entries": self.session_log,
+            }
+            self.session_report_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            self.log(f"🧾 세션 리포트 저장: {self.session_report_path.name}")
+        except Exception as e:
+            self.log(f"⚠️ 세션 리포트 저장 실패: {e}")
 
 if __name__ == "__main__":
     try: FlowVisionApp().root.mainloop()

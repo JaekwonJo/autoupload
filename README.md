@@ -1,60 +1,55 @@
-# 🌊 Flow Veo Vision Bot (Final Ver)
+# Flow Veo 자동화 봇 (Playwright Sync 전환판)
 
-> **Auto-Upload Automation for Flow/Sora**
-> *Automate your creative workflow with precision, human-like behavior, and bulletproof reliability.*
+Playwright(Sync API) 기반으로 동작하는 자동화 앱입니다.
+기존 프롬프트 순환/예약 시작/이어달리기/로그 창 기능을 유지하면서,
+브라우저 내부에서 사람처럼 보이는 마우스/타이핑 행동을 수행합니다.
 
-![Status](https://img.shields.io/badge/Status-Final_Ver-success)
-![Python](https://img.shields.io/badge/Python-3.12%2B-blue)
+## 핵심 변경점
+- OS 자동화 제거: `pyautogui`, `keyboard`, `mouse` 사용 안 함
+- Playwright 전용 동작: `page.mouse`, `page.keyboard`만 사용
+- ghost-cursor 연동: `python-ghost-cursor` 경로 기반 마우스 이동
+- 행동 패턴 강화:
+  - 베지어 마우스 이동 + 가속/감속 + 미세 지터 + 가끔 멈칫
+  - 클릭/타이핑 랜덤 딜레이(0.3~2초)
+  - 생각 시간 랜덤 pause(2~15초)
+  - 세션 중 랜덤 행동으로 반복 패턴 완화
+- 로그 강화:
+  - UI 로그 창
+  - 파일 로그: `logs/action_trace_YYYYMMDD_HHMMSS.log`
+  - 세션 리포트: `logs/session_report_YYYYMMDD_HHMMSS.json`
 
-## 🏆 Final Version Features (V2)
-This version represents the **Final Stable Release**. It includes strict safety rules to prevent errors and a professional HUD interface.
+## 설치 방법
+1. `1_필수라이브러리_설치.bat` 실행
+2. 내부적으로 아래를 자동 수행
+   - `pip install -r requirements.txt`
+   - `python -m playwright install chromium`
 
-### ✨ New in Final Ver
-- **Human Action HUD**: A detailed dashboard showing the bot's internal state (Fatigue, Typo Probability, Hesitation, Focus Loss) in real-time.
-- **Strict Input Safety**:
-  - **No Random Clicks**: The bot never clicks randomly. Clicks are reserved *only* for the "Submit" button.
-  - **Shift+Space/Enter**: Prevents accidental IME toggling or premature sending.
-- **Silent Launch**: `Flow_Start.vbs` launches the bot without any distracting black console windows.
-- **Separate Log Window**: A dedicated, large window to view logs and prompt previews comfortably.
+## 실행 방법
+- 일반 실행: `2_오토_프로그램_실행.bat`
+- 무음 실행: `Flow_Start.vbs`
+- 디버깅 실행: `5_디버깅_모드.bat`
 
-## 🚀 Quick Start
+## 첫 설정(중요)
+앱 왼쪽 설정에서 아래 3개를 반드시 입력하세요.
+1. 시작 URL
+2. 입력창 CSS Selector
+3. 제출 버튼 CSS Selector
 
-### 1. Installation
-Run **`1_필수라이브러리_설치.bat`** (Only needed once).
+앱에서 아래 버튼으로 자동 도움도 가능합니다.
+- `🔍 Selector 자동 찾기`: 현재 페이지에서 후보 selector 자동 탐색
+- `🧪 Selector 테스트`: 지금 입력된 selector가 실제로 보이는지 검사
+- `홈 화면이면 '새 프로젝트' 자동 클릭`: 홈 URL일 때 편집 화면으로 자동 진입 시도
+- `새 프로젝트 버튼 selector(선택)`: 자동 탐색이 안 될 때 직접 지정 가능
 
-### 2. Execution (Silent)
-Double-click **`Flow_Start.vbs`**. 
-*(Or use `2_오토_프로그램_실행.bat` if you prefer).*
+예시(사이트마다 다름):
+- 입력창: `textarea, [contenteditable='true']`
+- 제출 버튼: `button[type='submit']`
 
-### 3. Setup
-1. **Prompts**: Edit `flow_prompts.txt` (separated by `|||`).
-2. **Coordinates**: 
-   - Click "⬛ 입력창" -> Drag to select text box.
-   - Click "⬛ 생성 버튼" -> Drag to select submit button.
-3. **AFK Area**: Click "🟩 딴짓(AFK)" -> Select a safe area (e.g., desktop wallpaper) for mouse idling.
+## 프롬프트 파일
+- 기본 파일: `flow/flow_prompts.txt`
+- 구분자: `|||`
+- 슬롯(여러 문서) 기능, 이어달리기 기능 계속 사용 가능
 
-## 🛠️ Core Features
-
-### 📊 Dashboard & HUD
-- **Dark UI**: Professional Dracula-themed interface.
-- **Live Monitor**: Watch "Personality", "Mood", and detailed stats (Fatigue, Typos) change in real-time.
-
-### 🛡️ Ultimate Safety
-- **Anti-IME**: Bruteforce checks to ensure English input.
-- **Zombie Slayer**: Kills old processes on startup.
-- **FailSafe**: Move mouse to top-left to emergency stop.
-
-### 🎭 Human-Like Behavior
-- **AFK Mode**: Mouse moves and scrolls (no clicks) during wait times.
-- **Reserved Start Safety**: If one-time reservation is enabled, mouse stays still until the reserved time is reached.
-- **Random Speed**: Typing speed varies naturally.
-- **Reporting**: Detailed session logs saved to `logs/`.
-
-## 📂 File Structure
-- `flow/flow_auto_v2.py`: Main application (UI & Logic).
-- `flow/human_behavior_v2.py`: Behavior engine (Strict Rules).
-- `Flow_Start.vbs`: Silent Launcher.
-- `2_오토_프로그램_실행.bat`: Backup Launcher.
-
----
-*Maintained by Jaekwon Jo*
+## 주의
+- 셀렉터가 사이트 구조와 다르면 입력/제출이 실패할 수 있습니다.
+- 실패 시 `5_디버깅_모드.bat`로 실행 후 로그를 확인하세요.
