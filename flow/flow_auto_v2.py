@@ -2318,15 +2318,118 @@ class FlowVisionApp:
         except Exception:
             return ""
 
-    def _is_asset_search_like_locator(self, locator):
-        meta = self._locator_meta_text(locator)
-        if not meta:
+    def _locator_profile(self, locator):
+        try:
+            return locator.evaluate(
+                """(el) => {
+                    if (!el) return null;
+                    const a = (name) => (el.getAttribute(name) || "");
+                    const r = el.getBoundingClientRect();
+                    return {
+                        tag: (el.tagName || "").toLowerCase(),
+                        id: (el.id || "").toLowerCase(),
+                        className: (el.className || "").toLowerCase(),
+                        name: a("name").toLowerCase(),
+                        placeholder: a("placeholder").toLowerCase(),
+                        aria: a("aria-label").toLowerCase(),
+                        title: a("title").toLowerCase(),
+                        role: a("role").toLowerCase(),
+                        type: a("type").toLowerCase(),
+                        contenteditable: (a("contenteditable") || "").toLowerCase(),
+                        width: (r && r.width) ? r.width : 0,
+                        height: (r && r.height) ? r.height : 0,
+                    };
+                }"""
+            )
+        except Exception:
+            return None
+
+    def _is_prompt_like_locator(self, locator):
+        prof = self._locator_profile(locator)
+        if not prof:
             return False
+        meta = " ".join([
+            prof.get("placeholder", ""),
+            prof.get("aria", ""),
+            prof.get("title", ""),
+            prof.get("name", ""),
+            prof.get("id", ""),
+        ])
+        prompt_keys = (
+            "무엇을 만들고 싶으신가요",
+            "무엇을 만들",
+            "prompt",
+            "프롬프트",
+            "message",
+            "메시지",
+        )
+        if any(k in meta for k in prompt_keys):
+            return True
+
+        tag = prof.get("tag", "")
+        role = prof.get("role", "")
+        ce = prof.get("contenteditable", "")
+        width = float(prof.get("width") or 0)
+        height = float(prof.get("height") or 0)
+        has_textbox_shape = (
+            tag == "textarea"
+            or role == "textbox"
+            or ce in ("true", "plaintext-only")
+        )
+        # 대형 텍스트박스는 프롬프트 입력칸일 가능성이 높다.
+        if has_textbox_shape and width >= 620 and height >= 34:
+            return True
+        if has_textbox_shape and width >= 420 and height >= 44:
+            return True
+        return False
+
+    def _is_asset_search_like_locator(self, locator):
+        if self._is_prompt_like_locator(locator):
+            return False
+        prof = self._locator_profile(locator)
+        if not prof:
+            meta = self._locator_meta_text(locator)
+            if not meta:
+                return False
+            search_keys = ("asset", "search", "에셋", "검색", "swap_horiz", "swap")
+            prompt_keys = ("무엇을 만들고 싶으신가요", "prompt", "프롬프트", "message", "메시지")
+            has_search = any(k in meta for k in search_keys)
+            has_prompt = any(k in meta for k in prompt_keys)
+            return has_search and (not has_prompt)
+
+        meta = " ".join([
+            prof.get("placeholder", ""),
+            prof.get("aria", ""),
+            prof.get("title", ""),
+            prof.get("name", ""),
+            prof.get("type", ""),
+            prof.get("role", ""),
+            prof.get("id", ""),
+        ])
         search_keys = ("asset", "search", "에셋", "검색", "swap_horiz", "swap")
         prompt_keys = ("무엇을 만들고 싶으신가요", "prompt", "프롬프트", "message", "메시지")
         has_search = any(k in meta for k in search_keys)
         has_prompt = any(k in meta for k in prompt_keys)
-        return has_search and (not has_prompt)
+        if has_prompt:
+            return False
+
+        # 입력 역할이면서 가로폭이 큰 텍스트박스는 프롬프트칸으로 취급
+        tag = prof.get("tag", "")
+        role = prof.get("role", "")
+        ce = prof.get("contenteditable", "")
+        width = float(prof.get("width") or 0)
+        height = float(prof.get("height") or 0)
+        has_textbox_shape = (
+            tag == "textarea"
+            or role == "textbox"
+            or ce in ("true", "plaintext-only")
+        )
+        if has_textbox_shape and width >= 620 and height >= 34:
+            return False
+
+        if prof.get("type", "") == "search" or prof.get("role", "") == "searchbox":
+            return True
+        return has_search
 
     def _resolve_prompt_input_locator(self, input_selector, timeout_ms=2500):
         # 동적 UI에서 ref 재할당이 발생해도 매번 "프롬프트 입력칸"을 다시 찾도록 강제한다.
@@ -2348,7 +2451,17 @@ class FlowVisionApp:
             self._normalize_candidate_list(input_selector),
             timeout_ms=max(1200, int(timeout_ms * 0.8)),
         )
-        if input_loc is not None and (not self._is_asset_search_like_locator(input_loc)):
+        if input_loc is not None and (
+            self._is_prompt_like_locator(input_loc) or (not self._is_asset_search_like_locator(input_loc))
+        ):
+            return input_loc, resolved_selector
+
+        # 3차 폴백: reject 없이 전체 후보를 보고, 프롬프트로 보이는 박스면 허용
+        input_loc, resolved_selector = self._resolve_best_locator(
+            candidates,
+            timeout_ms=max(1200, int(timeout_ms * 0.8)),
+        )
+        if input_loc is not None and self._is_prompt_like_locator(input_loc):
             return input_loc, resolved_selector
 
         return None, None
@@ -3517,6 +3630,7 @@ class FlowVisionApp:
                 timeout_ms=2800,
             )
             if input_locator is None:
+                self.log(f"⚠️ 입력칸 탐지 실패 | 현재URL: {self.page.url} | 설정 selector: {input_selector}")
                 raise RuntimeError("프롬프트 입력칸을 찾지 못했습니다(에셋 검색칸 제외). selector 자동찾기/테스트를 다시 실행해주세요.")
 
             # 자동으로 더 좋은 selector를 찾았으면 설정 동기화
