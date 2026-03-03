@@ -328,7 +328,6 @@ class FlowVisionApp:
         self.playwright = None
         self.browser_context = None
         self.page = None
-        self.browser_owner_thread_id = None
         self.action_log_path = None
         self.action_log_fp = None
         self.session_report_path = None
@@ -473,25 +472,8 @@ class FlowVisionApp:
         return profile_path
 
     def _ensure_browser_session(self):
-        current_tid = threading.get_ident()
-        if (
-            self.page
-            and (not self.page.is_closed())
-            and self.browser_owner_thread_id == current_tid
-        ):
+        if self.page and not self.page.is_closed():
             return
-        if (
-            (self.page or self.browser_context or self.playwright)
-            and (self.browser_owner_thread_id is not None)
-            and (self.browser_owner_thread_id != current_tid)
-        ):
-            # Playwright Sync 객체는 생성된 스레드에서만 안전하게 사용 가능.
-            # 다른 스레드에서 재사용하면 greenlet thread 오류가 발생하므로 핸들을 버리고 재생성한다.
-            self.log("♻️ 브라우저 세션 재생성: 스레드 전환 감지")
-            self.page = None
-            self.browser_context = None
-            self.playwright = None
-            self.browser_owner_thread_id = None
         if self.playwright is None:
             self.playwright = sync_playwright().start()
         if self.browser_context:
@@ -547,7 +529,6 @@ class FlowVisionApp:
             self.page = self.browser_context.pages[0]
         else:
             self.page = self.browser_context.new_page()
-        self.browser_owner_thread_id = current_tid
 
         try:
             stealth_sync(self.page)
@@ -559,13 +540,8 @@ class FlowVisionApp:
         self._action_log(f"[{datetime.now().strftime('%H:%M:%S')}] 브라우저 세션 생성")
 
     def _shutdown_browser(self):
-        current_tid = threading.get_ident()
-        same_thread = (
-            self.browser_owner_thread_id is None
-            or self.browser_owner_thread_id == current_tid
-        )
         try:
-            if self.browser_context and same_thread:
+            if self.browser_context:
                 self.browser_context.close()
         except Exception:
             pass
@@ -573,12 +549,11 @@ class FlowVisionApp:
         self.page = None
 
         try:
-            if self.playwright and same_thread:
+            if self.playwright:
                 self.playwright.stop()
         except Exception:
             pass
         self.playwright = None
-        self.browser_owner_thread_id = None
 
     def _ensure_worker_thread(self):
         if self.worker_thread and self.worker_thread.is_alive():
@@ -2251,9 +2226,8 @@ class FlowVisionApp:
                 return
             if total <= 0:
                 return
-            # 너무 많은 요소일 때 과도한 탐색 방지 + 광범위 selector(contenteditable 등) 누락 방지
-            # 기존 20개 상한은 동적 UI에서 실제 입력칸이 뒤 인덱스로 밀릴 때 오탐/미탐을 유발했다.
-            upper = min(total, 80 if total > 24 else 24)
+            # 너무 많은 요소일 때 과도한 탐색 방지
+            upper = min(total, 20)
             for i in range(upper):
                 cand = loc.nth(i)
                 try:
@@ -2344,118 +2318,15 @@ class FlowVisionApp:
         except Exception:
             return ""
 
-    def _locator_profile(self, locator):
-        try:
-            return locator.evaluate(
-                """(el) => {
-                    if (!el) return null;
-                    const a = (name) => (el.getAttribute(name) || "");
-                    const r = el.getBoundingClientRect();
-                    return {
-                        tag: (el.tagName || "").toLowerCase(),
-                        id: (el.id || "").toLowerCase(),
-                        className: (el.className || "").toLowerCase(),
-                        name: a("name").toLowerCase(),
-                        placeholder: a("placeholder").toLowerCase(),
-                        aria: a("aria-label").toLowerCase(),
-                        title: a("title").toLowerCase(),
-                        role: a("role").toLowerCase(),
-                        type: a("type").toLowerCase(),
-                        contenteditable: (a("contenteditable") || "").toLowerCase(),
-                        width: (r && r.width) ? r.width : 0,
-                        height: (r && r.height) ? r.height : 0,
-                    };
-                }"""
-            )
-        except Exception:
-            return None
-
-    def _is_prompt_like_locator(self, locator):
-        prof = self._locator_profile(locator)
-        if not prof:
-            return False
-        meta = " ".join([
-            prof.get("placeholder", ""),
-            prof.get("aria", ""),
-            prof.get("title", ""),
-            prof.get("name", ""),
-            prof.get("id", ""),
-        ])
-        prompt_keys = (
-            "무엇을 만들고 싶으신가요",
-            "무엇을 만들",
-            "prompt",
-            "프롬프트",
-            "message",
-            "메시지",
-        )
-        if any(k in meta for k in prompt_keys):
-            return True
-
-        tag = prof.get("tag", "")
-        role = prof.get("role", "")
-        ce = prof.get("contenteditable", "")
-        width = float(prof.get("width") or 0)
-        height = float(prof.get("height") or 0)
-        has_textbox_shape = (
-            tag == "textarea"
-            or role == "textbox"
-            or ce in ("true", "plaintext-only")
-        )
-        # 대형 텍스트박스는 프롬프트 입력칸일 가능성이 높다.
-        if has_textbox_shape and width >= 620 and height >= 34:
-            return True
-        if has_textbox_shape and width >= 420 and height >= 44:
-            return True
-        return False
-
     def _is_asset_search_like_locator(self, locator):
-        if self._is_prompt_like_locator(locator):
+        meta = self._locator_meta_text(locator)
+        if not meta:
             return False
-        prof = self._locator_profile(locator)
-        if not prof:
-            meta = self._locator_meta_text(locator)
-            if not meta:
-                return False
-            search_keys = ("asset", "search", "에셋", "검색", "swap_horiz", "swap")
-            prompt_keys = ("무엇을 만들고 싶으신가요", "prompt", "프롬프트", "message", "메시지")
-            has_search = any(k in meta for k in search_keys)
-            has_prompt = any(k in meta for k in prompt_keys)
-            return has_search and (not has_prompt)
-
-        meta = " ".join([
-            prof.get("placeholder", ""),
-            prof.get("aria", ""),
-            prof.get("title", ""),
-            prof.get("name", ""),
-            prof.get("type", ""),
-            prof.get("role", ""),
-            prof.get("id", ""),
-        ])
         search_keys = ("asset", "search", "에셋", "검색", "swap_horiz", "swap")
         prompt_keys = ("무엇을 만들고 싶으신가요", "prompt", "프롬프트", "message", "메시지")
         has_search = any(k in meta for k in search_keys)
         has_prompt = any(k in meta for k in prompt_keys)
-        if has_prompt:
-            return False
-
-        # 입력 역할이면서 가로폭이 큰 텍스트박스는 프롬프트칸으로 취급
-        tag = prof.get("tag", "")
-        role = prof.get("role", "")
-        ce = prof.get("contenteditable", "")
-        width = float(prof.get("width") or 0)
-        height = float(prof.get("height") or 0)
-        has_textbox_shape = (
-            tag == "textarea"
-            or role == "textbox"
-            or ce in ("true", "plaintext-only")
-        )
-        if has_textbox_shape and width >= 620 and height >= 34:
-            return False
-
-        if prof.get("type", "") == "search" or prof.get("role", "") == "searchbox":
-            return True
-        return has_search
+        return has_search and (not has_prompt)
 
     def _resolve_prompt_input_locator(self, input_selector, timeout_ms=2500):
         # 동적 UI에서 ref 재할당이 발생해도 매번 "프롬프트 입력칸"을 다시 찾도록 강제한다.
@@ -2477,44 +2348,8 @@ class FlowVisionApp:
             self._normalize_candidate_list(input_selector),
             timeout_ms=max(1200, int(timeout_ms * 0.8)),
         )
-        if input_loc is not None and (
-            self._is_prompt_like_locator(input_loc) or (not self._is_asset_search_like_locator(input_loc))
-        ):
+        if input_loc is not None and (not self._is_asset_search_like_locator(input_loc)):
             return input_loc, resolved_selector
-
-        # 3차 폴백: reject 없이 전체 후보를 보고, 프롬프트로 보이는 박스면 허용
-        input_loc, resolved_selector = self._resolve_best_locator(
-            candidates,
-            timeout_ms=max(1200, int(timeout_ms * 0.8)),
-        )
-        if input_loc is not None and self._is_prompt_like_locator(input_loc):
-            return input_loc, resolved_selector
-
-        # 4차 폴백: DOM 휴리스틱으로 프롬프트칸 selector 재탐색
-        heuristic_selector = self._pick_input_selector_by_dom_heuristic()
-        if heuristic_selector:
-            probe = [heuristic_selector]
-            for sel in candidates:
-                if sel not in probe:
-                    probe.append(sel)
-            input_loc, resolved_selector = self._resolve_best_locator(
-                probe,
-                timeout_ms=max(1200, int(timeout_ms * 0.9)),
-            )
-            if input_loc is not None and (
-                self._is_prompt_like_locator(input_loc) or (not self._is_asset_search_like_locator(input_loc))
-            ):
-                return input_loc, (resolved_selector or heuristic_selector)
-
-        # 5차 폴백: 입력칸이 접혀있는 UI에서 먼저 입력창을 활성화해보고 다시 탐색
-        if self._prime_prompt_input_visibility():
-            input_loc, resolved_selector = self._resolve_best_locator(
-                candidates,
-                timeout_ms=max(1200, int(timeout_ms * 0.9)),
-                reject_fn=lambda cand, _sel: self._is_asset_search_like_locator(cand),
-            )
-            if input_loc is not None:
-                return input_loc, resolved_selector
 
         return None, None
 
@@ -2663,7 +2498,7 @@ class FlowVisionApp:
                         const style = window.getComputedStyle(el);
                         return style.visibility !== 'hidden' && style.display !== 'none' && style.opacity !== '0';
                     };
-                    const all = Array.from(document.querySelectorAll("textarea, [contenteditable='true'], [contenteditable='plaintext-only'], [role='textbox']"));
+                    const all = Array.from(document.querySelectorAll("textarea, [contenteditable='true'], [role='textbox']"));
                     const visible = all.filter(isVisible);
                     if (!visible.length) return null;
 
@@ -2717,37 +2552,6 @@ class FlowVisionApp:
             )
         except Exception:
             return None
-
-    def _prime_prompt_input_visibility(self):
-        """프롬프트 입력칸이 접혀 있거나 늦게 활성화되는 화면에서 포커스를 유도한다."""
-        if not self.page:
-            return False
-
-        candidates = [
-            "[aria-label*='무엇을 만들' i]",
-            "textarea[placeholder*='무엇을 만들' i]",
-            "textarea[aria-label*='무엇을 만들' i]",
-            "[contenteditable='true'][aria-label*='무엇을 만들' i]",
-            "[contenteditable='plaintext-only'][aria-label*='무엇을 만들' i]",
-            "text=무엇을 만들고 싶으신가요?",
-            "text=What do you want to create",
-            "text=Describe your idea",
-        ]
-        loc, sel = self._resolve_best_locator(
-            candidates,
-            timeout_ms=1200,
-            prefer_enabled=False,
-        )
-        if loc is None:
-            return False
-        try:
-            if self._click_with_actor_fallback(loc, "프롬프트 입력칸 활성화"):
-                self.actor.random_action_delay("입력칸 활성화 후 대기", 0.2, 0.9)
-                self.log(f"🧩 입력칸 활성화 시도: {sel or '텍스트 탐색'}")
-                return True
-        except Exception:
-            pass
-        return False
 
     def on_auto_detect_selectors(self):
         if self.running:
@@ -3323,18 +3127,7 @@ class FlowVisionApp:
         # 기존 브라우저가 살아 있으면 같은 창을 재사용한다. (불필요한 새 창 방지)
         reuse_existing = False
         try:
-            worker_tid = self.worker_thread.ident if (self.worker_thread and self.worker_thread.is_alive()) else None
-            reuse_existing = bool(
-                self.browser_context
-                and self.page
-                and (not self.page.is_closed())
-                and (
-                    # 작업 스레드가 이미 있으면 그 스레드 소유 세션만 재사용
-                    (worker_tid is not None and self.browser_owner_thread_id == worker_tid)
-                    # 작업 스레드가 아직 없으면 현재 세션 상태만 안내하고 _run_task에서 최종 판단
-                    or worker_tid is None
-                )
-            )
+            reuse_existing = bool(self.browser_context and self.page and (not self.page.is_closed()))
         except Exception:
             reuse_existing = False
         if reuse_existing:
@@ -3724,7 +3517,6 @@ class FlowVisionApp:
                 timeout_ms=2800,
             )
             if input_locator is None:
-                self.log(f"⚠️ 입력칸 탐지 실패 | 현재URL: {self.page.url} | 설정 selector: {input_selector}")
                 raise RuntimeError("프롬프트 입력칸을 찾지 못했습니다(에셋 검색칸 제외). selector 자동찾기/테스트를 다시 실행해주세요.")
 
             # 자동으로 더 좋은 selector를 찾았으면 설정 동기화
