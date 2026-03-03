@@ -22,6 +22,15 @@ import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
 from tkinter.scrolledtext import ScrolledText
 
+try:
+    import pystray
+    from PIL import Image
+    TRAY_AVAILABLE = True
+except ImportError:
+    pystray = None
+    Image = None
+    TRAY_AVAILABLE = False
+
 # [Playwright 핵심 모듈]
 from playwright.sync_api import (
     Error as PlaywrightError,
@@ -56,7 +65,8 @@ ES_CONTINUOUS = 0x80000000
 ES_SYSTEM_REQUIRED = 0x00000001
 ES_DISPLAY_REQUIRED = 0x00000002
 
-APP_NAME = "Flow Veo 자동화 봇 (Ultimate V2)"
+APP_VERSION = "2026-03-03 Ver.01"
+APP_NAME = f"Flow Veo 자동화 봇 (Ultimate V2) - {APP_VERSION}"
 CONFIG_FILE = "flow_config.json"
 DEFAULT_CONFIG = {
     "prompts_file": "flow_prompts.txt",
@@ -87,6 +97,14 @@ DEFAULT_CONFIG = {
     "scheduled_start_at": "",
     "language_mode": "en",
     "input_mode": "typing", # typing, paste, mixed
+    "asset_loop_enabled": False,
+    "asset_loop_start": 1,
+    "asset_loop_end": 1,
+    "asset_loop_prefix": "S",
+    "asset_loop_prompt_template": "{tag} : Naturally Seamless Loop animation.",
+    "asset_start_selector": "",
+    "asset_search_button_selector": "",
+    "asset_search_input_selector": "",
     "enter_submit_rate": 0.5,
     "use_ref_images": False,
     "ref_image_count": 1,
@@ -318,6 +336,14 @@ class FlowVisionApp:
         self.worker_stop_event = threading.Event()
         self.run_input_mode = None
         self.enter_only_submit = True
+        self.asset_loop_items = []
+        self.current_run_mode = None
+        self.tray_icon = None
+        self.tray_thread = None
+        self.hidden_to_tray = False
+        self._tray_warned_unavailable = False
+        self.paused = False
+        self.pause_remaining = None
 
         self.actor = HumanActor(action_logger=self._action_log, status_callback=self._actor_status)
         self.actor.language_mode = self.cfg.get("language_mode", "en")
@@ -330,7 +356,7 @@ class FlowVisionApp:
         # [NEW] Responsive Grid Weight
         self.root.grid_columnconfigure(0, weight=1)
         self.root.grid_rowconfigure(1, weight=1)
-        self.root.protocol("WM_DELETE_WINDOW", self.on_exit)
+        self.root.protocol("WM_DELETE_WINDOW", self.on_window_close)
         
         # [NEW] Log Window Instance
         self.log_window = LogWindow(self.root, self)
@@ -390,7 +416,8 @@ class FlowVisionApp:
         try:
             total_w = self.body_pane.winfo_width()
             if total_w > 0:
-                self.body_pane.sashpos(0, int(total_w * 0.44))
+                # 왼쪽(설정) 비중을 크게: 68% / 32%
+                self.body_pane.sashpos(0, int(total_w * 0.68))
         except:
             pass
 
@@ -705,6 +732,390 @@ class FlowVisionApp:
                 return candidate
             suffix += 1
 
+    def _build_asset_loop_items(self):
+        if not self.cfg.get("asset_loop_enabled", False):
+            return []
+
+        try:
+            start_num = int(self.cfg.get("asset_loop_start", 1))
+        except (TypeError, ValueError):
+            start_num = 1
+        try:
+            end_num = int(self.cfg.get("asset_loop_end", 1))
+        except (TypeError, ValueError):
+            end_num = start_num
+
+        start_num = max(1, start_num)
+        end_num = max(1, end_num)
+        if start_num > end_num:
+            start_num, end_num = end_num, start_num
+
+        prefix = (self.cfg.get("asset_loop_prefix") or "S").strip() or "S"
+        template = (self.cfg.get("asset_loop_prompt_template") or "{tag} : Naturally Seamless Loop animation.").strip()
+        if "{tag}" not in template:
+            template = "{tag} : " + template
+
+        max_items = 500
+        items = []
+        for n in range(start_num, end_num + 1):
+            if len(items) >= max_items:
+                break
+            tag = f"{prefix}{n}"
+            prompt = template.replace("{tag}", tag).strip()
+            items.append({"tag": tag, "prompt": prompt})
+        return items
+
+    def _asset_start_button_candidates(self):
+        cands = []
+        cands.extend(self._normalize_candidate_list(self.cfg.get("asset_start_selector", "")))
+        cands.extend([
+            "button:has-text('시작')",
+            "[role='button']:has-text('시작')",
+            "button:has-text('Start')",
+            "[role='button']:has-text('Start')",
+        ])
+        seen = set()
+        uniq = []
+        for x in cands:
+            if x not in seen:
+                uniq.append(x)
+                seen.add(x)
+        return uniq
+
+    def _asset_search_button_candidates(self):
+        cands = []
+        cands.extend(self._normalize_candidate_list(self.cfg.get("asset_search_button_selector", "")))
+        cands.extend([
+            "button:has-text('에셋 검색')",
+            "[role='button']:has-text('에셋 검색')",
+            "button:has-text('Asset search')",
+            "[role='button']:has-text('Asset search')",
+            "button:has-text('Search assets')",
+            "[role='button']:has-text('Search assets')",
+        ])
+        seen = set()
+        uniq = []
+        for x in cands:
+            if x not in seen:
+                uniq.append(x)
+                seen.add(x)
+        return uniq
+
+    def _asset_search_input_candidates(self):
+        cands = []
+        cands.extend(self._normalize_candidate_list(self.cfg.get("asset_search_input_selector", "")))
+        cands.extend([
+            "input[placeholder*='에셋 검색' i]",
+            "input[aria-label*='에셋 검색' i]",
+            "textarea[placeholder*='에셋 검색' i]",
+            "textarea[aria-label*='에셋 검색' i]",
+            "input[placeholder*='asset' i]",
+            "input[aria-label*='asset' i]",
+            "textarea[placeholder*='asset' i]",
+            "textarea[aria-label*='asset' i]",
+            "input[placeholder*='검색' i]",
+            "input[aria-label*='검색' i]",
+            "textarea[placeholder*='검색' i]",
+            "textarea[aria-label*='검색' i]",
+            "[role='textbox'][aria-label*='에셋' i]",
+            "[role='textbox'][aria-label*='asset' i]",
+            "[contenteditable='true'][aria-label*='에셋' i]",
+            "[contenteditable='true'][aria-label*='asset' i]",
+            "input[type='search']",
+            "[role='searchbox']",
+        ])
+        seen = set()
+        uniq = []
+        for x in cands:
+            if x not in seen:
+                uniq.append(x)
+                seen.add(x)
+        return uniq
+
+    def _wait_best_locator(self, candidates, timeout_sec=8, prefer_enabled=True):
+        end_ts = time.time() + max(1, timeout_sec)
+        while time.time() < end_ts:
+            loc, sel = self._resolve_best_locator(
+                candidates,
+                timeout_ms=900,
+                prefer_enabled=prefer_enabled,
+            )
+            if loc is not None:
+                return loc, sel
+            time.sleep(0.25)
+        return None, None
+
+    def _click_with_actor_fallback(self, locator, label):
+        if locator is None:
+            return False
+        try:
+            self.actor.move_to_locator(locator, label=label)
+            self.actor.smart_click(label=f"{label} 클릭")
+            return True
+        except Exception:
+            pass
+        try:
+            locator.click(timeout=2500)
+            return True
+        except Exception:
+            return False
+
+    def _resolve_text_locator_any_frame(self, texts, timeout_ms=1200):
+        if not self.page:
+            return None, None
+        if isinstance(texts, str):
+            texts = [texts]
+        texts = [t for t in texts if isinstance(t, str) and t.strip()]
+        if not texts:
+            return None, None
+
+        frames = []
+        try:
+            frames = list(self.page.frames)
+        except Exception:
+            frames = [self.page.main_frame]
+        if self.page.main_frame not in frames:
+            frames.insert(0, self.page.main_frame)
+
+        for fr in frames:
+            for txt in texts:
+                try:
+                    loc = fr.get_by_text(txt, exact=False).first
+                    if loc.count() <= 0:
+                        continue
+                    if not loc.is_visible(timeout=timeout_ms):
+                        continue
+                    return loc, f"text:{txt}"
+                except Exception:
+                    continue
+        return None, None
+
+    def _direct_fill_asset_search_via_dom(self, asset_tag):
+        if (not self.page) or (not asset_tag):
+            return False, "page/tag 없음"
+        try:
+            result = self.page.evaluate(
+                """(payload) => {
+                    const tag = String(payload.tag || "").trim();
+                    if (!tag) return {ok:false, reason:"empty-tag"};
+
+                    const searchKeys = ["asset", "search", "에셋", "검색"];
+                    const promptKeys = ["무엇을 만들고 싶으신가요", "prompt", "프롬프트", "message", "메시지"];
+
+                    const isVisible = (el) => {
+                        if (!el) return false;
+                        const r = el.getBoundingClientRect();
+                        if (!r || r.width < 10 || r.height < 10) return false;
+                        const st = window.getComputedStyle(el);
+                        return st && st.display !== "none" && st.visibility !== "hidden" && st.opacity !== "0";
+                    };
+
+                    const metaText = (el) => {
+                        const a = (k) => (el.getAttribute(k) || "");
+                        return [
+                            el.tagName || "",
+                            el.id || "",
+                            el.className || "",
+                            a("name"),
+                            a("placeholder"),
+                            a("aria-label"),
+                            a("title"),
+                            (el.innerText || ""),
+                        ].join(" ").toLowerCase();
+                    };
+
+                    const roots = [];
+                    const q = [document];
+                    while (q.length) {
+                        const root = q.shift();
+                        roots.push(root);
+                        const hostNodes = root.querySelectorAll ? root.querySelectorAll("*") : [];
+                        for (const h of hostNodes) {
+                            if (h && h.shadowRoot) q.push(h.shadowRoot);
+                        }
+                    }
+
+                    let best = null;
+                    let bestScore = -1e9;
+                    for (const root of roots) {
+                        const nodes = root.querySelectorAll ? root.querySelectorAll("input, textarea, [contenteditable='true'], [role='searchbox'], [role='textbox']") : [];
+                        for (const el of nodes) {
+                            if (!isVisible(el)) continue;
+                            const meta = metaText(el);
+                            const r = el.getBoundingClientRect();
+                            let score = 0;
+
+                            const hasSearch = searchKeys.some(k => meta.includes(k));
+                            const hasPrompt = promptKeys.some(k => meta.includes(k));
+                            if (hasSearch) score += 450;
+                            if (hasPrompt) score -= 700;
+
+                            if ((el.tagName || "").toLowerCase() === "input") score += 80;
+                            if ((el.getAttribute("type") || "").toLowerCase() === "search") score += 260;
+                            if (r.width > 120 && r.width < 700) score += 70;
+                            if (r.y > 0 && r.y < window.innerHeight * 0.9) score += 30;
+
+                            if (score > bestScore) {
+                                bestScore = score;
+                                best = el;
+                            }
+                        }
+                    }
+
+                    if (!best || bestScore < 120) {
+                        return {ok:false, reason:"search-input-not-found"};
+                    }
+
+                    best.focus();
+                    try {
+                        if ("value" in best) {
+                            best.value = "";
+                            best.dispatchEvent(new Event("input", {bubbles:true}));
+                            best.value = tag;
+                            best.dispatchEvent(new Event("input", {bubbles:true}));
+                            best.dispatchEvent(new Event("change", {bubbles:true}));
+                        } else {
+                            best.textContent = "";
+                            best.dispatchEvent(new InputEvent("input", {bubbles:true, data:""}));
+                            best.textContent = tag;
+                            best.dispatchEvent(new InputEvent("input", {bubbles:true, data:tag}));
+                        }
+                        return {ok:true, reason:"dom-filled"};
+                    } catch (e) {
+                        return {ok:false, reason:String(e)};
+                    }
+                }""",
+                {"tag": asset_tag},
+            )
+            ok = bool(result and result.get("ok"))
+            reason = (result or {}).get("reason", "")
+            return ok, reason
+        except Exception as e:
+            return False, str(e)
+
+    def _run_asset_loop_prestep(self, asset_tag):
+        if (not self.page) or (not asset_tag):
+            return
+
+        self.log(f"🔁 S반복 사전단계 시작: {asset_tag}")
+        start_locator, start_selector = self._wait_best_locator(
+            self._asset_start_button_candidates(),
+            timeout_sec=6,
+            prefer_enabled=False,
+        )
+        if start_locator is not None:
+            if self._click_with_actor_fallback(start_locator, "시작 버튼"):
+                self.log(f"🟢 Step1 시작 클릭: {start_selector or '텍스트 탐색'}")
+                self.actor.random_action_delay("시작 클릭 후 대기", 0.5, 1.6)
+        else:
+            start_locator, start_selector = self._resolve_text_locator_any_frame(["시작", "Start"], timeout_ms=1000)
+            if start_locator is not None and self._click_with_actor_fallback(start_locator, "시작 버튼"):
+                self.log(f"🟢 Step1 시작 클릭(문구탐색): {start_selector}")
+                self.actor.random_action_delay("시작 클릭 후 대기", 0.5, 1.6)
+            else:
+                self.log("ℹ️ Step1 시작 버튼 미탐지(현재 화면 유지)")
+
+        # 2-0) 에셋 검색 버튼 없이 바로 검색 입력칸이 열리는 UI 대응
+        direct_input, _ = self._wait_best_locator(
+            self._asset_search_input_candidates(),
+            timeout_sec=4,
+            prefer_enabled=False,
+        )
+        if direct_input is not None:
+            try:
+                direct_input.click(timeout=1200)
+            except Exception:
+                pass
+            try:
+                self.page.keyboard.press("Control+A")
+                self.page.keyboard.press("Backspace")
+            except Exception:
+                pass
+            try:
+                direct_input.fill(asset_tag)
+            except Exception:
+                try:
+                    direct_input.type(asset_tag, delay=random.randint(25, 70))
+                except Exception:
+                    direct_input = None
+            if direct_input is not None:
+                self.page.keyboard.press("Enter")
+                self.log(f"✅ Step2 에셋 검색 입력 완료(직접입력): {asset_tag}")
+                self.actor.random_action_delay("에셋 검색 Enter 후 대기", 0.2, 1.0)
+                return
+
+        search_candidates = self._asset_search_button_candidates() + [
+            "text=에셋 검색",
+            "text=Asset search",
+            "text=Search assets",
+            "[aria-label*='에셋' i][aria-label*='검색' i]",
+            "[title*='에셋' i][title*='검색' i]",
+            "[aria-label*='asset' i][aria-label*='search' i]",
+            "[title*='asset' i][title*='search' i]",
+        ]
+        search_locator, search_selector = self._wait_best_locator(
+            search_candidates,
+            timeout_sec=10,
+            prefer_enabled=False,
+        )
+        if search_locator is None:
+            search_locator, search_selector = self._resolve_text_locator_any_frame(
+                ["에셋 검색", "Asset search", "Search assets"],
+                timeout_ms=1200,
+            )
+        if search_locator is not None:
+            if not self._click_with_actor_fallback(search_locator, "에셋 검색 버튼"):
+                self.log("ℹ️ Step2 에셋 검색 클릭 실패, 입력칸 직접 탐색으로 전환")
+            else:
+                self.log(f"🔎 Step2 에셋 검색 클릭: {search_selector or '텍스트 탐색'}")
+                self.actor.random_action_delay("에셋 검색 클릭 후 대기", 0.4, 1.6)
+
+        search_input, _ = self._wait_best_locator(
+            self._asset_search_input_candidates(),
+            timeout_sec=8,
+            prefer_enabled=False,
+        )
+        if search_input is None:
+            # 클릭 후 포커스가 검색칸으로 이미 이동했을 수 있어 키보드 직접 입력 1회 폴백
+            try:
+                self.page.keyboard.press("Control+A")
+                self.page.keyboard.press("Backspace")
+                self.page.keyboard.insert_text(asset_tag)
+                self.page.keyboard.press("Enter")
+                self.log(f"✅ Step2 에셋 검색 입력 완료(포커스 폴백): {asset_tag}")
+                self.actor.random_action_delay("에셋 검색 Enter 후 대기", 0.3, 1.0)
+                return
+            except Exception:
+                ok_dom, reason_dom = self._direct_fill_asset_search_via_dom(asset_tag)
+                if ok_dom:
+                    self.page.keyboard.press("Enter")
+                    self.log(f"✅ Step2 에셋 검색 입력 완료(DOM 폴백): {asset_tag}")
+                    self.actor.random_action_delay("에셋 검색 Enter 후 대기", 0.3, 1.0)
+                    return
+                raise RuntimeError(f"Step2 실패: 에셋 검색 입력창을 찾지 못했습니다. (dom={reason_dom})")
+
+        try:
+            search_input.click(timeout=1500)
+        except Exception:
+            pass
+        try:
+            self.page.keyboard.press("Control+A")
+            self.page.keyboard.press("Backspace")
+        except Exception:
+            pass
+        try:
+            search_input.fill(asset_tag)
+        except Exception:
+            try:
+                search_input.type(asset_tag, delay=random.randint(25, 70))
+            except Exception:
+                raise RuntimeError("에셋 검색 입력에 실패했습니다.")
+
+        self.actor.random_action_delay("에셋 검색어 입력 후 대기", 0.1, 0.5)
+        self.page.keyboard.press("Enter")
+        self.log(f"✅ Step2 에셋 검색 입력 완료: {asset_tag}")
+        self.actor.random_action_delay("에셋 검색 Enter 후 대기", 0.2, 1.0)
+
     def _parse_schedule_datetime(self, raw_text):
         txt = (raw_text or "").strip()
         if not txt:
@@ -733,6 +1144,66 @@ class FlowVisionApp:
     def update_status_label(self, text, color):
         if color == "white": color = self.color_text
         self.lbl_main_status.config(text=text, fg=color)
+        if hasattr(self, "lbl_hud_state"):
+            self.lbl_hud_state.config(text=f"상태: {text}", fg=color)
+
+    def _create_collapsible_section(self, parent, title, opened=False):
+        wrap = tk.Frame(parent, bg=self.color_bg, highlightbackground="#E9ECEF", highlightthickness=1)
+        wrap.pack(fill="x", pady=(6, 6))
+
+        head = tk.Frame(wrap, bg=self.color_bg)
+        head.pack(fill="x")
+
+        state = {"open": bool(opened)}
+        body = tk.Frame(wrap, bg=self.color_bg)
+
+        btn = tk.Button(
+            head,
+            text="",
+            anchor="w",
+            relief="flat",
+            borderwidth=0,
+            bg=self.color_bg,
+            activebackground=self.color_bg,
+            fg=self.color_text,
+            font=("Malgun Gothic", 10, "bold"),
+            cursor="hand2",
+            padx=8,
+            pady=6,
+        )
+        btn.pack(fill="x")
+
+        def _refresh():
+            arrow = "▾" if state["open"] else "▸"
+            btn.config(text=f"{arrow} {title}")
+            if state["open"]:
+                body.pack(fill="x", padx=8, pady=(2, 8))
+            else:
+                body.pack_forget()
+
+        def _set_open(flag):
+            state["open"] = bool(flag)
+            _refresh()
+
+        btn.config(command=lambda: _set_open(not state["open"]))
+        _refresh()
+        return body, _set_open
+
+    def _set_mini_hud_collapsed(self, collapsed):
+        if not hasattr(self, "mini_hud_body"):
+            return
+        self.mini_hud_collapsed = bool(collapsed)
+        if self.mini_hud_collapsed:
+            self.mini_hud_body.pack_forget()
+            if hasattr(self, "btn_toggle_hud"):
+                self.btn_toggle_hud.config(text="펼치기")
+        else:
+            self.mini_hud_body.pack(fill="x", pady=(4, 0))
+            if hasattr(self, "btn_toggle_hud"):
+                self.btn_toggle_hud.config(text="접기")
+
+    def _toggle_mini_hud(self):
+        self._set_mini_hud_collapsed(not getattr(self, "mini_hud_collapsed", False))
 
     def _build_ui(self):
         # 1. Header (High Visibility)
@@ -743,6 +1214,12 @@ class FlowVisionApp:
         title_f.pack(side="left", padx=20, pady=10)
         tk.Label(title_f, text="Flow Veo 자동화 봇", font=("Malgun Gothic", 20, "bold"), bg="#F8F9FA", fg="#343A40").pack(anchor="w")
         tk.Label(title_f, text="Ultimate V2 High-Vis Edition", font=("Malgun Gothic", 10), bg="#F8F9FA", fg="#868E96").pack(anchor="w")
+
+        center_f = tk.Frame(header, bg="#F8F9FA")
+        center_f.pack(side="left", fill="both", expand=True, padx=10)
+        tk.Label(center_f, text="진행 상황", font=("Malgun Gothic", 10), bg="#F8F9FA", fg="#868E96").pack(anchor="center", pady=(10, 0))
+        self.lbl_header_progress = tk.Label(center_f, text="0 / 0 (0.0%)", font=("Consolas", 13, "bold"), bg="#F8F9FA", fg=self.color_accent)
+        self.lbl_header_progress.pack(anchor="center")
 
         status_f = tk.Frame(header, bg="#F8F9FA")
         status_f.pack(side="right", padx=30, fill="y")
@@ -889,9 +1366,110 @@ class FlowVisionApp:
         
         mode_map = {"typing": "⌨️ 타이핑", "paste": "📋 복사붙여넣기", "mixed": "🔀 혼용(랜덤)"}
 
-        # Relay
-        relay_f = tk.Frame(left_card, bg=self.color_bg)
-        relay_f.pack(fill="x", pady=10)
+        asset_body, _set_asset_open = self._create_collapsible_section(left_card, "S1~S# 에셋 자동 반복", opened=False)
+        asset_f = tk.Frame(asset_body, bg=self.color_bg)
+        asset_f.pack(fill="x", pady=6)
+        self.asset_loop_var = tk.BooleanVar(value=self.cfg.get("asset_loop_enabled", False))
+        tk.Checkbutton(
+            asset_f,
+            text="S번호 자동 반복 사용",
+            variable=self.asset_loop_var,
+            command=self.on_option_toggle,
+            bg=self.color_bg,
+            font=("Malgun Gothic", 10),
+            activebackground=self.color_bg,
+        ).pack(anchor="w")
+        tk.Label(
+            asset_f,
+            text="동작: 시작 클릭 -> 에셋 검색에 S번호 입력 -> 프롬프트 입력",
+            bg=self.color_bg,
+            fg=self.color_text_sec,
+            font=("Malgun Gothic", 9),
+        ).pack(anchor="w", pady=(2, 6))
+
+        asset_range_f = tk.Frame(asset_f, bg=self.color_bg)
+        asset_range_f.pack(fill="x", pady=(0, 6))
+        tk.Label(asset_range_f, text="시작 번호", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left")
+        self.asset_loop_start_var = tk.IntVar(value=self.cfg.get("asset_loop_start", 1))
+        self.spin_asset_start = tk.Spinbox(
+            asset_range_f,
+            from_=1,
+            to=9999,
+            width=6,
+            textvariable=self.asset_loop_start_var,
+            command=self.on_option_toggle,
+            bg="#FFFFFF",
+            fg="black",
+        )
+        self.spin_asset_start.pack(side="left", padx=(6, 14))
+        self.spin_asset_start.bind("<FocusOut>", self.on_option_toggle)
+        self.spin_asset_start.bind("<Return>", self.on_option_toggle)
+
+        tk.Label(asset_range_f, text="끝 번호", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left")
+        self.asset_loop_end_var = tk.IntVar(value=self.cfg.get("asset_loop_end", 1))
+        self.spin_asset_end = tk.Spinbox(
+            asset_range_f,
+            from_=1,
+            to=9999,
+            width=6,
+            textvariable=self.asset_loop_end_var,
+            command=self.on_option_toggle,
+            bg="#FFFFFF",
+            fg="black",
+        )
+        self.spin_asset_end.pack(side="left", padx=(6, 0))
+        self.spin_asset_end.bind("<FocusOut>", self.on_option_toggle)
+        self.spin_asset_end.bind("<Return>", self.on_option_toggle)
+
+        asset_prefix_f = tk.Frame(asset_f, bg=self.color_bg)
+        asset_prefix_f.pack(fill="x", pady=(0, 6))
+        tk.Label(asset_prefix_f, text="접두어", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left")
+        self.asset_loop_prefix_var = tk.StringVar(value=self.cfg.get("asset_loop_prefix", "S"))
+        self.entry_asset_prefix = tk.Entry(asset_prefix_f, textvariable=self.asset_loop_prefix_var, bg="#FFFFFF", fg="black", font=("Consolas", 10), width=8)
+        self.entry_asset_prefix.pack(side="left", padx=(6, 0))
+        self.entry_asset_prefix.bind("<FocusOut>", self.on_option_toggle)
+
+        tk.Label(asset_f, text="프롬프트 템플릿 ({tag}=S1/S2... 로 치환)", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(anchor="w")
+        self.asset_loop_template_var = tk.StringVar(
+            value=self.cfg.get("asset_loop_prompt_template", "{tag} : Naturally Seamless Loop animation.")
+        )
+        self.entry_asset_template = tk.Entry(
+            asset_f,
+            textvariable=self.asset_loop_template_var,
+            bg="#FFFFFF",
+            fg="black",
+            font=("Consolas", 10),
+        )
+        self.entry_asset_template.pack(fill="x", ipady=3, pady=(2, 0))
+        self.entry_asset_template.bind("<FocusOut>", self.on_option_toggle)
+
+        tk.Label(asset_f, text="시작 버튼 selector(선택)", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(anchor="w", pady=(8, 0))
+        self.asset_start_selector_var = tk.StringVar(value=self.cfg.get("asset_start_selector", ""))
+        self.entry_asset_start_selector = tk.Entry(asset_f, textvariable=self.asset_start_selector_var, bg="#FFFFFF", fg="black", font=("Consolas", 10))
+        self.entry_asset_start_selector.pack(fill="x", ipady=3, pady=(2, 4))
+        self.entry_asset_start_selector.bind("<FocusOut>", self.on_option_toggle)
+
+        tk.Label(asset_f, text="에셋 검색 버튼 selector(선택)", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(anchor="w")
+        self.asset_search_btn_selector_var = tk.StringVar(value=self.cfg.get("asset_search_button_selector", ""))
+        self.entry_asset_search_btn_selector = tk.Entry(asset_f, textvariable=self.asset_search_btn_selector_var, bg="#FFFFFF", fg="black", font=("Consolas", 10))
+        self.entry_asset_search_btn_selector.pack(fill="x", ipady=3, pady=(2, 4))
+        self.entry_asset_search_btn_selector.bind("<FocusOut>", self.on_option_toggle)
+
+        tk.Label(asset_f, text="에셋 검색 입력칸 selector(선택)", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(anchor="w")
+        self.asset_search_input_selector_var = tk.StringVar(value=self.cfg.get("asset_search_input_selector", ""))
+        self.entry_asset_search_input_selector = tk.Entry(asset_f, textvariable=self.asset_search_input_selector_var, bg="#FFFFFF", fg="black", font=("Consolas", 10))
+        self.entry_asset_search_input_selector.pack(fill="x", ipady=3, pady=(2, 6))
+        self.entry_asset_search_input_selector.bind("<FocusOut>", self.on_option_toggle)
+
+        asset_btn_f = tk.Frame(asset_f, bg=self.color_bg)
+        asset_btn_f.pack(fill="x", pady=(2, 0))
+        ttk.Button(asset_btn_f, text="🔍 에셋 selector 자동찾기", command=self.on_auto_detect_asset_selectors).pack(side="left")
+        ttk.Button(asset_btn_f, text="🧪 에셋 selector 테스트", command=self.on_test_asset_selectors).pack(side="left", padx=6)
+
+        # Relay (Accordion: 기본 접힘)
+        relay_body, _set_relay_open = self._create_collapsible_section(left_card, "이어달리기 / 문서 선택", opened=False)
+        relay_f = tk.Frame(relay_body, bg=self.color_bg)
+        relay_f.pack(fill="x", pady=6)
         c3 = tk.Checkbutton(relay_f, text="이어달리기 (파일 순차 실행)", variable=tk.BooleanVar(), command=self.on_option_toggle, bg=self.color_bg, font=("Malgun Gothic", 10), activebackground=self.color_bg)
         self.relay_var = tk.BooleanVar(value=self.cfg.get("relay_mode", False))
         c3.config(variable=self.relay_var)
@@ -902,7 +1480,7 @@ class FlowVisionApp:
         sp = tk.Spinbox(relay_f, from_=1, to=10, width=3, textvariable=self.relay_cnt_var, command=self.on_option_toggle, bg="#FFFFFF", fg="black")
         sp.pack(side="left", padx=5)
 
-        relay_range_f = tk.Frame(left_card, bg=self.color_bg)
+        relay_range_f = tk.Frame(relay_body, bg=self.color_bg)
         relay_range_f.pack(fill="x", pady=(0, 10))
         tk.Label(relay_range_f, text="이어달리기 범위:", bg=self.color_bg, font=("Malgun Gothic", 9, "bold")).pack(side="left")
         tk.Label(relay_range_f, text="시작", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left", padx=(8, 2))
@@ -915,7 +1493,7 @@ class FlowVisionApp:
         self.combo_relay_end.bind("<<ComboboxSelected>>", self.on_option_toggle)
         self._sync_relay_range_controls()
 
-        relay_pick_f = tk.Frame(left_card, bg=self.color_bg)
+        relay_pick_f = tk.Frame(relay_body, bg=self.color_bg)
         relay_pick_f.pack(fill="x", pady=(0, 8))
         self.relay_pick_var = tk.BooleanVar(value=self.cfg.get("relay_use_selection", False))
         tk.Checkbutton(
@@ -929,7 +1507,7 @@ class FlowVisionApp:
         ).pack(side="left")
         ttk.Button(relay_pick_f, text="문서 선택...", command=self.on_open_relay_selector).pack(side="left", padx=6)
 
-        self.lbl_relay_pick = tk.Label(left_card, text="", font=("Malgun Gothic", 9), fg=self.color_text_sec, bg=self.color_bg)
+        self.lbl_relay_pick = tk.Label(relay_body, text="", font=("Malgun Gothic", 9), fg=self.color_text_sec, bg=self.color_bg)
         self.lbl_relay_pick.pack(anchor="w", pady=(0, 8))
         self._sync_relay_selection_label()
 
@@ -939,7 +1517,9 @@ class FlowVisionApp:
         self.entry_interval.pack(fill="x", ipady=5)
         tk.Label(left_card, text="※ 설정한 시간마다 봇이 작동합니다.", font=("Malgun Gothic", 9), fg=self.color_text_sec).pack(anchor="w")
 
-        sched_card = tk.Frame(left_card, bg=self.color_bg)
+        # 예약 (Accordion: 기본 접힘)
+        sched_body, _set_sched_open = self._create_collapsible_section(left_card, "예약 시작 설정(고급)", opened=False)
+        sched_card = tk.Frame(sched_body, bg=self.color_bg)
         sched_card.pack(fill="x", pady=(14, 2))
         tk.Label(sched_card, text="4. 1회 예약 시작 (특정 날짜/시간)", font=("Malgun Gothic", 11, "bold"), fg=self.color_text).pack(anchor="w")
         self.schedule_var = tk.BooleanVar(value=self.cfg.get("scheduled_start_enabled", False))
@@ -979,17 +1559,13 @@ class FlowVisionApp:
         ttk.Button(quick_f, text="현재+30분", command=lambda: self.on_fill_schedule_time(30)).pack(side="left", padx=6)
         ttk.Button(quick_f, text="예약 지우기", command=self.on_clear_schedule_time).pack(side="left")
 
-        tk.Frame(left_card, height=30, bg=self.color_bg).pack()
-        self.btn_start = ttk.Button(left_card, text="▶ 자동화 시작", style="Action.TButton", command=self.on_start)
-        self.btn_start.pack(fill="x", ipady=15)
-        self.btn_stop = ttk.Button(left_card, text="⏹ 중지", command=self.on_stop, state="disabled")
-        self.btn_stop.pack(fill="x", pady=10, ipady=5)
+        tk.Frame(left_card, height=12, bg=self.color_bg).pack()
 
         # --- Right: Dashboard (HUD Design) ---
         right_panel = tk.Frame(self.body_pane, bg=self.color_bg)
 
-        self.body_pane.add(self.left_container, weight=4)
-        self.body_pane.add(right_panel, weight=6)
+        self.body_pane.add(self.left_container, weight=7)
+        self.body_pane.add(right_panel, weight=3)
         self.root.after(120, self._init_body_sash)
         
         # 1. Progress Card
@@ -1007,68 +1583,86 @@ class FlowVisionApp:
         self.lbl_eta = tk.Label(info_f, text="종료 예정: --:--", font=("Malgun Gothic", 10), fg=self.color_text_sec, bg=self.color_bg)
         self.lbl_eta.pack(side="right", pady=4)
         
-        # 2. Human Monitor (HUD)
-        mon_card = ttk.LabelFrame(right_panel, text=" 👁️ Human Action HUD ", padding=15)
-        mon_card.pack(fill="both", expand=True)
-        
-        # Top Header: Persona & Mood
-        hud_header = tk.Frame(mon_card, bg="#F1F3F5", padx=10, pady=10, relief="groove", borderwidth=1)
-        hud_header.pack(fill="x", pady=(0, 10))
-        
-        tk.Label(hud_header, text="CURRENT PERSONA", font=("Consolas", 8), fg="#868E96", bg="#F1F3F5").pack(anchor="w")
-        self.lbl_live_persona = tk.Label(hud_header, text="INITIALIZING...", font=("Malgun Gothic", 14, "bold"), fg="#343A40", bg="#F1F3F5")
-        self.lbl_live_persona.pack(anchor="w")
-        
-        tk.Frame(hud_header, height=1, bg="#DEE2E6").pack(fill="x", pady=5) # Divider
-        
-        mood_f = tk.Frame(hud_header, bg="#F1F3F5")
-        mood_f.pack(fill="x")
-        self.lbl_live_mood = tk.Label(mood_f, text="MOOD: -", font=("Consolas", 11, "bold"), fg=self.color_info, bg="#F1F3F5")
-        self.lbl_live_mood.pack(side="left")
-        self.lbl_live_speed = tk.Label(mood_f, text="SPEED: x1.0", font=("Consolas", 11, "bold"), fg=self.color_success, bg="#F1F3F5")
-        self.lbl_live_speed.pack(side="right")
+        # 2. Mini HUD (핵심 정보만 표시)
+        mon_card = ttk.LabelFrame(right_panel, text=" ⚡ Mini HUD ", padding=10)
+        mon_card.pack(fill="x", pady=(0, 10))
 
-        # Detailed Stats Grid
-        stats_f = tk.Frame(mon_card, bg=self.color_bg)
-        stats_f.pack(fill="x", pady=5)
-        
-        # Helper to create stat row
-        self.stat_labels = {}
-        def add_stat(row, col, label, key, color="#495057"):
-            f = tk.Frame(stats_f, bg=self.color_bg)
-            f.grid(row=row, column=col, sticky="ew", padx=5, pady=2)
-            tk.Label(f, text=label, font=("Malgun Gothic", 9), fg="#868E96", bg=self.color_bg).pack(anchor="w")
-            l = tk.Label(f, text="-", font=("Consolas", 11, "bold"), fg=color, bg=self.color_bg)
-            l.pack(anchor="w")
-            self.stat_labels[key] = l
-            stats_f.grid_columnconfigure(col, weight=1)
+        top_line = tk.Frame(mon_card, bg=self.color_bg)
+        top_line.pack(fill="x")
+        self.lbl_hud_state = tk.Label(top_line, text="상태: 준비 완료", font=("Malgun Gothic", 10, "bold"), fg=self.color_success, bg=self.color_bg)
+        self.lbl_hud_state.pack(side="left")
+        self.btn_toggle_hud = ttk.Button(top_line, text="펼치기", width=8, command=self._toggle_mini_hud)
+        self.btn_toggle_hud.pack(side="right")
+        self.lbl_hud_mode = tk.Label(
+            top_line,
+            text=f"입력: {self.cfg.get('input_mode', 'typing')}",
+            font=("Consolas", 10, "bold"),
+            fg=self.color_info,
+            bg=self.color_bg,
+        )
+        self.lbl_hud_mode.pack(side="right", padx=(0, 8))
 
-        # Row 0
-        add_stat(0, 0, "피로도 (Fatigue)", "fatigue", "#FFC107")
-        add_stat(0, 1, "오타 확률 (Typo)", "typo", "#FD7E14")
-        # Row 1
-        add_stat(1, 0, "망설임 (Hesitation)", "hesitation", "#6f42c1")
-        add_stat(1, 1, "초점 상실 (Loss)", "focus_loss", "#E83E8C")
-        # Row 2
-        add_stat(2, 0, "오버슈트 (Overshoot)", "overshoot", "#20C997")
-        add_stat(2, 1, "미세 보정 (Micro)", "correction", "#17A2B8")
-        # Row 3
-        add_stat(3, 0, "현재 배치 (Batch)", "batch", "#343A40")
-        add_stat(3, 1, "다음 휴식 (Bio Break)", "break", "#007AFF")
+        self.mini_hud_body = tk.Frame(mon_card, bg=self.color_bg)
+        self.lbl_hud_progress = tk.Label(
+            self.mini_hud_body,
+            text="진행: 0 / 0 | 배치: 0 / 0",
+            font=("Consolas", 10, "bold"),
+            fg=self.color_accent,
+            bg=self.color_bg,
+        )
+        self.lbl_hud_progress.pack(anchor="w", pady=(6, 2))
 
-        # Active Traits List
-        tk.Label(mon_card, text="ACTIVE BEHAVIOR TRAITS", font=("Consolas", 9, "bold"), fg="#ADB5BD", bg=self.color_bg).pack(anchor="w", pady=(15, 5))
-        
-        self.traits_frame = tk.Frame(mon_card, bg="#F8F9FA", relief="sunken", borderwidth=1)
-        self.traits_frame.pack(fill="both", expand=True)
-        
-        self.list_traits = tk.Listbox(self.traits_frame, height=4, bg="#F8F9FA", fg="#495057", 
-                                      font=("Malgun Gothic", 9), relief="flat", highlightthickness=0, selectbackground="#E9ECEF")
-        self.list_traits.pack(side="left", fill="both", expand=True, padx=5, pady=5)
-        
-        scrolly = ttk.Scrollbar(self.traits_frame, orient="vertical", command=self.list_traits.yview)
-        scrolly.pack(side="right", fill="y")
-        self.list_traits.config(yscrollcommand=scrolly.set)
+        self.lbl_hud_persona = tk.Label(
+            self.mini_hud_body,
+            text="페르소나: INITIALIZING...",
+            font=("Malgun Gothic", 10, "bold"),
+            fg="#343A40",
+            bg=self.color_bg,
+        )
+        self.lbl_hud_persona.pack(anchor="w")
+
+        self.lbl_hud_meta = tk.Label(
+            self.mini_hud_body,
+            text="무드: - | 속도: x1.0 | 다음휴식: -",
+            font=("Consolas", 10),
+            fg=self.color_text_sec,
+            bg=self.color_bg,
+        )
+        self.lbl_hud_meta.pack(anchor="w", pady=(2, 0))
+
+        self.lbl_hud_trait = tk.Label(
+            self.mini_hud_body,
+            text="특징: -",
+            font=("Malgun Gothic", 9),
+            fg="#495057",
+            bg=self.color_bg,
+            wraplength=520,
+            justify="left",
+        )
+        self.lbl_hud_trait.pack(anchor="w", pady=(4, 0))
+        self._set_mini_hud_collapsed(True)
+
+        ctrl_card = ttk.LabelFrame(right_panel, text=" ▶ 실행 컨트롤 ", padding=10)
+        ctrl_card.pack(fill="x", pady=(0, 10))
+        self.btn_start_prompt = ttk.Button(
+            ctrl_card,
+            text="▶ 프롬프트 자동화 시작",
+            style="Action.TButton",
+            command=self.on_start_prompt,
+        )
+        self.btn_start_prompt.pack(fill="x", ipady=12)
+        self.btn_start_asset = ttk.Button(
+            ctrl_card,
+            text="▶ S반복 자동화 시작",
+            command=self.on_start_asset,
+        )
+        self.btn_start_asset.pack(fill="x", ipady=10, pady=(8, 0))
+        self.btn_pause = ttk.Button(ctrl_card, text="⏸ 일시정지", command=self.on_pause, state="disabled")
+        self.btn_pause.pack(fill="x", pady=(8, 0), ipady=6)
+        self.btn_resume = ttk.Button(ctrl_card, text="▶ 재개", command=self.on_resume, state="disabled")
+        self.btn_resume.pack(fill="x", pady=(6, 0), ipady=6)
+        self.btn_stop = ttk.Button(ctrl_card, text="⏹ 완전중지(브라우저 종료)", command=self.on_stop, state="disabled")
+        self.btn_stop.pack(fill="x", pady=(6, 0), ipady=6)
 
         # 3. Bottom
         bottom = tk.Frame(self.root, bg=self.color_bg)
@@ -1337,6 +1931,24 @@ class FlowVisionApp:
         self.cfg["scheduled_start_enabled"] = self.schedule_var.get() if hasattr(self, "schedule_var") else self.cfg.get("scheduled_start_enabled", False)
         self.cfg["scheduled_start_at"] = self.schedule_text_var.get().strip() if hasattr(self, "schedule_text_var") else self.cfg.get("scheduled_start_at", "")
         self.cfg["language_mode"] = "ko_en" if self.lang_var.get() else "en"
+        self.cfg["asset_loop_enabled"] = self.asset_loop_var.get() if hasattr(self, "asset_loop_var") else self.cfg.get("asset_loop_enabled", False)
+        try:
+            asset_start = int(self.asset_loop_start_var.get()) if hasattr(self, "asset_loop_start_var") else int(self.cfg.get("asset_loop_start", 1))
+        except Exception:
+            asset_start = 1
+        try:
+            asset_end = int(self.asset_loop_end_var.get()) if hasattr(self, "asset_loop_end_var") else int(self.cfg.get("asset_loop_end", 1))
+        except Exception:
+            asset_end = asset_start
+        self.cfg["asset_loop_start"] = max(1, asset_start)
+        self.cfg["asset_loop_end"] = max(1, asset_end)
+        asset_prefix = self.asset_loop_prefix_var.get().strip() if hasattr(self, "asset_loop_prefix_var") else str(self.cfg.get("asset_loop_prefix", "S"))
+        self.cfg["asset_loop_prefix"] = asset_prefix or "S"
+        asset_template = self.asset_loop_template_var.get().strip() if hasattr(self, "asset_loop_template_var") else str(self.cfg.get("asset_loop_prompt_template", ""))
+        self.cfg["asset_loop_prompt_template"] = asset_template or "{tag} : Naturally Seamless Loop animation."
+        self.cfg["asset_start_selector"] = self.asset_start_selector_var.get().strip() if hasattr(self, "asset_start_selector_var") else self.cfg.get("asset_start_selector", "")
+        self.cfg["asset_search_button_selector"] = self.asset_search_btn_selector_var.get().strip() if hasattr(self, "asset_search_btn_selector_var") else self.cfg.get("asset_search_button_selector", "")
+        self.cfg["asset_search_input_selector"] = self.asset_search_input_selector_var.get().strip() if hasattr(self, "asset_search_input_selector_var") else self.cfg.get("asset_search_input_selector", "")
         # 실행 중에는 시작 시 확정한 입력방식을 유지(중간 변경으로 typing/paste 뒤바뀜 방지)
         if self.running and self.run_input_mode in ("typing", "paste", "mixed"):
             self.cfg["input_mode"] = self.run_input_mode
@@ -1368,6 +1980,8 @@ class FlowVisionApp:
         self._sync_relay_selection_label()
         if hasattr(self, 'actor'):
             self.actor.language_mode = self.cfg["language_mode"]
+        if hasattr(self, "lbl_hud_mode"):
+            self.lbl_hud_mode.config(text=f"입력: {self.cfg['input_mode']}")
         self.log(f"⚙️ 설정 동기화 완료 (입력방식: {self.cfg['input_mode']})")
 
     def _pick_first_visible_selector(self, candidates):
@@ -1403,9 +2017,16 @@ class FlowVisionApp:
         cands.extend(self._normalize_candidate_list(self.cfg.get("input_selector", "")))
         cands.extend(self._normalize_candidate_list(self.cfg.get("input_selectors", [])))
         cands.extend([
+            "textarea[placeholder*='무엇을 만들고 싶으신가요' i]",
+            "textarea[aria-label*='무엇을 만들고 싶으신가요' i]",
+            "[role='textbox'][aria-label*='무엇을 만들고 싶으신가요' i]",
+            "[contenteditable='true'][aria-label*='무엇을 만들고 싶으신가요' i]",
             "#PINHOLE_TEXT_AREA_ELEMENT_ID",
             "textarea#PINHOLE_TEXT_AREA_ELEMENT_ID",
             "[id*='PINHOLE' i]",
+            "textarea:not([placeholder*='검색' i]):not([aria-label*='검색' i]):not([placeholder*='asset' i]):not([aria-label*='asset' i])",
+            "[role='textbox']:not([aria-label*='검색' i]):not([aria-label*='asset' i])",
+            "[contenteditable='true']:not([aria-label*='검색' i]):not([aria-label*='asset' i])",
             "textarea",
             "[contenteditable='true']",
             "[contenteditable='plaintext-only']",
@@ -1414,6 +2035,10 @@ class FlowVisionApp:
             "[role='textbox']",
             "div.ProseMirror[contenteditable='true']",
             "div[data-lexical-editor='true']",
+            "textarea[placeholder*='무엇을 만들' i]",
+            "textarea[aria-label*='무엇을 만들' i]",
+            "textarea[placeholder*='프롬프트' i]",
+            "textarea[aria-label*='프롬프트' i]",
             "textarea[placeholder*='prompt' i]",
             "textarea[placeholder*='message' i]",
             "textarea[placeholder*='메시지' i]",
@@ -1569,7 +2194,7 @@ class FlowVisionApp:
             pass
         return None, None
 
-    def _resolve_best_locator(self, candidates, near_locator=None, timeout_ms=1200, prefer_enabled=True):
+    def _resolve_best_locator(self, candidates, near_locator=None, timeout_ms=1200, prefer_enabled=True, reject_fn=None):
         """
         selector가 여러 개 매칭될 때 가장 적절한 요소를 고르는 함수.
         - near_locator가 있으면 그 근처의 요소를 우선 선택
@@ -1610,6 +2235,12 @@ class FlowVisionApp:
                         continue
                 except Exception:
                     continue
+                if reject_fn is not None:
+                    try:
+                        if reject_fn(cand, sel):
+                            continue
+                    except Exception:
+                        pass
                 try:
                     box = cand.bounding_box()
                 except Exception:
@@ -1665,6 +2296,62 @@ class FlowVisionApp:
             pass
 
         return best, best_selector
+
+    def _locator_meta_text(self, locator):
+        try:
+            return locator.evaluate(
+                """(el) => {
+                    const a = (name) => (el.getAttribute(name) || "");
+                    const parts = [
+                        (el.tagName || ""),
+                        (el.id || ""),
+                        (el.className || ""),
+                        a("name"),
+                        a("placeholder"),
+                        a("aria-label"),
+                        a("title"),
+                        (el.innerText || ""),
+                    ];
+                    return parts.join(" ").toLowerCase();
+                }"""
+            ) or ""
+        except Exception:
+            return ""
+
+    def _is_asset_search_like_locator(self, locator):
+        meta = self._locator_meta_text(locator)
+        if not meta:
+            return False
+        search_keys = ("asset", "search", "에셋", "검색", "swap_horiz", "swap")
+        prompt_keys = ("무엇을 만들고 싶으신가요", "prompt", "프롬프트", "message", "메시지")
+        has_search = any(k in meta for k in search_keys)
+        has_prompt = any(k in meta for k in prompt_keys)
+        return has_search and (not has_prompt)
+
+    def _resolve_prompt_input_locator(self, input_selector, timeout_ms=2500):
+        # 동적 UI에서 ref 재할당이 발생해도 매번 "프롬프트 입력칸"을 다시 찾도록 강제한다.
+        candidates = self._normalize_candidate_list(input_selector)
+        for sel in self._input_candidates():
+            if sel not in candidates:
+                candidates.append(sel)
+
+        input_loc, resolved_selector = self._resolve_best_locator(
+            candidates,
+            timeout_ms=timeout_ms,
+            reject_fn=lambda cand, _sel: self._is_asset_search_like_locator(cand),
+        )
+        if input_loc is not None:
+            return input_loc, resolved_selector
+
+        # 2차 폴백: 사용자 지정 selector만은 마지막으로 1회 허용(예외 케이스 대비)
+        input_loc, resolved_selector = self._resolve_best_locator(
+            self._normalize_candidate_list(input_selector),
+            timeout_ms=max(1200, int(timeout_ms * 0.8)),
+        )
+        if input_loc is not None and (not self._is_asset_search_like_locator(input_loc)):
+            return input_loc, resolved_selector
+
+        return None, None
 
     def _read_input_text(self, input_locator):
         if input_locator is None:
@@ -1725,12 +2412,7 @@ class FlowVisionApp:
     def _is_input_visible(self, input_selector):
         if not self.page:
             return False
-        # 사용자 지정 selector + 기본 후보를 함께 확인(동적 UI 변화 대응)
-        cands = self._normalize_candidate_list(input_selector)
-        for sel in self._input_candidates():
-            if sel not in cands:
-                cands.append(sel)
-        loc, _ = self._resolve_visible_locator(cands, timeout_ms=1200)
+        loc, _ = self._resolve_prompt_input_locator(input_selector, timeout_ms=1200)
         return loc is not None
 
     def _wait_until_input_visible(self, input_selector, timeout_sec=18):
@@ -1829,8 +2511,12 @@ class FlowVisionApp:
                         let s = r.width * r.height;
                         if (tag === 'textarea') s += 100000;
                         if (ce === 'true' || ce === 'plaintext-only') s += 20000;
+                        if (ph.includes('무엇을 만들') || ar.includes('무엇을 만들')) s += 120000;
+                        if (ph.includes('프롬프트') || ar.includes('프롬프트')) s += 90000;
                         if (ph.includes('prompt') || ph.includes('message') || ph.includes('메시지')) s += 80000;
                         if (ar.includes('prompt') || ar.includes('message') || ar.includes('메시지')) s += 80000;
+                        if (ph.includes('asset') || ph.includes('search') || ph.includes('에셋') || ph.includes('검색')) s -= 220000;
+                        if (ar.includes('asset') || ar.includes('search') || ar.includes('에셋') || ar.includes('검색')) s -= 220000;
                         return s;
                     };
                     visible.sort((a, b) => score(b) - score(a));
@@ -1888,10 +2574,12 @@ class FlowVisionApp:
             input_hint = (self.cfg.get("input_selector") or "").strip() or "#PINHOLE_TEXT_AREA_ELEMENT_ID, textarea, [contenteditable='true'], [role='textbox']"
             self._try_open_new_project_if_needed(input_hint)
 
-            input_candidates = self._input_candidates()
             submit_candidates = self._submit_candidates()
 
-            found_input_loc, found_input = self._resolve_best_locator(input_candidates, timeout_ms=1200)
+            found_input_loc, found_input = self._resolve_prompt_input_locator(
+                self.cfg.get("input_selector", ""),
+                timeout_ms=1400,
+            )
             if not found_input:
                 found_input = self._pick_input_selector_by_dom_heuristic()
                 if found_input:
@@ -1948,8 +2636,8 @@ class FlowVisionApp:
 
             def _check_once():
                 try:
-                    input_loc, _ = self._resolve_best_locator(
-                        self._normalize_candidate_list(input_selector) or self._input_candidates(),
+                    input_loc, _ = self._resolve_prompt_input_locator(
+                        input_selector,
                         timeout_ms=2200,
                     )
                     input_ok_local = input_loc is not None
@@ -1994,6 +2682,150 @@ class FlowVisionApp:
         except Exception as e:
             self.log(f"❌ selector 테스트 실패: {e}")
             self.update_status_label("❌ selector 테스트 실패", self.color_error)
+
+    def on_auto_detect_asset_selectors(self):
+        if self.running:
+            messagebox.showwarning("안내", "자동화 실행 중에는 selector 탐색을 할 수 없습니다.\n먼저 중지 후 시도해주세요.")
+            return
+        self.on_option_toggle()
+        self._auto_detect_asset_selectors_worker()
+
+    def _auto_detect_asset_selectors_worker(self):
+        try:
+            self.update_status_label("🔍 에셋 selector 자동 탐색 중...", self.color_info)
+            self._ensure_browser_session()
+            self.actor.set_page(self.page)
+
+            start_url = (self.cfg.get("start_url") or "").strip()
+            if start_url and start_url not in (self.page.url or ""):
+                self.page.goto(start_url, wait_until="domcontentloaded", timeout=45000)
+            time.sleep(random.uniform(1.0, 2.3))
+
+            start_loc, start_sel = self._wait_best_locator(
+                self._asset_start_button_candidates(),
+                timeout_sec=7,
+                prefer_enabled=False,
+            )
+            search_candidates = self._asset_search_button_candidates() + [
+                "text=에셋 검색",
+                "text=Asset search",
+                "text=Search assets",
+            ]
+            search_loc, search_sel = self._wait_best_locator(
+                search_candidates,
+                timeout_sec=9,
+                prefer_enabled=False,
+            )
+            if start_loc is None:
+                start_loc, start_sel = self._resolve_text_locator_any_frame(["시작", "Start"], timeout_ms=1000)
+            if search_loc is None:
+                search_loc, search_sel = self._resolve_text_locator_any_frame(
+                    ["에셋 검색", "Asset search", "Search assets"],
+                    timeout_ms=1200,
+                )
+
+            input_loc, input_sel = self._wait_best_locator(
+                self._asset_search_input_candidates(),
+                timeout_sec=2,
+                prefer_enabled=False,
+            )
+            if (input_loc is None) and (search_loc is not None):
+                try:
+                    search_loc.click(timeout=2000)
+                    self.actor.random_action_delay("에셋 검색 입력칸 표시 대기", 0.3, 1.2)
+                except Exception:
+                    pass
+                input_loc, input_sel = self._wait_best_locator(
+                    self._asset_search_input_candidates(),
+                    timeout_sec=8,
+                    prefer_enabled=False,
+                )
+
+            if start_sel:
+                self.cfg["asset_start_selector"] = start_sel
+                if hasattr(self, "asset_start_selector_var"):
+                    self.asset_start_selector_var.set(start_sel)
+            if search_sel:
+                self.cfg["asset_search_button_selector"] = search_sel
+                if hasattr(self, "asset_search_btn_selector_var"):
+                    self.asset_search_btn_selector_var.set(search_sel)
+            if input_sel:
+                self.cfg["asset_search_input_selector"] = input_sel
+                if hasattr(self, "asset_search_input_selector_var"):
+                    self.asset_search_input_selector_var.set(input_sel)
+            self.save_config()
+
+            self.log(
+                "🔍 에셋 selector 자동탐색 결과 | "
+                f"시작: {start_sel or '미탐지'} | 에셋검색: {search_sel or '미탐지'} | 검색입력: {input_sel or '미탐지'}"
+            )
+            if start_sel and input_sel:
+                self.update_status_label("✅ 에셋 selector 자동탐색 완료", self.color_success)
+            else:
+                self.update_status_label("⚠️ 에셋 selector 일부 미탐지", self.color_error)
+        except Exception as e:
+            self.log(f"❌ 에셋 selector 자동탐색 실패: {e}")
+            self.update_status_label("❌ 에셋 selector 자동탐색 실패", self.color_error)
+
+    def on_test_asset_selectors(self):
+        if self.running:
+            messagebox.showwarning("안내", "자동화 실행 중에는 selector 테스트를 할 수 없습니다.\n먼저 중지 후 시도해주세요.")
+            return
+        self.on_option_toggle()
+        self._test_asset_selectors_worker()
+
+    def _test_asset_selectors_worker(self):
+        try:
+            self.update_status_label("🧪 에셋 selector 테스트 중...", self.color_info)
+            self._ensure_browser_session()
+            self.actor.set_page(self.page)
+
+            start_url = (self.cfg.get("start_url") or "").strip()
+            if start_url and start_url not in (self.page.url or ""):
+                self.page.goto(start_url, wait_until="domcontentloaded", timeout=45000)
+            time.sleep(random.uniform(0.8, 1.8))
+
+            start_candidates = self._normalize_candidate_list(self.cfg.get("asset_start_selector", "")) or self._asset_start_button_candidates()
+            search_candidates = self._normalize_candidate_list(self.cfg.get("asset_search_button_selector", "")) or self._asset_search_button_candidates()
+            input_candidates = self._normalize_candidate_list(self.cfg.get("asset_search_input_selector", "")) or self._asset_search_input_candidates()
+
+            start_loc, start_sel = self._resolve_best_locator(start_candidates, timeout_ms=2200, prefer_enabled=False)
+            search_loc, search_sel = self._resolve_best_locator(search_candidates + ["text=에셋 검색", "text=Asset search"], timeout_ms=2200, prefer_enabled=False)
+            if start_loc is None:
+                start_loc, start_sel = self._resolve_text_locator_any_frame(["시작", "Start"], timeout_ms=1000)
+            if search_loc is None:
+                search_loc, search_sel = self._resolve_text_locator_any_frame(
+                    ["에셋 검색", "Asset search", "Search assets"],
+                    timeout_ms=1200,
+                )
+
+            input_loc, input_sel = self._resolve_best_locator(input_candidates, timeout_ms=1800, prefer_enabled=False)
+            if (input_loc is None) and (search_loc is not None):
+                try:
+                    search_loc.click(timeout=2000)
+                except Exception:
+                    pass
+                self.actor.random_action_delay("검색 입력칸 확인 대기", 0.3, 1.0)
+                input_loc, input_sel = self._resolve_best_locator(input_candidates, timeout_ms=3000, prefer_enabled=False)
+
+            start_ok = start_loc is not None
+            search_ok = search_loc is not None
+            input_ok = input_loc is not None
+            # 일부 UI는 버튼 없이 검색 입력칸이 바로 노출되므로 search 버튼은 선택 항목으로 처리
+            flow_ok = start_ok and input_ok
+
+            self.log(
+                f"🧪 에셋 selector 테스트 | 시작({start_sel or start_candidates[0] if start_candidates else '-'})={'OK' if start_ok else 'FAIL'} | "
+                f"에셋검색({search_sel or search_candidates[0] if search_candidates else '-'})={'OK' if search_ok else 'FAIL'} | "
+                f"검색입력({input_sel or input_candidates[0] if input_candidates else '-'})={'OK' if input_ok else 'FAIL'}"
+            )
+            if flow_ok:
+                self.update_status_label("✅ 에셋 selector 테스트 통과", self.color_success)
+            else:
+                self.update_status_label("⚠️ 에셋 selector 확인 필요", self.color_error)
+        except Exception as e:
+            self.log(f"❌ 에셋 selector 테스트 실패: {e}")
+            self.update_status_label("❌ 에셋 selector 테스트 실패", self.color_error)
 
     def on_open_relay_selector(self):
         slots = self.cfg.get("prompt_slots", [])
@@ -2081,16 +2913,22 @@ class FlowVisionApp:
 
     def on_reload(self):
         try:
-            path = self.base / self.cfg["prompts_file"]
-            if not path.exists(): path.write_text("", encoding="utf-8")
-            raw = path.read_text(encoding="utf-8")
-            
-            # [NEW] Send to Log Window
-            if hasattr(self, 'log_window'):
-                self.log_window.set_preview(raw)
-            
-            sep = self.cfg.get("prompts_separator", "|||")
-            self.prompts = [p.strip() for p in raw.split(sep) if p.strip()]
+            if self.cfg.get("asset_loop_enabled"):
+                self.asset_loop_items = self._build_asset_loop_items()
+                self.prompts = [item["prompt"] for item in self.asset_loop_items]
+                raw = "\n".join(self.prompts)
+                if hasattr(self, "log_window"):
+                    self.log_window.set_preview(raw)
+            else:
+                self.asset_loop_items = []
+                path = self.base / self.cfg["prompts_file"]
+                if not path.exists(): path.write_text("", encoding="utf-8")
+                raw = path.read_text(encoding="utf-8")
+                # [NEW] Send to Log Window
+                if hasattr(self, 'log_window'):
+                    self.log_window.set_preview(raw)
+                sep = self.cfg.get("prompts_separator", "|||")
+                self.prompts = [p.strip() for p in raw.split(sep) if p.strip()]
             if self.prompts:
                 if self.running and self.index >= len(self.prompts):
                     # 완료 상태(index == len)를 유지해서 자동 재시작을 방지
@@ -2100,7 +2938,10 @@ class FlowVisionApp:
             else:
                 self.index = 0
             self._update_progress_ui()
-            self.log(f"로드 완료 ({len(self.prompts)}개)")
+            if self.cfg.get("asset_loop_enabled"):
+                self.log(f"로드 완료 (S반복 {len(self.prompts)}개)")
+            else:
+                self.log(f"로드 완료 ({len(self.prompts)}개)")
             slots = [s["name"] for s in self.cfg["prompt_slots"]]
             self.combo_slots["values"] = slots
             self.combo_slots.current(self.cfg["active_prompt_slot"])
@@ -2117,78 +2958,74 @@ class FlowVisionApp:
             pct = (min(current, total) / total) * 100
             self.progress_var.set(pct)
             self.lbl_prog_text.config(text=f"{min(current, total)} / {total} ({pct:.1f}%)")
+            if hasattr(self, "lbl_header_progress"):
+                self.lbl_header_progress.config(text=f"{min(current, total)} / {total} ({pct:.1f}%)")
         else:
             self.progress_var.set(0)
             self.lbl_prog_text.config(text="0 / 0 (0%)")
+            if hasattr(self, "lbl_header_progress"):
+                self.lbl_header_progress.config(text="0 / 0 (0.0%)")
+        if hasattr(self, "lbl_hud_progress"):
+            try:
+                processed = getattr(self.actor, "processed_count", 0)
+                batch_size = getattr(self.actor, "current_batch_size", 0)
+            except Exception:
+                processed = 0
+                batch_size = 0
+            self.lbl_hud_progress.config(text=f"진행: {min(current, total)} / {total} | 배치: {processed} / {batch_size}")
 
     def _update_monitor_ui(self):
-        # Update labels with the latest data from the actor
+        # 미니 HUD 갱신: 핵심 정보만 짧게 표시
         try:
             p_name = self.actor.current_persona_name
             mood = self.actor.current_mood
             speed_mult = self.actor.cfg.get('speed_multiplier', 1.0)
-            
-            # --- Key Stats ---
-            fatigue = self.actor.get_fatigue_factor()
-            typo_rate = self.actor.cfg.get("typo_rate", 0)
-            hesitation = self.actor.cfg.get("hesitation_before_click", 0)
-            
-            # Additional Stats for HUD
-            overshoot = self.actor.cfg.get("overshoot_rate", 0)
-            correction = self.actor.cfg.get("micro_correction_rate", 0)
-            focus_loss = self.actor.cfg.get("window_focus_switch_rate", 0)
-            
-            # Batch Info
+
             processed = self.actor.processed_count
             batch_size = self.actor.current_batch_size
             next_break = max(0, batch_size - processed)
-
-            # Update UI Elements
-            self.lbl_live_persona.config(text=p_name.upper())
-            self.lbl_live_mood.config(text=f"MOOD: {mood.upper()}")
-            
-            # Speed: Show as "x 1.2" (Inverse of multiplier if multiplier < 1 is fast? 
-            # Usually lower multiplier = faster delay in code.
-            # But let's show "Speed" as 'Fast' or 'Slow'. 
-            # If mult=0.5 -> delay is half -> Speed x2.0
-            real_speed = 1.0 / speed_mult if speed_mult > 0 else 0
-            self.lbl_live_speed.config(text=f"SPEED: x{real_speed:.1f}")
-
-            # Update Grid Labels using the dictionary
-            def set_text(key, txt):
-                if key in self.stat_labels: self.stat_labels[key].config(text=txt)
-
-            set_text("fatigue", f"{fatigue:.0%}") # 100% means fresh? Or fatigued?
-            # Code says: factor = 1.0 - (elapsed...*0.005). So 1.0 is Fresh.
-            # Let's display "Condition" instead of Fatigue? 
-            # Or label it "Fatigue: 20%" if factor is 0.8?
-            # User asks for "Fatigue". If 1.0 is full speed, then fatigue is 0%.
-            fatigue_pct = (1.0 - fatigue)
-            set_text("fatigue", f"{fatigue_pct:.0%}")
-            
-            set_text("typo", f"{typo_rate:.1%}")
-            set_text("hesitation", f"{hesitation:.0%}")
-            set_text("focus_loss", f"{focus_loss:.0%}")
-            set_text("overshoot", f"{overshoot:.0%}")
-            set_text("correction", f"{correction:.0%}")
-            set_text("batch", f"{processed} / {batch_size}")
-            set_text("break", f"{next_break} left")
-
-            # Update active traits list
-            self.list_traits.delete(0, 'end')
             active_traits = self.actor.get_active_traits()
-            
-            if not active_traits:
-                self.list_traits.insert('end', "  - Standard Mode -")
-                self.list_traits.itemconfig(0, {'fg': '#ADB5BD'})
-            else:
-                for trait in active_traits:
-                    self.list_traits.insert('end', f"  • {trait}")
-                    
+            total = len(self.prompts)
+            current = min(self.index, total)
+            real_speed = 1.0 / speed_mult if speed_mult > 0 else 0.0
+
+            if hasattr(self, "lbl_hud_progress"):
+                self.lbl_hud_progress.config(text=f"진행: {current} / {total} | 배치: {processed} / {batch_size}")
+            if hasattr(self, "lbl_hud_persona"):
+                self.lbl_hud_persona.config(text=f"페르소나: {p_name}")
+            if hasattr(self, "lbl_hud_meta"):
+                self.lbl_hud_meta.config(text=f"무드: {mood} | 속도: x{real_speed:.1f} | 다음휴식: {next_break}")
+            if hasattr(self, "lbl_hud_trait"):
+                if active_traits:
+                    self.lbl_hud_trait.config(text=f"특징: {active_traits[0]}")
+                else:
+                    self.lbl_hud_trait.config(text="특징: 기본 모드")
         except Exception as e:
             print(f"Failed to update monitor UI: {e}")
 
+    def _set_run_mode(self, mode):
+        use_asset = (mode == "asset")
+        self.current_run_mode = mode
+        self.cfg["asset_loop_enabled"] = use_asset
+        if hasattr(self, "asset_loop_var"):
+            self.asset_loop_var.set(use_asset)
+        self.save_config()
+
+    def on_start_prompt(self):
+        self._set_run_mode("prompt")
+        self.on_start()
+
+    def on_start_asset(self):
+        self._set_run_mode("asset")
+        self.on_start()
+
     def on_start(self):
+        if self.running:
+            self.log("ℹ️ 이미 자동화가 실행 중입니다.")
+            return
+        if self.paused:
+            self.on_resume()
+            return
         self.on_reload() # 시작 시 프롬프트 최신화
         try:
             self.cfg["interval_seconds"] = int(self.entry_interval.get())
@@ -2196,6 +3033,13 @@ class FlowVisionApp:
         self.cfg["scheduled_start_enabled"] = self.schedule_var.get() if hasattr(self, "schedule_var") else self.cfg.get("scheduled_start_enabled", False)
         self.cfg["scheduled_start_at"] = self.schedule_text_var.get().strip() if hasattr(self, "schedule_text_var") else self.cfg.get("scheduled_start_at", "")
         self.save_config()
+
+        if self.cfg.get("asset_loop_enabled") and self.cfg.get("relay_mode"):
+            self.cfg["relay_mode"] = False
+            if hasattr(self, "relay_var"):
+                self.relay_var.set(False)
+            self.save_config()
+            self.log("ℹ️ S반복 모드에서는 이어달리기를 자동 해제합니다.")
 
         if self.cfg.get("relay_mode"):
             seq = self._get_effective_relay_sequence()
@@ -2220,7 +3064,10 @@ class FlowVisionApp:
             return
         
         if not self.prompts and not self.cfg.get("relay_mode"):
-            messagebox.showwarning("주의", "프롬프트 파일이 비어있습니다!\n먼저 프롬프트를 입력하고 저장을 눌러주세요.")
+            if self.cfg.get("asset_loop_enabled"):
+                messagebox.showwarning("주의", "S반복 목록이 비어 있습니다.\n시작/끝 번호를 확인해주세요.")
+            else:
+                messagebox.showwarning("주의", "프롬프트 파일이 비어있습니다!\n먼저 프롬프트를 입력하고 저장을 눌러주세요.")
             return
         
         if self.index >= len(self.prompts):
@@ -2247,11 +3094,24 @@ class FlowVisionApp:
             self._open_action_log()
             self.session_report_path = self.logs_dir / f"session_report_{self.session_start_time.strftime('%Y%m%d_%H%M%S')}.json"
         self.running = True
-        self.btn_start.config(state="disabled")
+        self.paused = False
+        self.pause_remaining = None
+        if hasattr(self, "btn_start_prompt"):
+            self.btn_start_prompt.config(state="disabled")
+        if hasattr(self, "btn_start_asset"):
+            self.btn_start_asset.config(state="disabled")
+        if hasattr(self, "btn_pause"):
+            self.btn_pause.config(state="normal")
+        if hasattr(self, "btn_resume"):
+            self.btn_resume.config(state="disabled")
         self.btn_stop.config(state="normal")
         self.update_status_label("🚀 시작 중...", self.color_success)
         self.play_sound("start")
         self.on_option_toggle()
+        if self.cfg.get("asset_loop_enabled"):
+            self.log("🚀 S반복 자동화 시작")
+        else:
+            self.log("🚀 프롬프트 자동화 시작")
         # 실행 시점 입력방식 고정: 중간에 설정이 바뀌어도 현재 런에는 영향 없게 한다.
         self.run_input_mode = (self.cfg.get("input_mode", "paste") or "paste").strip().lower()
         if self.run_input_mode not in ("typing", "paste", "mixed"):
@@ -2264,8 +3124,17 @@ class FlowVisionApp:
         except Exception:
             pass
         self.log(f"🔒 실행 입력방식 고정: {self.run_input_mode}")
-        # selector 테스트 등에서 열려 있던 세션은 시작 전에 같은(UI) 스레드에서 안전 종료
-        self._shutdown_browser()
+        # 기존 브라우저가 살아 있으면 같은 창을 재사용한다. (불필요한 새 창 방지)
+        reuse_existing = False
+        try:
+            reuse_existing = bool(self.browser_context and self.page and (not self.page.is_closed()))
+        except Exception:
+            reuse_existing = False
+        if reuse_existing:
+            self.log("🌐 기존 브라우저 세션 재사용")
+        else:
+            # 세션이 없거나 깨진 경우에만 새로 시작
+            self._shutdown_browser()
         self._ensure_worker_thread()
         try:
             self.actor.update_batch_size()
@@ -2282,9 +3151,61 @@ class FlowVisionApp:
             self.scheduled_start_ts = None
             self.t_next = time.time() # 즉시 시작
 
+    def on_pause(self):
+        if self.paused:
+            return
+        if (not self.running) and (not self.is_processing):
+            return
+        self.paused = True
+        self.running = False
+        if self.t_next:
+            self.pause_remaining = max(1, int(self.t_next - time.time()))
+        else:
+            self.pause_remaining = 1
+        self.scheduled_waiting = False
+        self.scheduled_start_ts = None
+        if hasattr(self, "btn_pause"):
+            self.btn_pause.config(state="disabled")
+        if hasattr(self, "btn_resume"):
+            self.btn_resume.config(state="normal")
+        self.btn_stop.config(state="normal")
+        self.update_status_label("⏸ 일시정지", self.color_info)
+        self.log("⏸ 자동화 일시정지 (브라우저/탭 유지)")
+
+    def on_resume(self):
+        if not self.paused:
+            return
+        self.paused = False
+        self.running = True
+        if hasattr(self, "btn_pause"):
+            self.btn_pause.config(state="normal")
+        if hasattr(self, "btn_resume"):
+            self.btn_resume.config(state="disabled")
+        if hasattr(self, "btn_start_prompt"):
+            self.btn_start_prompt.config(state="disabled")
+        if hasattr(self, "btn_start_asset"):
+            self.btn_start_asset.config(state="disabled")
+        self.btn_stop.config(state="normal")
+        self._ensure_worker_thread()
+        wait_sec = max(1, int(self.pause_remaining or 1))
+        self.pause_remaining = None
+        if not self.is_processing:
+            self.t_next = time.time() + wait_sec
+        self.update_status_label("▶ 재개됨", self.color_success)
+        self.log(f"▶ 자동화 재개 (다음 작업까지 약 {wait_sec}초)")
+
     def on_stop(self):
         self.running = False
-        self.btn_start.config(state="normal")
+        self.paused = False
+        self.pause_remaining = None
+        if hasattr(self, "btn_start_prompt"):
+            self.btn_start_prompt.config(state="normal")
+        if hasattr(self, "btn_start_asset"):
+            self.btn_start_asset.config(state="normal")
+        if hasattr(self, "btn_pause"):
+            self.btn_pause.config(state="disabled")
+        if hasattr(self, "btn_resume"):
+            self.btn_resume.config(state="disabled")
         self.btn_stop.config(state="disabled")
         self.update_status_label("중지됨", self.color_error)
         self.is_processing = False
@@ -2299,17 +3220,124 @@ class FlowVisionApp:
         self._shutdown_browser()
         self._close_action_log()
         self.run_input_mode = None
+        self.current_run_mode = None
         try:
             self.combo_input_mode.config(state="readonly")
         except Exception:
             pass
+
+    def _create_tray_image(self):
+        if Image is None:
+            return None
+        icon_path = self.base.parent / "icon.ico"
+        try:
+            if icon_path.exists():
+                return Image.open(str(icon_path))
+        except Exception:
+            pass
+        try:
+            # fallback: 단색 아이콘
+            img = Image.new("RGB", (64, 64), color=(0, 122, 255))
+            return img
+        except Exception:
+            return None
+
+    def _start_tray_icon(self):
+        if not TRAY_AVAILABLE:
+            return False
+        if self.tray_icon is not None:
+            return True
+
+        image = self._create_tray_image()
+        if image is None:
+            return False
+
+        def _on_open(icon, item):
+            try:
+                self.root.after(0, self.show_from_tray)
+            except Exception:
+                pass
+
+        def _on_exit(icon, item):
+            try:
+                self.root.after(0, self.on_tray_exit_request)
+            except Exception:
+                pass
+
+        menu = pystray.Menu(
+            pystray.MenuItem("열기", _on_open, default=True),
+            pystray.MenuItem("종료", _on_exit),
+        )
+        self.tray_icon = pystray.Icon("flow_veo_bot", image, APP_NAME, menu)
+
+        def _run():
+            try:
+                self.tray_icon.run()
+            except Exception:
+                pass
+
+        self.tray_thread = threading.Thread(target=_run, daemon=True)
+        self.tray_thread.start()
+        return True
+
+    def _stop_tray_icon(self):
+        icon = self.tray_icon
+        self.tray_icon = None
+        if icon is not None:
+            try:
+                icon.stop()
+            except Exception:
+                pass
+        t = self.tray_thread
+        self.tray_thread = None
+        if t and t.is_alive():
+            try:
+                t.join(timeout=1.5)
+            except Exception:
+                pass
+
+    def hide_to_tray(self):
+        if not self._start_tray_icon():
+            if not self._tray_warned_unavailable:
+                self._tray_warned_unavailable = True
+                messagebox.showwarning("트레이 미지원", "트레이 기능이 없어 창만 숨깁니다.\n(pystray/Pillow 설치 시 트레이 사용 가능)")
+            self.root.withdraw()
+            self.hidden_to_tray = True
+            return
+        self.root.withdraw()
+        if hasattr(self, "log_window") and self.log_window:
+            try:
+                self.log_window.root.withdraw()
+            except Exception:
+                pass
+        self.hidden_to_tray = True
+        self.log("🧩 트레이로 숨김")
+
+    def show_from_tray(self):
+        self.hidden_to_tray = False
+        try:
+            self.root.deiconify()
+            self.root.lift()
+            self.root.focus_force()
+        except Exception:
+            pass
+
+    def on_tray_exit_request(self):
+        if not messagebox.askyesno("종료 확인", "정말 프로그램을 종료할까요?"):
+            return
+        self.on_exit()
+
+    def on_window_close(self):
+        self.hide_to_tray()
 
     def on_exit(self):
         self.running = False
         self._stop_worker_thread()
         self._shutdown_browser()
         self._close_action_log()
+        self._stop_tray_icon()
         self.run_input_mode = None
+        self.current_run_mode = None
         try:
             self.root.destroy()
         except Exception:
@@ -2441,6 +3469,21 @@ class FlowVisionApp:
                 self.log(f"🌐 페이지 이동: {start_url}")
                 self.page.goto(start_url, wait_until="domcontentloaded", timeout=45000)
                 self.actor.random_action_delay("페이지 로딩 안정화", 1.0, 3.0)
+
+            prompt = self.prompts[self.index]
+            asset_tag = None
+            if self.cfg.get("asset_loop_enabled"):
+                if 0 <= self.index < len(self.asset_loop_items):
+                    asset_tag = self.asset_loop_items[self.index].get("tag")
+                if not asset_tag:
+                    m = re.match(r"^\s*([A-Za-z]+[0-9]+)\s*:", prompt)
+                    if m:
+                        asset_tag = m.group(1)
+                if asset_tag:
+                    # S반복 모드는 Step1/Step2(시작/에셋검색)를 먼저 수행해야 입력창이 활성화되는 경우가 있다.
+                    self.update_status_label(f"🔁 에셋 준비 중... ({asset_tag})", self.color_info)
+                    self._run_asset_loop_prestep(asset_tag)
+
             # 실행 시점 안정화: 입력창이 늦게 뜨는 경우를 대비해 충분히 대기
             input_probe = self._normalize_candidate_list(input_selector)
             for sel in self._input_candidates():
@@ -2467,20 +3510,14 @@ class FlowVisionApp:
                 print(f"Persona update failed: {e}")
                 self.log(f"⚠️ 페르소나 업데이트 오류: {e}")
 
-            prompt = self.prompts[self.index]
             start_t = datetime.now()
 
-            input_candidates = self._normalize_candidate_list(input_selector)
-            for sel in self._input_candidates():
-                if sel not in input_candidates:
-                    input_candidates.append(sel)
-
-            input_locator, resolved_input_selector = self._resolve_best_locator(
-                input_candidates,
-                timeout_ms=2500,
+            input_locator, resolved_input_selector = self._resolve_prompt_input_locator(
+                input_selector,
+                timeout_ms=2800,
             )
             if input_locator is None:
-                raise RuntimeError("입력창 요소를 찾지 못했습니다. selector 자동찾기/테스트를 다시 실행해주세요.")
+                raise RuntimeError("프롬프트 입력칸을 찾지 못했습니다(에셋 검색칸 제외). selector 자동찾기/테스트를 다시 실행해주세요.")
 
             # 자동으로 더 좋은 selector를 찾았으면 설정 동기화
             if resolved_input_selector and resolved_input_selector != input_selector:

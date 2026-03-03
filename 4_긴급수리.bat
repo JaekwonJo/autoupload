@@ -17,7 +17,7 @@ echo Using Python: %PYCMD%
 echo.
 
 %PYCMD% -m pip install --upgrade pip
-%PYCMD% -m pip install pyautogui pyperclip opencv-python pillow pynput
+%PYCMD% -m pip install pyautogui pyperclip opencv-python pillow pynput pystray
 
 echo.
 echo ========================================================

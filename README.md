@@ -24,6 +24,18 @@ Playwright(Sync API) 기반으로 동작하는 자동화 앱입니다.
    - `pip install -r requirements.txt`
    - `python -m playwright install chromium`
 
+## 원터치 설치+실행 (다른 PC용)
+- `0_원터치_설치+실행.bat` 더블클릭 1번으로 실행 가능합니다.
+- Python이 없는 PC에서도 자동으로 내장 Python을 받아서(`runtime/python-embed`) 설치/실행합니다.
+- 최초 1회만 시간이 조금 걸립니다. (라이브러리 + Chromium 다운로드)
+- 그 다음부터는 같은 버튼만 누르면 바로 실행됩니다.
+
+## 설치 마법사(.exe) 배포판 만들기 (2026-03-03 Ver.01)
+- 빌드 스크립트: `release/build_installer.bat`
+- Inno Setup 6 설치 후 위 배치 파일 실행
+- 결과물: `dist/FlowVeo_20260303_Ver01_Setup.exe`
+- 상세 가이드: `release/배포_가이드_20260303_Ver01.md`
+
 ## 실행 방법
 - 일반 실행: `2_오토_프로그램_실행.bat`
 - 무음 실행: `Flow_Start.vbs`

@@ -1,5 +1,25 @@
 # 🔨 Build Log
 
+## 2026-03-03 (Tue) - Ver.01 Release (Tray + Pause/Resume + Installer)
+- **Success**:
+  - Added tray-minimize close behavior and tray exit confirmation.
+  - Added `일시정지/재개` flow that keeps browser session alive.
+  - Added one-touch bootstrap launcher for PCs without Python.
+  - Added installer wizard scripts for final distribution (`.exe` setup builder).
+- **Changes**:
+  - **Runtime/UI (`flow_auto_v2.py`)**:
+    - Added app version label: `2026-03-03 Ver.01`.
+    - Added pause/resume runtime state and control buttons.
+    - Kept existing stop as full stop (browser close).
+  - **One-touch launch**:
+    - Added `0_원터치_설치+실행.bat`.
+    - Updated `Flow_Start.vbs`, `run_silent.vbs` to prefer embedded runtime.
+    - Added `FlowVeo_실행.bat` for installer shortcut entry.
+  - **Installer build**:
+    - Added Inno Setup script: `release/installer/FlowVeo_20260303_Ver01.iss`
+    - Added build helper: `release/build_installer.bat`
+    - Added release guide: `release/배포_가이드_20260303_Ver01.md`
+
 ## 2026-02-28 (Sat) - Reserved Start Strict Wait (No Mouse Move Before Time)
 - **Success**:
   - Added strict reservation wait behavior exactly as requested.

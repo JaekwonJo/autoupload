@@ -1,3 +1,5 @@
 playwright
 playwright-stealth
 python-ghost-cursor
+pystray
+Pillow
