@@ -566,7 +566,7 @@ class FlowVisionApp:
     def _stop_worker_thread(self):
         self.worker_stop_event.set()
         try:
-            self.task_queue.put_nowait("stop")
+            self.task_queue.put_nowait("shutdown_and_stop")
         except Exception:
             pass
         if self.worker_thread and self.worker_thread.is_alive():
@@ -589,6 +589,12 @@ class FlowVisionApp:
             except queue.Empty:
                 continue
             if cmd == "stop":
+                break
+            if cmd == "shutdown_and_stop":
+                try:
+                    self._shutdown_browser()
+                except Exception:
+                    pass
                 break
             if cmd == "run":
                 try:
@@ -3124,17 +3130,15 @@ class FlowVisionApp:
         except Exception:
             pass
         self.log(f"🔒 실행 입력방식 고정: {self.run_input_mode}")
-        # 기존 브라우저가 살아 있으면 같은 창을 재사용한다. (불필요한 새 창 방지)
-        reuse_existing = False
+        # 안정성 우선: UI(Selector 테스트)와 작업 스레드 간 Playwright 세션 충돌 방지
+        # 실행 시작 시 기존 세션을 정리하고, 작업 스레드에서 세션을 새로 만든다.
         try:
-            reuse_existing = bool(self.browser_context and self.page and (not self.page.is_closed()))
+            has_existing = bool(self.browser_context and self.page and (not self.page.is_closed()))
         except Exception:
-            reuse_existing = False
-        if reuse_existing:
-            self.log("🌐 기존 브라우저 세션 재사용")
-        else:
-            # 세션이 없거나 깨진 경우에만 새로 시작
-            self._shutdown_browser()
+            has_existing = False
+        if has_existing:
+            self.log("♻️ 실행 전 브라우저 세션 정리(스레드 충돌 방지)")
+        self._shutdown_browser()
         self._ensure_worker_thread()
         try:
             self.actor.update_batch_size()
