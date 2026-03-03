@@ -30,6 +30,7 @@ logs/
 flow/logs/
 Flow_Project/logs/
 flow_downloads/
+runtime/
 
 # App state files (local progress)
 hailuo_state_*.json

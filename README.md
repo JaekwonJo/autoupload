@@ -30,14 +30,16 @@ Playwright(Sync API) 기반으로 동작하는 자동화 앱입니다.
 - 최초 1회만 시간이 조금 걸립니다. (라이브러리 + Chromium 다운로드)
 - 그 다음부터는 같은 버튼만 누르면 바로 실행됩니다.
 
-## 설치 마법사(.exe) 배포판 만들기 (2026-03-03 Ver.01)
+## 설치 마법사(.exe) 배포판 만들기 (2026-03-04 Ver.02)
 - 빌드 스크립트: `release/build_installer.bat`
 - Inno Setup 6 설치 후 위 배치 파일 실행
-- 결과물: `dist/FlowVeo_20260303_Ver01_Setup.exe`
+- 결과물: `dist/Autoupload_20260304_Ver02_Setup.exe`
 - 상세 가이드: `release/배포_가이드_20260303_Ver01.md`
 
 ## 실행 방법
 - 일반 실행: `2_오토_프로그램_실행.bat`
+- 원터치 실행(권장 이름): `Autoupload_실행.bat`
+- 바탕화면 바로가기 생성: `바탕화면_바로가기_생성.bat`
 - 무음 실행: `Flow_Start.vbs`
 - 디버깅 실행: `5_디버깅_모드.bat`
 

@@ -4,7 +4,7 @@ chcp 65001 >nul
 cd /d "%~dp0"
 
 echo ========================================================
-echo [Flow Veo] Installer Build - 2026-03-03 Ver.01
+echo [Autoupload] Installer Build - 2026-03-04 Ver.02
 echo ========================================================
 echo.
 
@@ -54,7 +54,7 @@ if errorlevel 1 (
 
 echo.
 echo [OK] 빌드 완료
-echo 출력 폴더: ..\dist
+echo 출력 폴더: ..\dist (Autoupload_20260304_Ver02_Setup.exe)
 echo.
 pause
 exit /b 0

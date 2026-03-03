@@ -39,18 +39,17 @@ if not exist "%PY_EXE%" (
 
     echo [3/6] 내장 Python site 설정 중...
     set "PTH_FILE="
-    for %%f in ("%PY_HOME%\python*._pth") do (
-        if not defined PTH_FILE set "PTH_FILE=%%~ff"
+    for /f "delims=" %%f in ('dir /b /a:-d "%PY_HOME%\python*._pth" 2^>nul') do (
+        if not defined PTH_FILE set "PTH_FILE=%PY_HOME%\%%f"
     )
-    if defined PTH_FILE (
-        powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-          "$p='%PTH_FILE%'; $lines=Get-Content $p; " ^
-          "$hasSitePackages=($lines -match '^[ ]*Lib\\site-packages[ ]*$').Length -gt 0; " ^
-          "if(-not $hasSitePackages){$lines += 'Lib\\site-packages'}; " ^
-          "$lines=$lines | ForEach-Object { if($_ -match '^[ ]*#?[ ]*import site[ ]*$'){ 'import site' } else { $_ } }; " ^
-          "Set-Content -Path $p -Value $lines -Encoding ASCII"
-        if errorlevel 1 goto :FAIL_PTH
-    )
+    if not defined PTH_FILE goto :FAIL_PTH_MISSING
+    powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+      "$p='%PTH_FILE%'; $lines=Get-Content $p; " ^
+      "$hasSitePackages=($lines -match '^[ ]*Lib\\site-packages[ ]*$').Length -gt 0; " ^
+      "if(-not $hasSitePackages){$lines += 'Lib\\site-packages'}; " ^
+      "$lines=$lines | ForEach-Object { if($_ -match '^[ ]*#?[ ]*import site[ ]*$'){ 'import site' } else { $_ } }; " ^
+      "Set-Content -Path $p -Value $lines -Encoding ASCII"
+    if errorlevel 1 goto :FAIL_PTH
 )
 
 echo [4/6] pip 준비 확인 중...
@@ -107,6 +106,14 @@ exit /b 1
 :FAIL_PTH
 echo.
 echo [ERROR] 내장 Python 설정(pth) 실패
+echo.
+pause
+exit /b 1
+
+:FAIL_PTH_MISSING
+echo.
+echo [ERROR] python*._pth 파일을 찾지 못했습니다.
+echo 내장 Python 압축 해제 상태를 확인해주세요.
 echo.
 pause
 exit /b 1

@@ -2,6 +2,7 @@
 
 > **Last Updated:** 2026-02-28 (Sat) - Reserved Start Strict Wait
 > **Current Stage:** 🛠️ Scheduling Precision Update
+> **Latest Handoff Doc:** `CODEX_연속작업_인수인계_20260304.md`
 
 ## 📊 Project Overview
 - **Type:** Desktop Automation Tool (Python, Tkinter, PyAutoGUI)
