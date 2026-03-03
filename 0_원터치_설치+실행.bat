@@ -74,11 +74,26 @@ echo.
 echo [OK] 준비 완료. 프로그램을 실행합니다.
 echo.
 
-if exist "%PYW_EXE%" (
-    start "" "%PYW_EXE%" -m flow.flow_auto_v2
-) else (
-    start "" "%PY_EXE%" -m flow.flow_auto_v2
+python -c "import tkinter,playwright,pystray,PIL" >nul 2>&1
+if not errorlevel 1 (
+    start "" pythonw -m flow.flow_auto_v2
+    goto :LAUNCH_OK
 )
+
+if exist "%PY_EXE%" (
+    "%PY_EXE%" -c "import tkinter" >nul 2>&1
+    if errorlevel 1 goto :FAIL_NO_TK
+    if exist "%PYW_EXE%" (
+        start "" "%PYW_EXE%" -m flow.flow_auto_v2
+    ) else (
+        start "" "%PY_EXE%" -m flow.flow_auto_v2
+    )
+    goto :LAUNCH_OK
+)
+
+goto :FAIL_LAUNCH
+
+:LAUNCH_OK
 
 echo [INFO] 실행 명령 전달 완료.
 echo.
@@ -144,6 +159,23 @@ echo.
 pause
 exit /b 1
 
+:FAIL_NO_TK
+echo.
+echo [ERROR] 내장 Python에 tkinter가 없어 GUI를 실행할 수 없습니다.
+echo [INFO] 이 PC에서는 일반 Python(권장)으로 실행해주세요.
+echo [INFO] 실행 파일: 2_오토_프로그램_실행.bat
+echo.
+pause
+exit /b 1
+
+:FAIL_LAUNCH
+echo.
+echo [ERROR] 실행 엔진을 찾지 못했습니다.
+echo [INFO] 2_오토_프로그램_실행.bat 로 실행해보세요.
+echo.
+pause
+exit /b 1
+
 :ENSURE_PTH
 set "PTH_FILE="
 for /f "delims=" %%f in ('dir /b /a:-d "%PY_HOME%\python*._pth" 2^>nul') do (
@@ -152,8 +184,10 @@ for /f "delims=" %%f in ('dir /b /a:-d "%PY_HOME%\python*._pth" 2^>nul') do (
 if not defined PTH_FILE exit /b 1
 powershell -NoProfile -ExecutionPolicy Bypass -Command ^
   "$p='%PTH_FILE%'; $lines=Get-Content $p; " ^
+  "$root='%ROOT%'; " ^
   "$hasSitePackages=($lines -match '^[ ]*Lib\\site-packages[ ]*$').Length -gt 0; " ^
   "if(-not $hasSitePackages){$lines += 'Lib\\site-packages'}; " ^
+  "if(-not ($lines -contains $root)){$lines += $root}; " ^
   "$lines=$lines | ForEach-Object { if($_ -match '^[ ]*#?[ ]*import site[ ]*$'){ 'import site' } else { $_ } }; " ^
   "Set-Content -Path $p -Value $lines -Encoding ASCII"
 if errorlevel 1 exit /b 1
