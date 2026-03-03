@@ -11,7 +11,9 @@ echo ========================================================
 echo.
 
 set "ROOT=%cd%"
-set "RUNTIME_DIR=%ROOT%\runtime"
+for %%I in ("%LOCALAPPDATA%") do set "LOCALAPPDATA_NORM=%%~fI"
+if not defined LOCALAPPDATA_NORM set "LOCALAPPDATA_NORM=%ROOT%"
+set "RUNTIME_DIR=%LOCALAPPDATA_NORM%\Autoupload\runtime"
 set "PY_HOME=%RUNTIME_DIR%\python-embed"
 set "PY_EXE=%PY_HOME%\python.exe"
 set "PYW_EXE=%PY_HOME%\pythonw.exe"
@@ -37,23 +39,14 @@ if not exist "%PY_EXE%" (
 
     del /q "%RUNTIME_DIR%\%PY_ZIP%" >nul 2>&1
 
-    echo [3/6] 내장 Python site 설정 중...
-    set "PTH_FILE="
-    for /f "delims=" %%f in ('dir /b /a:-d "%PY_HOME%\python*._pth" 2^>nul') do (
-        if not defined PTH_FILE set "PTH_FILE=%PY_HOME%\%%f"
-    )
-    if not defined PTH_FILE goto :FAIL_PTH_MISSING
-    powershell -NoProfile -ExecutionPolicy Bypass -Command ^
-      "$p='%PTH_FILE%'; $lines=Get-Content $p; " ^
-      "$hasSitePackages=($lines -match '^[ ]*Lib\\site-packages[ ]*$').Length -gt 0; " ^
-      "if(-not $hasSitePackages){$lines += 'Lib\\site-packages'}; " ^
-      "$lines=$lines | ForEach-Object { if($_ -match '^[ ]*#?[ ]*import site[ ]*$'){ 'import site' } else { $_ } }; " ^
-      "Set-Content -Path $p -Value $lines -Encoding ASCII"
-    if errorlevel 1 goto :FAIL_PTH
 )
 
+echo [3/6] 내장 Python site 설정 확인 중...
+call :ENSURE_PTH
+if errorlevel 1 goto :FAIL_PTH
+
 echo [4/6] pip 준비 확인 중...
-"%PY_EXE%" -m pip --version >nul 2>&1
+call :RUN_PIP --version >nul 2>&1
 if errorlevel 1 (
     echo pip 설치 중...
     powershell -NoProfile -ExecutionPolicy Bypass -Command ^
@@ -61,12 +54,16 @@ if errorlevel 1 (
     if errorlevel 1 goto :FAIL_GETPIP
     "%PY_EXE%" "%GETPIP%" --no-warn-script-location
     if errorlevel 1 goto :FAIL_PIP_INSTALL
+    call :ENSURE_PTH
+    if errorlevel 1 goto :FAIL_PTH
+    call :RUN_PIP --version >nul 2>&1
+    if errorlevel 1 goto :FAIL_PIP_INSTALL
 )
 
 echo [5/6] 필수 라이브러리 설치/업데이트 중...
-"%PY_EXE%" -m pip install --upgrade pip
+call :RUN_PIP install --upgrade pip
 if errorlevel 1 goto :FAIL_LIB
-"%PY_EXE%" -m pip install -r requirements.txt
+call :RUN_PIP install -r requirements.txt
 if errorlevel 1 goto :FAIL_LIB
 
 echo [6/6] Playwright Chromium 설치 확인 중...
@@ -145,4 +142,28 @@ echo.
 echo [ERROR] Playwright Chromium 설치 실패
 echo.
 pause
+exit /b 1
+
+:ENSURE_PTH
+set "PTH_FILE="
+for /f "delims=" %%f in ('dir /b /a:-d "%PY_HOME%\python*._pth" 2^>nul') do (
+    if not defined PTH_FILE set "PTH_FILE=%PY_HOME%\%%f"
+)
+if not defined PTH_FILE exit /b 1
+powershell -NoProfile -ExecutionPolicy Bypass -Command ^
+  "$p='%PTH_FILE%'; $lines=Get-Content $p; " ^
+  "$hasSitePackages=($lines -match '^[ ]*Lib\\site-packages[ ]*$').Length -gt 0; " ^
+  "if(-not $hasSitePackages){$lines += 'Lib\\site-packages'}; " ^
+  "$lines=$lines | ForEach-Object { if($_ -match '^[ ]*#?[ ]*import site[ ]*$'){ 'import site' } else { $_ } }; " ^
+  "Set-Content -Path $p -Value $lines -Encoding ASCII"
+if errorlevel 1 exit /b 1
+exit /b 0
+
+:RUN_PIP
+"%PY_EXE%" -m pip %*
+if not errorlevel 1 exit /b 0
+if exist "%PIP_EXE%" (
+    "%PIP_EXE%" %*
+    exit /b %errorlevel%
+)
 exit /b 1
