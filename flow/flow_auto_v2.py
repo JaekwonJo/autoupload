@@ -328,6 +328,7 @@ class FlowVisionApp:
         self.playwright = None
         self.browser_context = None
         self.page = None
+        self.browser_owner_thread_id = None
         self.action_log_path = None
         self.action_log_fp = None
         self.session_report_path = None
@@ -472,8 +473,25 @@ class FlowVisionApp:
         return profile_path
 
     def _ensure_browser_session(self):
-        if self.page and not self.page.is_closed():
+        current_tid = threading.get_ident()
+        if (
+            self.page
+            and (not self.page.is_closed())
+            and self.browser_owner_thread_id == current_tid
+        ):
             return
+        if (
+            (self.page or self.browser_context or self.playwright)
+            and (self.browser_owner_thread_id is not None)
+            and (self.browser_owner_thread_id != current_tid)
+        ):
+            # Playwright Sync 객체는 생성된 스레드에서만 안전하게 사용 가능.
+            # 다른 스레드에서 재사용하면 greenlet thread 오류가 발생하므로 핸들을 버리고 재생성한다.
+            self.log("♻️ 브라우저 세션 재생성: 스레드 전환 감지")
+            self.page = None
+            self.browser_context = None
+            self.playwright = None
+            self.browser_owner_thread_id = None
         if self.playwright is None:
             self.playwright = sync_playwright().start()
         if self.browser_context:
@@ -529,6 +547,7 @@ class FlowVisionApp:
             self.page = self.browser_context.pages[0]
         else:
             self.page = self.browser_context.new_page()
+        self.browser_owner_thread_id = current_tid
 
         try:
             stealth_sync(self.page)
@@ -540,8 +559,13 @@ class FlowVisionApp:
         self._action_log(f"[{datetime.now().strftime('%H:%M:%S')}] 브라우저 세션 생성")
 
     def _shutdown_browser(self):
+        current_tid = threading.get_ident()
+        same_thread = (
+            self.browser_owner_thread_id is None
+            or self.browser_owner_thread_id == current_tid
+        )
         try:
-            if self.browser_context:
+            if self.browser_context and same_thread:
                 self.browser_context.close()
         except Exception:
             pass
@@ -549,11 +573,12 @@ class FlowVisionApp:
         self.page = None
 
         try:
-            if self.playwright:
+            if self.playwright and same_thread:
                 self.playwright.stop()
         except Exception:
             pass
         self.playwright = None
+        self.browser_owner_thread_id = None
 
     def _ensure_worker_thread(self):
         if self.worker_thread and self.worker_thread.is_alive():
@@ -3298,7 +3323,18 @@ class FlowVisionApp:
         # 기존 브라우저가 살아 있으면 같은 창을 재사용한다. (불필요한 새 창 방지)
         reuse_existing = False
         try:
-            reuse_existing = bool(self.browser_context and self.page and (not self.page.is_closed()))
+            worker_tid = self.worker_thread.ident if (self.worker_thread and self.worker_thread.is_alive()) else None
+            reuse_existing = bool(
+                self.browser_context
+                and self.page
+                and (not self.page.is_closed())
+                and (
+                    # 작업 스레드가 이미 있으면 그 스레드 소유 세션만 재사용
+                    (worker_tid is not None and self.browser_owner_thread_id == worker_tid)
+                    # 작업 스레드가 아직 없으면 현재 세션 상태만 안내하고 _run_task에서 최종 판단
+                    or worker_tid is None
+                )
+            )
         except Exception:
             reuse_existing = False
         if reuse_existing:
