@@ -375,9 +375,9 @@ class HumanActor:
             wrong = target_char
 
         self.page.keyboard.type(wrong)
-        self.random_action_delay("오타 후 멈칫", 0.3, 1.0)
+        self.random_action_delay("오타 후 멈칫", 0.05, 0.22)
         self.page.keyboard.press("Backspace")
-        self.random_action_delay("오타 수정 후 딜레이", 0.3, 0.7)
+        self.random_action_delay("오타 수정 후 딜레이", 0.04, 0.16)
         self._log_action(f"오타 시뮬레이션: '{wrong}' -> 백스페이스")
 
     def type_text(self, text: str, input_locator=None, speed_callback=None, mode: str = "typing"):
@@ -405,8 +405,8 @@ class HumanActor:
         typo_rate = self.cfg.get("typo_rate", 0.03)
 
         for idx, ch in enumerate(text):
-            if idx > 0 and idx % random.randint(8, 20) == 0 and random.random() < self.cfg.get("breathing_pause_rate", 0.25):
-                self.think_pause("문장 입력 중 생각", 2.0, 6.0)
+            if idx > 0 and idx % random.randint(18, 42) == 0 and random.random() < min(0.10, self.cfg.get("breathing_pause_rate", 0.25) * 0.35):
+                self.think_pause("문장 입력 중 생각", 0.35, 1.4)
 
             current_typo_rate = typo_rate * (1.8 if fatigue < 0.9 else 1.0)
             if ch not in [" ", "\n"] and random.random() < current_typo_rate:
@@ -417,8 +417,17 @@ class HumanActor:
             else:
                 self.page.keyboard.type(ch)
 
-            # 요구사항: 타이핑 랜덤 딜레이 0.3~2.0초
-            delay = random.uniform(0.3, 2.0)
+            # typing 모드 과도 지연(문자당 수초) 완화: 자연스러움은 유지하고 실사용 속도 보장
+            speed = max(0.55, min(self.cfg.get("speed_multiplier", 1.0), 1.6))
+            fatigue_slow = 1.0 + max(0.0, (1.0 - fatigue)) * 0.45
+            if ch in [" ", "\n"]:
+                base_min, base_max = 0.02, 0.08
+            elif ch in [".", ",", "!", "?", ":", ";", ")", "(", "]", "["]:
+                base_min, base_max = 0.03, 0.11
+            else:
+                base_min, base_max = 0.035, 0.14
+            delay = random.uniform(base_min, base_max) * (1.0 / speed) * fatigue_slow
+            delay = max(0.015, min(delay, 0.26))
             if speed_callback:
                 speed_callback(round(1.0 / max(delay, 0.01), 2))
 
