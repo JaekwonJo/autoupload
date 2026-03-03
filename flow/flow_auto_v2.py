@@ -2226,8 +2226,9 @@ class FlowVisionApp:
                 return
             if total <= 0:
                 return
-            # 너무 많은 요소일 때 과도한 탐색 방지
-            upper = min(total, 20)
+            # 너무 많은 요소일 때 과도한 탐색 방지 + 광범위 selector(contenteditable 등) 누락 방지
+            # 기존 20개 상한은 동적 UI에서 실제 입력칸이 뒤 인덱스로 밀릴 때 오탐/미탐을 유발했다.
+            upper = min(total, 80 if total > 24 else 24)
             for i in range(upper):
                 cand = loc.nth(i)
                 try:
@@ -2464,6 +2465,32 @@ class FlowVisionApp:
         if input_loc is not None and self._is_prompt_like_locator(input_loc):
             return input_loc, resolved_selector
 
+        # 4차 폴백: DOM 휴리스틱으로 프롬프트칸 selector 재탐색
+        heuristic_selector = self._pick_input_selector_by_dom_heuristic()
+        if heuristic_selector:
+            probe = [heuristic_selector]
+            for sel in candidates:
+                if sel not in probe:
+                    probe.append(sel)
+            input_loc, resolved_selector = self._resolve_best_locator(
+                probe,
+                timeout_ms=max(1200, int(timeout_ms * 0.9)),
+            )
+            if input_loc is not None and (
+                self._is_prompt_like_locator(input_loc) or (not self._is_asset_search_like_locator(input_loc))
+            ):
+                return input_loc, (resolved_selector or heuristic_selector)
+
+        # 5차 폴백: 입력칸이 접혀있는 UI에서 먼저 입력창을 활성화해보고 다시 탐색
+        if self._prime_prompt_input_visibility():
+            input_loc, resolved_selector = self._resolve_best_locator(
+                candidates,
+                timeout_ms=max(1200, int(timeout_ms * 0.9)),
+                reject_fn=lambda cand, _sel: self._is_asset_search_like_locator(cand),
+            )
+            if input_loc is not None:
+                return input_loc, resolved_selector
+
         return None, None
 
     def _read_input_text(self, input_locator):
@@ -2611,7 +2638,7 @@ class FlowVisionApp:
                         const style = window.getComputedStyle(el);
                         return style.visibility !== 'hidden' && style.display !== 'none' && style.opacity !== '0';
                     };
-                    const all = Array.from(document.querySelectorAll("textarea, [contenteditable='true'], [role='textbox']"));
+                    const all = Array.from(document.querySelectorAll("textarea, [contenteditable='true'], [contenteditable='plaintext-only'], [role='textbox']"));
                     const visible = all.filter(isVisible);
                     if (!visible.length) return null;
 
@@ -2665,6 +2692,37 @@ class FlowVisionApp:
             )
         except Exception:
             return None
+
+    def _prime_prompt_input_visibility(self):
+        """프롬프트 입력칸이 접혀 있거나 늦게 활성화되는 화면에서 포커스를 유도한다."""
+        if not self.page:
+            return False
+
+        candidates = [
+            "[aria-label*='무엇을 만들' i]",
+            "textarea[placeholder*='무엇을 만들' i]",
+            "textarea[aria-label*='무엇을 만들' i]",
+            "[contenteditable='true'][aria-label*='무엇을 만들' i]",
+            "[contenteditable='plaintext-only'][aria-label*='무엇을 만들' i]",
+            "text=무엇을 만들고 싶으신가요?",
+            "text=What do you want to create",
+            "text=Describe your idea",
+        ]
+        loc, sel = self._resolve_best_locator(
+            candidates,
+            timeout_ms=1200,
+            prefer_enabled=False,
+        )
+        if loc is None:
+            return False
+        try:
+            if self._click_with_actor_fallback(loc, "프롬프트 입력칸 활성화"):
+                self.actor.random_action_delay("입력칸 활성화 후 대기", 0.2, 0.9)
+                self.log(f"🧩 입력칸 활성화 시도: {sel or '텍스트 탐색'}")
+                return True
+        except Exception:
+            pass
+        return False
 
     def on_auto_detect_selectors(self):
         if self.running:
