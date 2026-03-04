@@ -100,6 +100,7 @@ DEFAULT_CONFIG = {
     "asset_loop_enabled": False,
     "asset_loop_start": 1,
     "asset_loop_end": 1,
+    "asset_loop_num_width": 0,
     "asset_loop_prefix": "S",
     "asset_loop_prompt_template": "{tag} : Naturally Seamless Loop animation.",
     "asset_start_selector": "",
@@ -757,6 +758,11 @@ class FlowVisionApp:
             start_num, end_num = end_num, start_num
 
         prefix = (self.cfg.get("asset_loop_prefix") or "S").strip() or "S"
+        try:
+            pad_width = int(self.cfg.get("asset_loop_num_width", 0))
+        except (TypeError, ValueError):
+            pad_width = 0
+        pad_width = max(0, pad_width)
         template = (self.cfg.get("asset_loop_prompt_template") or "{tag} : Naturally Seamless Loop animation.").strip()
         if "{tag}" not in template:
             template = "{tag} : " + template
@@ -766,7 +772,8 @@ class FlowVisionApp:
         for n in range(start_num, end_num + 1):
             if len(items) >= max_items:
                 break
-            tag = f"{prefix}{n}"
+            num_txt = str(n).zfill(pad_width) if pad_width > 0 else str(n)
+            tag = f"{prefix}{num_txt}"
             prompt = template.replace("{tag}", tag).strip()
             items.append({"tag": tag, "prompt": prompt})
         return items
@@ -1396,7 +1403,7 @@ class FlowVisionApp:
         asset_range_f = tk.Frame(asset_f, bg=self.color_bg)
         asset_range_f.pack(fill="x", pady=(0, 6))
         tk.Label(asset_range_f, text="시작 번호", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left")
-        self.asset_loop_start_var = tk.IntVar(value=self.cfg.get("asset_loop_start", 1))
+        self.asset_loop_start_var = tk.StringVar(value=str(self.cfg.get("asset_loop_start", 1)))
         self.spin_asset_start = tk.Spinbox(
             asset_range_f,
             from_=1,
@@ -1412,7 +1419,7 @@ class FlowVisionApp:
         self.spin_asset_start.bind("<Return>", self.on_option_toggle)
 
         tk.Label(asset_range_f, text="끝 번호", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left")
-        self.asset_loop_end_var = tk.IntVar(value=self.cfg.get("asset_loop_end", 1))
+        self.asset_loop_end_var = tk.StringVar(value=str(self.cfg.get("asset_loop_end", 1)))
         self.spin_asset_end = tk.Spinbox(
             asset_range_f,
             from_=1,
@@ -1938,16 +1945,48 @@ class FlowVisionApp:
         self.cfg["scheduled_start_at"] = self.schedule_text_var.get().strip() if hasattr(self, "schedule_text_var") else self.cfg.get("scheduled_start_at", "")
         self.cfg["language_mode"] = "ko_en" if self.lang_var.get() else "en"
         self.cfg["asset_loop_enabled"] = self.asset_loop_var.get() if hasattr(self, "asset_loop_var") else self.cfg.get("asset_loop_enabled", False)
+        raw_start = ""
+        raw_end = ""
         try:
-            asset_start = int(self.asset_loop_start_var.get()) if hasattr(self, "asset_loop_start_var") else int(self.cfg.get("asset_loop_start", 1))
+            if hasattr(self, "spin_asset_start"):
+                raw_start = str(self.spin_asset_start.get()).strip()
+            elif hasattr(self, "asset_loop_start_var"):
+                raw_start = str(self.asset_loop_start_var.get()).strip()
+        except Exception:
+            raw_start = ""
+        try:
+            if hasattr(self, "spin_asset_end"):
+                raw_end = str(self.spin_asset_end.get()).strip()
+            elif hasattr(self, "asset_loop_end_var"):
+                raw_end = str(self.asset_loop_end_var.get()).strip()
+        except Exception:
+            raw_end = ""
+
+        try:
+            asset_start = int(raw_start) if raw_start else int(self.cfg.get("asset_loop_start", 1))
         except Exception:
             asset_start = 1
         try:
-            asset_end = int(self.asset_loop_end_var.get()) if hasattr(self, "asset_loop_end_var") else int(self.cfg.get("asset_loop_end", 1))
+            asset_end = int(raw_end) if raw_end else int(self.cfg.get("asset_loop_end", 1))
         except Exception:
             asset_end = asset_start
         self.cfg["asset_loop_start"] = max(1, asset_start)
         self.cfg["asset_loop_end"] = max(1, asset_end)
+
+        # 시작/끝 번호를 01처럼 입력하면 자리수를 보존해 S01, S02... 형태로 생성
+        requested_width = 0
+        for raw in (raw_start, raw_end):
+            if raw and raw.isdigit() and len(raw) > 1 and raw.startswith("0"):
+                requested_width = max(requested_width, len(raw))
+        try:
+            prev_width = int(self.cfg.get("asset_loop_num_width", 0))
+        except Exception:
+            prev_width = 0
+        if requested_width > 0:
+            self.cfg["asset_loop_num_width"] = requested_width
+        else:
+            self.cfg["asset_loop_num_width"] = max(0, prev_width)
+
         asset_prefix = self.asset_loop_prefix_var.get().strip() if hasattr(self, "asset_loop_prefix_var") else str(self.cfg.get("asset_loop_prefix", "S"))
         self.cfg["asset_loop_prefix"] = asset_prefix or "S"
         asset_template = self.asset_loop_template_var.get().strip() if hasattr(self, "asset_loop_template_var") else str(self.cfg.get("asset_loop_prompt_template", ""))
