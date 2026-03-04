@@ -882,6 +882,10 @@ class FlowVisionApp:
         cands.extend(self._normalize_candidate_list(self.cfg.get(key, "")))
         if mode == "image":
             cands.extend([
+                "button:has-text('image')",
+                "[role='button']:has-text('image')",
+                "button:has-text('View images')",
+                "[role='button']:has-text('View images')",
                 "button:has-text('이미지')",
                 "[role='button']:has-text('이미지')",
                 "button[aria-label*='이미지' i]",
@@ -892,6 +896,10 @@ class FlowVisionApp:
             ])
         else:
             cands.extend([
+                "button:has-text('videocam')",
+                "[role='button']:has-text('videocam')",
+                "button:has-text('View videos')",
+                "[role='button']:has-text('View videos')",
                 "button:has-text('영상')",
                 "[role='button']:has-text('영상')",
                 "button[aria-label*='영상' i]",
@@ -907,6 +915,62 @@ class FlowVisionApp:
                 uniq.append(x)
                 seen.add(x)
         return uniq
+
+    def _resolve_download_filter_button(self, mode, timeout_sec=4):
+        if not self.page:
+            return None, None
+        mode = "image" if mode == "image" else "video"
+        end_ts = time.time() + max(1, timeout_sec)
+        viewport_h = 900
+        try:
+            vp = self.page.viewport_size or {}
+            viewport_h = int(vp.get("height", 900))
+        except Exception:
+            pass
+
+        while time.time() < end_ts:
+            best = None
+            best_sel = None
+            best_score = float("-inf")
+            for sel in self._download_filter_candidates(mode):
+                try:
+                    loc = self.page.locator(sel)
+                    total = min(loc.count(), 20)
+                except Exception:
+                    continue
+                for i in range(total):
+                    cand = loc.nth(i)
+                    try:
+                        if not cand.is_visible(timeout=500):
+                            continue
+                        box = cand.bounding_box()
+                    except Exception:
+                        continue
+                    if not box:
+                        continue
+                    # 좌측 사이드 필터 아이콘 영역만 허용
+                    if box["x"] > 130:
+                        continue
+                    if box["y"] < 60 or box["y"] > (viewport_h * 0.55):
+                        continue
+                    score = 1000.0 - (box["x"] * 1.8) - (abs((box["y"] + box["height"] / 2.0) - 170.0) * 0.5)
+                    meta = self._locator_meta_text(cand)
+                    if mode == "video":
+                        if ("videocam" in meta) or ("view videos" in meta) or ("video" in meta) or ("영상" in meta):
+                            score += 300.0
+                        if "동영상 x" in meta:
+                            score -= 1200.0
+                    else:
+                        if ("image" in meta) or ("view images" in meta) or ("이미지" in meta):
+                            score += 300.0
+                    if score > best_score:
+                        best_score = score
+                        best = cand
+                        best_sel = sel
+            if best is not None:
+                return best, best_sel
+            time.sleep(0.2)
+        return None, None
 
     def _download_card_candidates(self, mode):
         key = "download_image_card_selector" if mode == "image" else "download_video_card_selector"
@@ -1030,6 +1094,11 @@ class FlowVisionApp:
                     if not box:
                         continue
                     if box["width"] < 100 or box["height"] < 20:
+                        continue
+                    # 상단 검색바만 허용 (프로젝트명/하단 입력창 제외)
+                    if box["y"] > max(170, viewport_h * 0.28):
+                        continue
+                    if box["x"] < 220:
                         continue
                     score = 0.0
                     meta = self._locator_meta_text(cand)
@@ -1534,13 +1603,10 @@ class FlowVisionApp:
                     pass
 
     def _click_download_filter(self, mode, used):
-        filter_loc, filter_sel = self._resolve_best_locator(
-            self._download_filter_candidates(mode),
-            timeout_ms=1800,
-            prefer_enabled=False,
-        )
+        filter_loc, filter_sel = self._resolve_download_filter_button(mode, timeout_sec=5)
         if filter_loc is None:
             # 필터 버튼을 못 찾아도 현재 화면이 이미 해당 필터일 수 있어 실패로 보지 않는다.
+            self.log(f"ℹ️ {'이미지' if mode == 'image' else '영상'} 필터 버튼 미탐지(현재 화면 유지)")
             return False
         used["filter"] = filter_sel or ""
         self._click_with_actor_fallback(filter_loc, f"{'이미지' if mode == 'image' else '영상'} 필터")
@@ -1695,6 +1761,20 @@ class FlowVisionApp:
         )
         if menu_loc is None:
             menu_loc, menu_sel = self._resolve_text_locator_any_frame(["다운로드", "Download"], timeout_ms=1000)
+        if menu_loc is None:
+            # 더보기 메뉴가 짧게 닫힌 경우 1회 재시도
+            try:
+                self._click_with_actor_fallback(more_loc, "더보기 버튼(재시도)")
+                self.actor.random_action_delay("다운로드 메뉴 재표시 대기", 0.2, 0.7)
+            except Exception:
+                pass
+            menu_loc, menu_sel = self._wait_best_locator(
+                self._download_menu_candidates(mode),
+                timeout_sec=4,
+                prefer_enabled=False,
+            )
+            if menu_loc is None:
+                menu_loc, menu_sel = self._resolve_text_locator_any_frame(["다운로드", "Download"], timeout_ms=1000)
         if menu_loc is None:
             raise RuntimeError("다운로드 메뉴를 찾지 못했습니다.")
         used["menu"] = menu_sel or ""
