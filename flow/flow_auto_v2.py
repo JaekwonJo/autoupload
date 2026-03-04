@@ -855,6 +855,7 @@ class FlowVisionApp:
             "[role='textbox'][aria-label*='search' i]",
             "[contenteditable='true'][aria-label*='검색' i]",
             "[contenteditable='true'][aria-label*='search' i]",
+            "input[type='text']",
         ])
         seen = set()
         uniq = []
@@ -863,6 +864,17 @@ class FlowVisionApp:
                 uniq.append(x)
                 seen.add(x)
         return uniq
+
+    def _download_search_toggle_candidates(self):
+        return [
+            "button:has-text('search')",
+            "[role='button']:has-text('search')",
+            "button[aria-label*='검색' i]",
+            "[role='button'][aria-label*='검색' i]",
+            "button[aria-label*='search' i]",
+            "[role='button'][aria-label*='search' i]",
+            "button[title*='search' i]",
+        ]
 
     def _download_filter_candidates(self, mode):
         key = "download_image_filter_selector" if mode == "image" else "download_video_filter_selector"
@@ -998,6 +1010,7 @@ class FlowVisionApp:
 
         positive_keys = ("search", "검색", "media", "all media")
         negative_keys = ("project", "title", "이름", "rename", "name", "prompt", "프롬프트", "무엇을 만들고")
+        toggled = False
 
         while time.time() < end_ts:
             for sel in self._download_search_input_candidates():
@@ -1045,6 +1058,19 @@ class FlowVisionApp:
                         best_sel = sel
             if best_loc is not None and best_score >= -40:
                 return best_loc, best_sel
+            if (not toggled) and (time.time() + 0.8 < end_ts):
+                toggle_loc, _ = self._resolve_best_locator(
+                    self._download_search_toggle_candidates(),
+                    timeout_ms=900,
+                    prefer_enabled=False,
+                )
+                if toggle_loc is not None:
+                    try:
+                        self._click_with_actor_fallback(toggle_loc, "검색 아이콘")
+                        self.actor.random_action_delay("검색바 표시 대기", 0.2, 0.8)
+                        toggled = True
+                    except Exception:
+                        pass
             time.sleep(0.25)
         return best_loc, best_sel
 
