@@ -855,7 +855,6 @@ class FlowVisionApp:
             "[role='textbox'][aria-label*='search' i]",
             "[contenteditable='true'][aria-label*='검색' i]",
             "[contenteditable='true'][aria-label*='search' i]",
-            "input",
         ])
         seen = set()
         uniq = []
@@ -979,6 +978,146 @@ class FlowVisionApp:
                 uniq.append(x)
                 seen.add(x)
         return uniq
+
+    def _resolve_download_search_input(self, timeout_sec=8):
+        if not self.page:
+            return None, None
+
+        end_ts = time.time() + max(1, timeout_sec)
+        best_loc = None
+        best_sel = None
+        best_score = float("-inf")
+        viewport_w = 1600
+        viewport_h = 900
+        try:
+            vp = self.page.viewport_size or {}
+            viewport_w = int(vp.get("width", 1600))
+            viewport_h = int(vp.get("height", 900))
+        except Exception:
+            pass
+
+        positive_keys = ("search", "검색", "media", "all media")
+        negative_keys = ("project", "title", "이름", "rename", "name", "prompt", "프롬프트", "무엇을 만들고")
+
+        while time.time() < end_ts:
+            for sel in self._download_search_input_candidates():
+                try:
+                    loc = self.page.locator(sel)
+                    total = min(loc.count(), 20)
+                except Exception:
+                    continue
+                for i in range(total):
+                    cand = loc.nth(i)
+                    try:
+                        if not cand.is_visible(timeout=600):
+                            continue
+                        box = cand.bounding_box()
+                    except Exception:
+                        continue
+                    if not box:
+                        continue
+                    if box["width"] < 100 or box["height"] < 20:
+                        continue
+                    score = 0.0
+                    meta = self._locator_meta_text(cand)
+                    if any(k in meta for k in positive_keys):
+                        score += 450.0
+                    if any(k in meta for k in negative_keys):
+                        score -= 800.0
+                    if box["width"] >= 280:
+                        score += 220.0
+                    elif box["width"] >= 180:
+                        score += 80.0
+                    else:
+                        score -= 300.0
+                    if box["y"] <= max(160, viewport_h * 0.22):
+                        score += 120.0
+                    else:
+                        score -= 220.0
+                    cx = box["x"] + box["width"] / 2.0
+                    center_bias = abs(cx - (viewport_w / 2.0))
+                    score -= center_bias * 0.25
+                    if box["x"] < viewport_w * 0.18:
+                        score -= 180.0
+                    if score > best_score:
+                        best_score = score
+                        best_loc = cand
+                        best_sel = sel
+            if best_loc is not None and best_score >= -40:
+                return best_loc, best_sel
+            time.sleep(0.25)
+        return best_loc, best_sel
+
+    def _find_first_media_tile_box(self):
+        if not self.page:
+            return None
+        try:
+            return self.page.evaluate(
+                """() => {
+                    const isVisible = (el) => {
+                        if (!el) return false;
+                        const r = el.getBoundingClientRect();
+                        if (!r || r.width < 160 || r.height < 90) return false;
+                        const st = window.getComputedStyle(el);
+                        if (!st) return false;
+                        return st.display !== 'none' && st.visibility !== 'hidden' && st.opacity !== '0';
+                    };
+                    const candidates = Array.from(document.querySelectorAll("video, img, canvas"));
+                    const boxes = [];
+                    for (const el of candidates) {
+                        if (!isVisible(el)) continue;
+                        const r = el.getBoundingClientRect();
+                        if (r.top < 70) continue;
+                        boxes.push({x:r.left, y:r.top, width:r.width, height:r.height});
+                    }
+                    boxes.sort((a,b) => (a.y - b.y) || (a.x - b.x));
+                    return boxes.length ? boxes[0] : null;
+                }"""
+            )
+        except Exception:
+            return None
+
+    def _resolve_more_button_near_box(self, box):
+        if (not self.page) or (not box):
+            return None, None
+        try:
+            loc = self.page.locator("button, [role='button']")
+            total = min(loc.count(), 250)
+        except Exception:
+            return None, None
+        right_top_x = float(box["x"]) + float(box["width"]) - 18.0
+        right_top_y = float(box["y"]) + 18.0
+        best = None
+        best_score = float("inf")
+        for i in range(total):
+            cand = loc.nth(i)
+            try:
+                if not cand.is_visible(timeout=500):
+                    continue
+                b = cand.bounding_box()
+            except Exception:
+                continue
+            if not b:
+                continue
+            if b["x"] < box["x"] - 24 or b["x"] > (box["x"] + box["width"] + 24):
+                continue
+            if b["y"] < box["y"] - 30 or b["y"] > (box["y"] + min(140, box["height"] * 0.45)):
+                continue
+            if b["width"] > 110 or b["height"] > 70:
+                continue
+            cx = b["x"] + b["width"] / 2.0
+            cy = b["y"] + b["height"] / 2.0
+            score = abs(cx - right_top_x) + abs(cy - right_top_y)
+            try:
+                meta = cand.evaluate("""(el)=>((el.getAttribute('aria-label')||'')+' '+(el.getAttribute('title')||'')+' '+(el.innerText||'')).toLowerCase()""")
+            except Exception:
+                meta = ""
+            if any(x in meta for x in ("더보기", "more", "menu", "...", "⋮", "︙")):
+                score -= 220.0
+            if score < best_score:
+                best_score = score
+                best = cand
+        return (best, "") if best is not None else (None, None)
 
     def _asset_start_button_candidates(self):
         cands = []
@@ -1443,11 +1582,7 @@ class FlowVisionApp:
 
         self._click_download_filter(mode, used)
 
-        search_loc, search_sel = self._wait_best_locator(
-            self._download_search_input_candidates(),
-            timeout_sec=8,
-            prefer_enabled=False,
-        )
+        search_loc, search_sel = self._resolve_download_search_input(timeout_sec=8)
         if search_loc is None:
             raise RuntimeError("검색 입력칸을 찾지 못했습니다.")
         used["search_input"] = search_sel or ""
@@ -1498,6 +1633,24 @@ class FlowVisionApp:
                 )
                 if more_loc is None:
                     more_loc, more_sel = self._resolve_more_button_from_card(card_loc, mode)
+                if more_loc is None:
+                    try:
+                        box = card_loc.bounding_box()
+                    except Exception:
+                        box = None
+                    more_loc, more_sel = self._resolve_more_button_near_box(box)
+            if more_loc is None:
+                tile_box = self._find_first_media_tile_box()
+                if tile_box:
+                    try:
+                        self.page.mouse.move(
+                            float(tile_box["x"]) + float(tile_box["width"]) * 0.5,
+                            float(tile_box["y"]) + float(tile_box["height"]) * 0.45,
+                            steps=8,
+                        )
+                    except Exception:
+                        pass
+                    more_loc, more_sel = self._resolve_more_button_near_box(tile_box)
             if more_loc is not None:
                 used["more"] = more_sel or ""
                 break
@@ -3407,7 +3560,11 @@ class FlowVisionApp:
     def _auto_detect_download_selectors_worker(self, mode):
         mode = "image" if mode == "image" else "video"
         mode_txt = "이미지" if mode == "image" else "영상"
+        opened_here = False
         try:
+            if not self.action_log_fp:
+                self._open_action_log("download_trace")
+                opened_here = True
             self.update_status_label(f"🔍 {mode_txt} 다운로드 selector 자동 탐색 중...", self.color_info)
             self._ensure_browser_session()
             self.actor.set_page(self.page)
@@ -3437,6 +3594,9 @@ class FlowVisionApp:
         except Exception as e:
             self.log(f"❌ {mode_txt} 다운로드 selector 자동탐색 실패: {e}")
             self.update_status_label(f"❌ {mode_txt} 다운로드 selector 자동탐색 실패", self.color_error)
+        finally:
+            if opened_here:
+                self._close_action_log()
 
     def on_test_image_download_selectors(self):
         if self.running:
@@ -3455,7 +3615,11 @@ class FlowVisionApp:
     def _test_download_selectors_worker(self, mode):
         mode = "image" if mode == "image" else "video"
         mode_txt = "이미지" if mode == "image" else "영상"
+        opened_here = False
         try:
+            if not self.action_log_fp:
+                self._open_action_log("download_trace")
+                opened_here = True
             self.update_status_label(f"🧪 {mode_txt} 다운로드 selector 테스트 중...", self.color_info)
             self._ensure_browser_session()
             self.actor.set_page(self.page)
@@ -3491,6 +3655,9 @@ class FlowVisionApp:
         except Exception as e:
             self.log(f"❌ {mode_txt} 다운로드 selector 테스트 실패: {e}")
             self.update_status_label(f"❌ {mode_txt} 다운로드 selector 테스트 실패", self.color_error)
+        finally:
+            if opened_here:
+                self._close_action_log()
 
     def on_open_relay_selector(self):
         slots = self.cfg.get("prompt_slots", [])
