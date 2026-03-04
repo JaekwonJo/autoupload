@@ -121,6 +121,7 @@ DEFAULT_CONFIG = {
     "download_image_menu_selector": "",
     "download_video_quality_selector": "",
     "download_image_quality_selector": "",
+    "download_output_dir": "",
     "download_human_slowdown": 1.35,
     "enter_submit_rate": 0.5,
     "use_ref_images": False,
@@ -861,6 +862,60 @@ class FlowVisionApp:
         if quality == "4K":
             return 180 if is_test else 120
         return 90 if is_test else 70
+
+    def _profile_download_default_dir(self):
+        try:
+            pref = self._resolve_profile_dir() / "Default" / "Preferences"
+            if not pref.exists():
+                return None
+            data = json.loads(pref.read_text(encoding="utf-8", errors="ignore"))
+            for key in (
+                ("savefile", "default_directory"),
+                ("download", "default_directory"),
+            ):
+                val = (((data or {}).get(key[0]) or {}).get(key[1]) or "").strip()
+                if val:
+                    return Path(val)
+        except Exception:
+            return None
+        return None
+
+    def _resolve_download_output_dir(self):
+        configured = str(self.cfg.get("download_output_dir", "") or "").strip()
+        if configured:
+            p = Path(configured).expanduser()
+            try:
+                p.mkdir(parents=True, exist_ok=True)
+            except Exception:
+                pass
+            return p
+        prof = self._profile_download_default_dir()
+        if prof is not None:
+            try:
+                prof.mkdir(parents=True, exist_ok=True)
+            except Exception:
+                pass
+            return prof
+        fallback = Path.home() / "Downloads"
+        try:
+            fallback.mkdir(parents=True, exist_ok=True)
+        except Exception:
+            pass
+        return fallback
+
+    def _next_available_path(self, path_obj):
+        if not path_obj.exists():
+            return path_obj
+        stem = path_obj.stem
+        suffix = path_obj.suffix
+        parent = path_obj.parent
+        n = 1
+        while n <= 9999:
+            cand = parent / f"{stem} ({n}){suffix}"
+            if not cand.exists():
+                return cand
+            n += 1
+        return parent / f"{stem}_{datetime.now().strftime('%Y%m%d_%H%M%S')}{suffix}"
 
     def _download_search_input_candidates(self):
         cands = []
@@ -1852,10 +1907,19 @@ class FlowVisionApp:
                     quality_loc.click(timeout=2500)
             dl = dl_info.value
             file_name = dl.suggested_filename or ""
+            out_dir = self._resolve_download_output_dir()
+            safe_name = file_name.strip() if file_name else ""
+            if not safe_name:
+                ext = ".mp4" if mode == "video" else ".png"
+                safe_name = f"{tag}{ext}"
+            target = self._next_available_path(out_dir / safe_name)
+            dl.save_as(str(target))
+            file_path = str(target)
+            self.log(f"💾 다운로드 저장 경로: {file_path}")
         except Exception as e:
             raise RuntimeError(f"다운로드 시작 실패: {e}")
 
-        return {"used": used, "file": file_name}
+        return {"used": used, "file": file_name, "path": file_path}
 
     def _parse_schedule_datetime(self, raw_text):
         txt = (raw_text or "").strip()
@@ -2255,6 +2319,21 @@ class FlowVisionApp:
         )
         self.combo_download_image_quality.pack(side="left", padx=(6, 0))
         self.combo_download_image_quality.bind("<<ComboboxSelected>>", self.on_option_toggle)
+
+        out_f = tk.Frame(dl_f, bg=self.color_bg)
+        out_f.pack(fill="x", pady=(0, 6))
+        tk.Label(out_f, text="저장 폴더", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left")
+        self.download_output_dir_var = tk.StringVar(value=self.cfg.get("download_output_dir", ""))
+        self.entry_download_output_dir = tk.Entry(
+            out_f,
+            textvariable=self.download_output_dir_var,
+            bg="#FFFFFF",
+            fg="black",
+            font=("Consolas", 9),
+        )
+        self.entry_download_output_dir.pack(side="left", fill="x", expand=True, padx=(6, 6), ipady=2)
+        self.entry_download_output_dir.bind("<FocusOut>", self.on_option_toggle)
+        ttk.Button(out_f, text="폴더선택", command=self.on_pick_download_output_dir).pack(side="left")
 
         tk.Label(dl_f, text="검색 입력 selector(공통)", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(anchor="w")
         self.download_search_input_selector_var = tk.StringVar(value=self.cfg.get("download_search_input_selector", ""))
@@ -2748,6 +2827,18 @@ class FlowVisionApp:
         self.log(f"🔄 슬롯 동기화 완료: {len(added)}개 추가")
         messagebox.showinfo("동기화 완료", f"{len(added)}개 슬롯을 추가했습니다.\n{added_preview}")
 
+    def on_pick_download_output_dir(self):
+        initial = str(self.cfg.get("download_output_dir", "") or "").strip()
+        if not initial:
+            initial = str(self._resolve_download_output_dir())
+        picked = filedialog.askdirectory(initialdir=initial, title="다운로드 저장 폴더 선택")
+        if not picked:
+            return
+        if hasattr(self, "download_output_dir_var"):
+            self.download_output_dir_var.set(picked)
+        self.on_option_toggle()
+        self.log(f"📁 다운로드 저장 폴더 설정: {picked}")
+
     def on_option_toggle(self, event=None):
         self.cfg["afk_mode"] = self.afk_var.get()
         self.cfg["sound_enabled"] = self.sound_var.get()
@@ -2814,6 +2905,7 @@ class FlowVisionApp:
         self.cfg["download_image_quality"] = self.download_image_quality_var.get().strip().upper() if hasattr(self, "download_image_quality_var") else str(self.cfg.get("download_image_quality", "4K"))
         if self.cfg["download_image_quality"] not in ("1K", "2K", "4K"):
             self.cfg["download_image_quality"] = "4K"
+        self.cfg["download_output_dir"] = self.download_output_dir_var.get().strip() if hasattr(self, "download_output_dir_var") else self.cfg.get("download_output_dir", "")
         self.cfg["download_search_input_selector"] = self.download_search_input_selector_var.get().strip() if hasattr(self, "download_search_input_selector_var") else self.cfg.get("download_search_input_selector", "")
         self.cfg["download_video_filter_selector"] = self.download_video_filter_selector_var.get().strip() if hasattr(self, "download_video_filter_selector_var") else self.cfg.get("download_video_filter_selector", "")
         self.cfg["download_image_filter_selector"] = self.download_image_filter_selector_var.get().strip() if hasattr(self, "download_image_filter_selector_var") else self.cfg.get("download_image_filter_selector", "")
@@ -3802,7 +3894,10 @@ class FlowVisionApp:
             result = self._run_single_download_flow(mode=mode, tag=tag, quality=quality, dry_run=False, wait_sec=60, is_test=True)
             self._apply_download_used_selectors(mode, result.get("used", {}))
             self.save_config()
-            self.log(f"🧪 {mode_txt} 다운로드 selector 테스트 성공 | 태그: {tag} | 품질: {quality} | 파일: {result.get('file') or '-'}")
+            self.log(
+                f"🧪 {mode_txt} 다운로드 selector 테스트 성공 | 태그: {tag} | 품질: {quality} | "
+                f"파일: {result.get('file') or '-'} | 경로: {result.get('path') or '-'}"
+            )
             self.update_status_label(f"✅ {mode_txt} 다운로드 selector 테스트 통과", self.color_success)
         except Exception as e:
             self.log(f"❌ {mode_txt} 다운로드 selector 테스트 실패: {e}")
@@ -4691,6 +4786,7 @@ class FlowVisionApp:
         quality = self._download_quality(mode)
         tag = self.download_items[self.download_index]
         started_at = datetime.now()
+        self.log(f"📁 다운로드 저장 폴더: {self._resolve_download_output_dir()}")
 
         try:
             self._ensure_browser_session()
@@ -4713,17 +4809,21 @@ class FlowVisionApp:
             self._apply_download_used_selectors(mode, result.get("used", {}))
             self.save_config()
             file_name = result.get("file") or ""
+            file_path = result.get("path") or ""
             self.download_session_log.append({
                 "tag": tag,
                 "mode": mode,
                 "quality": quality,
                 "status": "success",
                 "file_name": file_name,
+                "file_path": file_path,
                 "started_at": started_at.isoformat(),
                 "ended_at": datetime.now().isoformat(),
                 "error": "",
             })
             self.log(f"✅ 다운로드 성공: {tag} ({mode}/{quality}) {file_name}")
+            if file_path:
+                self.log(f"📂 저장 위치: {file_path}")
             self.play_sound("success")
         except Exception as e:
             self.download_session_log.append({
@@ -4732,6 +4832,7 @@ class FlowVisionApp:
                 "quality": quality,
                 "status": "failed",
                 "file_name": "",
+                "file_path": "",
                 "started_at": started_at.isoformat(),
                 "ended_at": datetime.now().isoformat(),
                 "error": str(e),
@@ -4935,6 +5036,7 @@ class FlowVisionApp:
                 "mode": self._download_mode(),
                 "video_quality": self._download_quality("video"),
                 "image_quality": self._download_quality("image"),
+                "output_dir": str(self._resolve_download_output_dir()),
                 "total": len(self.download_session_log),
                 "success": len(self.download_session_log) - len(failed),
                 "failed": len(failed),
