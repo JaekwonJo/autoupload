@@ -1748,6 +1748,32 @@ class FlowVisionApp:
             return best, self.cfg.get(key, "")
         return None, None
 
+    def _apply_vertical_quality_path_if_needed(self, mode, quality, quality_loc):
+        # 이미지 4K 메뉴는 대각선 이동 시 서브메뉴가 닫히는 경우가 있어
+        # 1K 위치에서 같은 X축으로 수직 이동해 4K를 누르는 경로를 우선 적용한다.
+        if (not self.page) or mode != "image" or str(quality).upper() != "4K" or quality_loc is None:
+            return
+        try:
+            one_loc, _ = self._resolve_best_locator(
+                self._download_quality_candidates("image", "1K"),
+                timeout_ms=800,
+                prefer_enabled=False,
+            )
+            if one_loc is None:
+                return
+            b1 = one_loc.bounding_box()
+            b4 = quality_loc.bounding_box()
+            if (not b1) or (not b4):
+                return
+            x = float(b4["x"]) + float(b4["width"]) * 0.5
+            y1 = float(b1["y"]) + float(b1["height"]) * 0.5
+            y4 = float(b4["y"]) + float(b4["height"]) * 0.5
+            self.page.mouse.move(x, y1, steps=7)
+            self.page.mouse.move(x, y4, steps=14)
+            self._action_log(f"[{datetime.now().strftime('%H:%M:%S')}] 4K 수직 이동 경로 적용")
+        except Exception:
+            return
+
     def _run_single_download_flow(self, mode, tag, quality, dry_run=False, wait_sec=60, is_test=False):
         if not self.page:
             raise RuntimeError("브라우저 페이지가 없습니다.")
@@ -1900,24 +1926,68 @@ class FlowVisionApp:
 
         dl_timeout_sec = self._download_expect_timeout_sec(mode, quality, is_test=is_test)
         self.log(f"⏱️ 다운로드 시작 대기 타임아웃: {dl_timeout_sec}초 ({mode}/{quality})")
-        self._download_action_delay("품질 클릭 전 안정화", 0.2, 0.8)
-        try:
-            with self.page.expect_download(timeout=int(dl_timeout_sec * 1000)) as dl_info:
-                if not self._click_with_actor_fallback(quality_loc, f"{quality} 품질"):
-                    quality_loc.click(timeout=2500)
-            dl = dl_info.value
-            file_name = dl.suggested_filename or ""
-            out_dir = self._resolve_download_output_dir()
-            safe_name = file_name.strip() if file_name else ""
-            if not safe_name:
-                ext = ".mp4" if mode == "video" else ".png"
-                safe_name = f"{tag}{ext}"
-            target = self._next_available_path(out_dir / safe_name)
-            dl.save_as(str(target))
-            file_path = str(target)
-            self.log(f"💾 다운로드 저장 경로: {file_path}")
-        except Exception as e:
-            raise RuntimeError(f"다운로드 시작 실패: {e}")
+        dl = None
+        last_err = None
+        for attempt in range(2):
+            try:
+                if attempt > 0:
+                    self.log(f"♻️ 품질 클릭 재시도 {attempt+1}/2")
+                    if not self._click_with_actor_fallback(more_loc, "더보기 버튼(품질 재시도)"):
+                        raise RuntimeError("더보기 버튼 재열기 실패")
+                    menu_loc_retry, _ = self._wait_best_locator(
+                        self._download_menu_candidates(mode),
+                        timeout_sec=4,
+                        prefer_enabled=False,
+                    )
+                    if menu_loc_retry is None:
+                        menu_loc_retry, _ = self._resolve_text_locator_any_frame(["다운로드", "Download"], timeout_ms=1000)
+                    if menu_loc_retry is None:
+                        raise RuntimeError("다운로드 메뉴 재탐색 실패")
+                    try:
+                        self.actor.move_to_locator(menu_loc_retry, label="다운로드 메뉴(재시도)")
+                    except Exception:
+                        try:
+                            menu_loc_retry.hover(timeout=900)
+                        except Exception:
+                            pass
+                    self._download_action_delay("품질 목록 재표시 대기", 0.12, 0.45)
+                    quality_loc, quality_sel = self._wait_best_locator(
+                        self._download_quality_candidates(mode, quality),
+                        timeout_sec=4,
+                        prefer_enabled=False,
+                    )
+                    if quality_loc is None:
+                        quality_loc, quality_sel = self._resolve_text_locator_any_frame([quality], timeout_ms=1000)
+                    if quality_loc is None:
+                        raise RuntimeError(f"{quality} 품질 항목 재탐색 실패")
+                    used["quality"] = quality_sel or used["quality"]
+
+                self._download_action_delay("품질 클릭 전 안정화", 0.2, 0.8)
+                self._apply_vertical_quality_path_if_needed(mode, quality, quality_loc)
+                with self.page.expect_download(timeout=int(dl_timeout_sec * 1000)) as dl_info:
+                    quality_loc.click(timeout=2500, force=True)
+                dl = dl_info.value
+                break
+            except Exception as e:
+                last_err = e
+                if attempt == 0:
+                    self._download_action_delay("품질 재시도 전 대기", 0.18, 0.55)
+                else:
+                    raise RuntimeError(f"다운로드 시작 실패: {e}")
+
+        if dl is None:
+            raise RuntimeError(f"다운로드 시작 실패: {last_err}")
+
+        file_name = dl.suggested_filename or ""
+        out_dir = self._resolve_download_output_dir()
+        safe_name = file_name.strip() if file_name else ""
+        if not safe_name:
+            ext = ".mp4" if mode == "video" else ".png"
+            safe_name = f"{tag}{ext}"
+        target = self._next_available_path(out_dir / safe_name)
+        dl.save_as(str(target))
+        file_path = str(target)
+        self.log(f"💾 다운로드 저장 경로: {file_path}")
 
         return {"used": used, "file": file_name, "path": file_path}
 
