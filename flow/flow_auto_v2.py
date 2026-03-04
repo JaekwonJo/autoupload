@@ -106,6 +106,21 @@ DEFAULT_CONFIG = {
     "asset_start_selector": "",
     "asset_search_button_selector": "",
     "asset_search_input_selector": "",
+    "download_mode": "video",  # video / image
+    "download_video_quality": "1080P",
+    "download_image_quality": "4K",
+    "download_wait_seconds": 60,
+    "download_search_input_selector": "",
+    "download_video_filter_selector": "",
+    "download_image_filter_selector": "",
+    "download_video_card_selector": "",
+    "download_image_card_selector": "",
+    "download_video_more_selector": "",
+    "download_image_more_selector": "",
+    "download_video_menu_selector": "",
+    "download_image_menu_selector": "",
+    "download_video_quality_selector": "",
+    "download_image_quality_selector": "",
     "enter_submit_rate": 0.5,
     "use_ref_images": False,
     "ref_image_count": 1,
@@ -345,6 +360,10 @@ class FlowVisionApp:
         self._tray_warned_unavailable = False
         self.paused = False
         self.pause_remaining = None
+        self.download_items = []
+        self.download_index = 0
+        self.download_session_log = []
+        self.download_report_path = None
 
         self.actor = HumanActor(action_logger=self._action_log, status_callback=self._actor_status)
         self.actor.language_mode = self.cfg.get("language_mode", "en")
@@ -446,11 +465,12 @@ class FlowVisionApp:
         except Exception:
             pass
 
-    def _open_action_log(self):
+    def _open_action_log(self, prefix="action_trace"):
         if self.action_log_fp:
             return
         stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-        self.action_log_path = self.logs_dir / f"action_trace_{stamp}.log"
+        safe_prefix = str(prefix or "action_trace").strip() or "action_trace"
+        self.action_log_path = self.logs_dir / f"{safe_prefix}_{stamp}.log"
         self.action_log_fp = self.action_log_path.open("a", encoding="utf-8")
         self._action_log(f"[{datetime.now().strftime('%H:%M:%S')}] 액션 로그 파일 생성: {self.action_log_path}")
         self.log(f"🧾 행동 로그 저장 시작: {self.action_log_path.name}")
@@ -777,6 +797,188 @@ class FlowVisionApp:
             prompt = template.replace("{tag}", tag).strip()
             items.append({"tag": tag, "prompt": prompt})
         return items
+
+    def _build_download_items(self):
+        try:
+            start_num = int(self.cfg.get("asset_loop_start", 1))
+        except (TypeError, ValueError):
+            start_num = 1
+        try:
+            end_num = int(self.cfg.get("asset_loop_end", 1))
+        except (TypeError, ValueError):
+            end_num = start_num
+        start_num = max(1, start_num)
+        end_num = max(1, end_num)
+        if start_num > end_num:
+            start_num, end_num = end_num, start_num
+
+        prefix = (self.cfg.get("asset_loop_prefix") or "S").strip() or "S"
+        try:
+            pad_width = int(self.cfg.get("asset_loop_num_width", 0))
+        except (TypeError, ValueError):
+            pad_width = 0
+        if pad_width <= 0:
+            pad_width = 2
+
+        items = []
+        max_items = 500
+        for n in range(start_num, end_num + 1):
+            if len(items) >= max_items:
+                break
+            tag = f"{prefix}{str(n).zfill(pad_width)}"
+            items.append(tag)
+        return items
+
+    def _download_mode(self):
+        mode = str(self.cfg.get("download_mode", "video") or "video").strip().lower()
+        return "image" if mode == "image" else "video"
+
+    def _download_quality(self, mode=None):
+        mode = mode or self._download_mode()
+        if mode == "image":
+            val = str(self.cfg.get("download_image_quality", "4K") or "4K").strip().upper()
+            return val if val in ("1K", "2K", "4K") else "4K"
+        val = str(self.cfg.get("download_video_quality", "1080P") or "1080P").strip().upper()
+        return val if val in ("720P", "1080P", "4K") else "1080P"
+
+    def _download_search_input_candidates(self):
+        cands = []
+        cands.extend(self._normalize_candidate_list(self.cfg.get("download_search_input_selector", "")))
+        cands.extend([
+            "input[placeholder*='검색' i]",
+            "input[aria-label*='검색' i]",
+            "input[placeholder*='search' i]",
+            "input[aria-label*='search' i]",
+            "input[type='search']",
+            "[role='searchbox']",
+            "[role='textbox'][aria-label*='검색' i]",
+            "[role='textbox'][aria-label*='search' i]",
+            "[contenteditable='true'][aria-label*='검색' i]",
+            "[contenteditable='true'][aria-label*='search' i]",
+            "input",
+        ])
+        seen = set()
+        uniq = []
+        for x in cands:
+            if x not in seen:
+                uniq.append(x)
+                seen.add(x)
+        return uniq
+
+    def _download_filter_candidates(self, mode):
+        key = "download_image_filter_selector" if mode == "image" else "download_video_filter_selector"
+        cands = []
+        cands.extend(self._normalize_candidate_list(self.cfg.get(key, "")))
+        if mode == "image":
+            cands.extend([
+                "button:has-text('이미지')",
+                "[role='button']:has-text('이미지')",
+                "button[aria-label*='이미지' i]",
+                "[role='button'][aria-label*='이미지' i]",
+                "button:has-text('Image')",
+                "[role='button']:has-text('Image')",
+                "button[aria-label*='image' i]",
+            ])
+        else:
+            cands.extend([
+                "button:has-text('영상')",
+                "[role='button']:has-text('영상')",
+                "button[aria-label*='영상' i]",
+                "[role='button'][aria-label*='영상' i]",
+                "button:has-text('Video')",
+                "[role='button']:has-text('Video')",
+                "button[aria-label*='video' i]",
+            ])
+        seen = set()
+        uniq = []
+        for x in cands:
+            if x not in seen:
+                uniq.append(x)
+                seen.add(x)
+        return uniq
+
+    def _download_card_candidates(self, mode):
+        key = "download_image_card_selector" if mode == "image" else "download_video_card_selector"
+        cands = []
+        cands.extend(self._normalize_candidate_list(self.cfg.get(key, "")))
+        cands.extend([
+            "article",
+            "[role='listitem']",
+            "li",
+            "div[class*='card' i]",
+            "div[class*='tile' i]",
+            "div[data-testid*='card' i]",
+            "div[data-testid*='result' i]",
+        ])
+        seen = set()
+        uniq = []
+        for x in cands:
+            if x not in seen:
+                uniq.append(x)
+                seen.add(x)
+        return uniq
+
+    def _download_more_candidates(self, mode):
+        key = "download_image_more_selector" if mode == "image" else "download_video_more_selector"
+        cands = []
+        cands.extend(self._normalize_candidate_list(self.cfg.get(key, "")))
+        cands.extend([
+            "button[aria-label*='더보기' i]",
+            "[role='button'][aria-label*='더보기' i]",
+            "button[aria-label*='more' i]",
+            "[role='button'][aria-label*='more' i]",
+            "button[title*='more' i]",
+            "button:has-text('...')",
+            "button:has-text('⋮')",
+        ])
+        seen = set()
+        uniq = []
+        for x in cands:
+            if x not in seen:
+                uniq.append(x)
+                seen.add(x)
+        return uniq
+
+    def _download_menu_candidates(self, mode):
+        key = "download_image_menu_selector" if mode == "image" else "download_video_menu_selector"
+        cands = []
+        cands.extend(self._normalize_candidate_list(self.cfg.get(key, "")))
+        cands.extend([
+            "button:has-text('다운로드')",
+            "[role='menuitem']:has-text('다운로드')",
+            "[role='button']:has-text('다운로드')",
+            "text=다운로드",
+            "button:has-text('Download')",
+            "[role='menuitem']:has-text('Download')",
+            "text=Download",
+        ])
+        seen = set()
+        uniq = []
+        for x in cands:
+            if x not in seen:
+                uniq.append(x)
+                seen.add(x)
+        return uniq
+
+    def _download_quality_candidates(self, mode, quality):
+        key = "download_image_quality_selector" if mode == "image" else "download_video_quality_selector"
+        quality = str(quality or "").strip().upper()
+        cands = []
+        cands.extend(self._normalize_candidate_list(self.cfg.get(key, "")))
+        if quality:
+            cands.extend([
+                f"button:has-text('{quality}')",
+                f"[role='menuitem']:has-text('{quality}')",
+                f"[role='option']:has-text('{quality}')",
+                f"text={quality}",
+            ])
+        seen = set()
+        uniq = []
+        for x in cands:
+            if x not in seen:
+                uniq.append(x)
+                seen.add(x)
+        return uniq
 
     def _asset_start_button_candidates(self):
         cands = []
@@ -1129,6 +1331,229 @@ class FlowVisionApp:
         self.log(f"✅ Step2 에셋 검색 입력 완료: {asset_tag}")
         self.actor.random_action_delay("에셋 검색 Enter 후 대기", 0.2, 1.0)
 
+    def _apply_download_used_selectors(self, mode, used):
+        if not isinstance(used, dict):
+            return
+        mapping = {
+            "search_input": ("download_search_input_selector", None),
+            "filter": ("download_image_filter_selector" if mode == "image" else "download_video_filter_selector", None),
+            "card": ("download_image_card_selector" if mode == "image" else "download_video_card_selector", None),
+            "more": ("download_image_more_selector" if mode == "image" else "download_video_more_selector", None),
+            "menu": ("download_image_menu_selector" if mode == "image" else "download_video_menu_selector", None),
+            "quality": ("download_image_quality_selector" if mode == "image" else "download_video_quality_selector", None),
+        }
+        var_mapping = {
+            "download_search_input_selector": "download_search_input_selector_var",
+            "download_image_filter_selector": "download_image_filter_selector_var",
+            "download_video_filter_selector": "download_video_filter_selector_var",
+            "download_image_card_selector": "download_image_card_selector_var",
+            "download_video_card_selector": "download_video_card_selector_var",
+            "download_image_more_selector": "download_image_more_selector_var",
+            "download_video_more_selector": "download_video_more_selector_var",
+            "download_image_menu_selector": "download_image_menu_selector_var",
+            "download_video_menu_selector": "download_video_menu_selector_var",
+            "download_image_quality_selector": "download_image_quality_selector_var",
+            "download_video_quality_selector": "download_video_quality_selector_var",
+        }
+        for k, raw in used.items():
+            cfg_key = mapping.get(k, (None, None))[0]
+            val = str(raw or "").strip()
+            if not cfg_key or not val:
+                continue
+            self.cfg[cfg_key] = val
+            var_name = var_mapping.get(cfg_key)
+            if var_name and hasattr(self, var_name):
+                try:
+                    getattr(self, var_name).set(val)
+                except Exception:
+                    pass
+
+    def _click_download_filter(self, mode, used):
+        filter_loc, filter_sel = self._resolve_best_locator(
+            self._download_filter_candidates(mode),
+            timeout_ms=1800,
+            prefer_enabled=False,
+        )
+        if filter_loc is None:
+            # 필터 버튼을 못 찾아도 현재 화면이 이미 해당 필터일 수 있어 실패로 보지 않는다.
+            return False
+        used["filter"] = filter_sel or ""
+        self._click_with_actor_fallback(filter_loc, f"{'이미지' if mode == 'image' else '영상'} 필터")
+        self.actor.random_action_delay("필터 적용 대기", 0.2, 0.9)
+        return True
+
+    def _resolve_more_button_from_card(self, card_loc, mode):
+        # 카드 내부에서 우상단 작은 버튼(더보기)을 우선 추정한다.
+        if card_loc is None:
+            return None, None
+        try:
+            card_box = card_loc.bounding_box()
+        except Exception:
+            card_box = None
+        if not card_box:
+            return None, None
+
+        try:
+            inner = card_loc.locator("button, [role='button']")
+            total = min(inner.count(), 30)
+        except Exception:
+            total = 0
+            inner = None
+
+        best = None
+        best_score = float("inf")
+        for i in range(total):
+            cand = inner.nth(i)
+            try:
+                if not cand.is_visible(timeout=800):
+                    continue
+                box = cand.bounding_box()
+            except Exception:
+                continue
+            if not box:
+                continue
+            if box["width"] < 12 or box["height"] < 12:
+                continue
+            cx = box["x"] + box["width"] / 2.0
+            cy = box["y"] + box["height"] / 2.0
+            right_top_x = card_box["x"] + card_box["width"] - 28.0
+            right_top_y = card_box["y"] + 20.0
+            score = abs(cx - right_top_x) + abs(cy - right_top_y)
+            try:
+                meta = cand.evaluate("""(el)=>((el.getAttribute('aria-label')||'')+' '+(el.innerText||'')).toLowerCase()""")
+            except Exception:
+                meta = ""
+            if any(x in meta for x in ("더보기", "more", "menu", "...", "⋮")):
+                score -= 250.0
+            if score < best_score:
+                best_score = score
+                best = cand
+        if best is not None:
+            key = "download_image_more_selector" if mode == "image" else "download_video_more_selector"
+            return best, self.cfg.get(key, "")
+        return None, None
+
+    def _run_single_download_flow(self, mode, tag, quality, dry_run=False, wait_sec=60):
+        if not self.page:
+            raise RuntimeError("브라우저 페이지가 없습니다.")
+        mode = "image" if mode == "image" else "video"
+        quality = self._download_quality(mode) if not quality else str(quality).strip().upper()
+        wait_sec = max(10, min(120, int(wait_sec)))
+        used = {"search_input": "", "filter": "", "card": "", "more": "", "menu": "", "quality": ""}
+
+        self._click_download_filter(mode, used)
+
+        search_loc, search_sel = self._wait_best_locator(
+            self._download_search_input_candidates(),
+            timeout_sec=8,
+            prefer_enabled=False,
+        )
+        if search_loc is None:
+            raise RuntimeError("검색 입력칸을 찾지 못했습니다.")
+        used["search_input"] = search_sel or ""
+        try:
+            search_loc.click(timeout=1500)
+        except Exception:
+            pass
+        try:
+            self.page.keyboard.press("Control+A")
+            self.page.keyboard.press("Backspace")
+        except Exception:
+            pass
+        try:
+            search_loc.fill(tag)
+        except Exception:
+            try:
+                search_loc.type(tag, delay=random.randint(20, 60))
+            except Exception as e:
+                raise RuntimeError(f"검색어 입력 실패: {e}")
+        self.page.keyboard.press("Enter")
+        self.actor.random_action_delay("검색 결과 반영 대기", 0.4, 1.2)
+
+        deadline = time.time() + wait_sec
+        card_loc = None
+        card_sel = None
+        more_loc = None
+        more_sel = None
+        while time.time() < deadline:
+            card_loc, card_sel = self._resolve_best_locator(
+                self._download_card_candidates(mode),
+                timeout_ms=1100,
+                prefer_enabled=False,
+            )
+            if card_loc is not None:
+                used["card"] = card_sel or ""
+                try:
+                    self.actor.move_to_locator(card_loc, label=f"결과 카드({tag})")
+                except Exception:
+                    try:
+                        card_loc.hover(timeout=1000)
+                    except Exception:
+                        pass
+                more_loc, more_sel = self._resolve_best_locator(
+                    self._download_more_candidates(mode),
+                    near_locator=card_loc,
+                    timeout_ms=1000,
+                    prefer_enabled=False,
+                )
+                if more_loc is None:
+                    more_loc, more_sel = self._resolve_more_button_from_card(card_loc, mode)
+            if more_loc is not None:
+                used["more"] = more_sel or ""
+                break
+            time.sleep(0.5)
+
+        if more_loc is None:
+            raise RuntimeError(f"더보기 버튼을 찾지 못했습니다. (대기 {wait_sec}초)")
+
+        if not self._click_with_actor_fallback(more_loc, "더보기 버튼"):
+            raise RuntimeError("더보기 버튼 클릭 실패")
+
+        menu_loc, menu_sel = self._wait_best_locator(
+            self._download_menu_candidates(mode),
+            timeout_sec=7,
+            prefer_enabled=False,
+        )
+        if menu_loc is None:
+            menu_loc, menu_sel = self._resolve_text_locator_any_frame(["다운로드", "Download"], timeout_ms=1000)
+        if menu_loc is None:
+            raise RuntimeError("다운로드 메뉴를 찾지 못했습니다.")
+        used["menu"] = menu_sel or ""
+
+        try:
+            self.actor.move_to_locator(menu_loc, label="다운로드 메뉴")
+        except Exception:
+            try:
+                menu_loc.hover(timeout=1200)
+            except Exception:
+                pass
+        self.actor.random_action_delay("품질 목록 표시 대기", 0.15, 0.6)
+
+        quality_loc, quality_sel = self._wait_best_locator(
+            self._download_quality_candidates(mode, quality),
+            timeout_sec=7,
+            prefer_enabled=False,
+        )
+        if quality_loc is None:
+            quality_loc, quality_sel = self._resolve_text_locator_any_frame([quality], timeout_ms=1000)
+        if quality_loc is None:
+            raise RuntimeError(f"{quality} 품질 항목을 찾지 못했습니다.")
+        used["quality"] = quality_sel or ""
+
+        if dry_run:
+            return {"used": used, "file": None}
+
+        try:
+            with self.page.expect_download(timeout=15000) as dl_info:
+                if not self._click_with_actor_fallback(quality_loc, f"{quality} 품질"):
+                    quality_loc.click(timeout=2500)
+            dl = dl_info.value
+            file_name = dl.suggested_filename or ""
+        except Exception as e:
+            raise RuntimeError(f"다운로드 시작 실패: {e}")
+
+        return {"used": used, "file": file_name}
+
     def _parse_schedule_datetime(self, raw_text):
         txt = (raw_text or "").strip()
         if not txt:
@@ -1479,6 +1904,81 @@ class FlowVisionApp:
         ttk.Button(asset_btn_f, text="🔍 에셋 selector 자동찾기", command=self.on_auto_detect_asset_selectors).pack(side="left")
         ttk.Button(asset_btn_f, text="🧪 에셋 selector 테스트", command=self.on_test_asset_selectors).pack(side="left", padx=6)
 
+        dl_body, _set_dl_open = self._create_collapsible_section(left_card, "다운로드 자동화", opened=False)
+        dl_f = tk.Frame(dl_body, bg=self.color_bg)
+        dl_f.pack(fill="x", pady=6)
+
+        mode_f = tk.Frame(dl_f, bg=self.color_bg)
+        mode_f.pack(fill="x", pady=(0, 6))
+        tk.Label(mode_f, text="모드", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left")
+        self.download_mode_var = tk.StringVar(value=self.cfg.get("download_mode", "video"))
+        self.combo_download_mode = ttk.Combobox(
+            mode_f,
+            textvariable=self.download_mode_var,
+            state="readonly",
+            width=10,
+            values=("video", "image"),
+            font=("Malgun Gothic", 9),
+        )
+        self.combo_download_mode.pack(side="left", padx=(6, 0))
+        self.combo_download_mode.bind("<<ComboboxSelected>>", self.on_option_toggle)
+
+        q_f = tk.Frame(dl_f, bg=self.color_bg)
+        q_f.pack(fill="x", pady=(0, 6))
+        tk.Label(q_f, text="영상 품질", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left")
+        self.download_video_quality_var = tk.StringVar(value=self.cfg.get("download_video_quality", "1080P"))
+        self.combo_download_video_quality = ttk.Combobox(
+            q_f,
+            textvariable=self.download_video_quality_var,
+            state="readonly",
+            width=8,
+            values=("1080P", "720P", "4K"),
+            font=("Malgun Gothic", 9),
+        )
+        self.combo_download_video_quality.pack(side="left", padx=(6, 12))
+        self.combo_download_video_quality.bind("<<ComboboxSelected>>", self.on_option_toggle)
+
+        tk.Label(q_f, text="이미지 품질", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left")
+        self.download_image_quality_var = tk.StringVar(value=self.cfg.get("download_image_quality", "4K"))
+        self.combo_download_image_quality = ttk.Combobox(
+            q_f,
+            textvariable=self.download_image_quality_var,
+            state="readonly",
+            width=6,
+            values=("4K", "2K", "1K"),
+            font=("Malgun Gothic", 9),
+        )
+        self.combo_download_image_quality.pack(side="left", padx=(6, 0))
+        self.combo_download_image_quality.bind("<<ComboboxSelected>>", self.on_option_toggle)
+
+        tk.Label(dl_f, text="검색 입력 selector(공통)", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(anchor="w")
+        self.download_search_input_selector_var = tk.StringVar(value=self.cfg.get("download_search_input_selector", ""))
+        self.entry_download_search = tk.Entry(dl_f, textvariable=self.download_search_input_selector_var, bg="#FFFFFF", fg="black", font=("Consolas", 10))
+        self.entry_download_search.pack(fill="x", ipady=3, pady=(2, 4))
+        self.entry_download_search.bind("<FocusOut>", self.on_option_toggle)
+
+        tk.Label(dl_f, text="영상 필터 selector", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(anchor="w")
+        self.download_video_filter_selector_var = tk.StringVar(value=self.cfg.get("download_video_filter_selector", ""))
+        self.entry_download_video_filter = tk.Entry(dl_f, textvariable=self.download_video_filter_selector_var, bg="#FFFFFF", fg="black", font=("Consolas", 10))
+        self.entry_download_video_filter.pack(fill="x", ipady=3, pady=(2, 4))
+        self.entry_download_video_filter.bind("<FocusOut>", self.on_option_toggle)
+
+        tk.Label(dl_f, text="이미지 필터 selector", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(anchor="w")
+        self.download_image_filter_selector_var = tk.StringVar(value=self.cfg.get("download_image_filter_selector", ""))
+        self.entry_download_image_filter = tk.Entry(dl_f, textvariable=self.download_image_filter_selector_var, bg="#FFFFFF", fg="black", font=("Consolas", 10))
+        self.entry_download_image_filter.pack(fill="x", ipady=3, pady=(2, 4))
+        self.entry_download_image_filter.bind("<FocusOut>", self.on_option_toggle)
+
+        d1 = tk.Frame(dl_f, bg=self.color_bg)
+        d1.pack(fill="x", pady=(2, 0))
+        ttk.Button(d1, text="🔍 이미지 다운로드 자동찾기", command=self.on_auto_detect_image_download_selectors).pack(side="left")
+        ttk.Button(d1, text="🧪 이미지 다운로드 테스트", command=self.on_test_image_download_selectors).pack(side="left", padx=6)
+
+        d2 = tk.Frame(dl_f, bg=self.color_bg)
+        d2.pack(fill="x", pady=(6, 0))
+        ttk.Button(d2, text="🔍 영상 다운로드 자동찾기", command=self.on_auto_detect_video_download_selectors).pack(side="left")
+        ttk.Button(d2, text="🧪 영상 다운로드 테스트", command=self.on_test_video_download_selectors).pack(side="left", padx=6)
+
         # Relay (Accordion: 기본 접힘)
         relay_body, _set_relay_open = self._create_collapsible_section(left_card, "이어달리기 / 문서 선택", opened=False)
         relay_f = tk.Frame(relay_body, bg=self.color_bg)
@@ -1670,6 +2170,12 @@ class FlowVisionApp:
             command=self.on_start_asset,
         )
         self.btn_start_asset.pack(fill="x", ipady=10, pady=(8, 0))
+        self.btn_start_download = ttk.Button(
+            ctrl_card,
+            text="▶ 다운로드 자동화 시작",
+            command=self.on_start_download,
+        )
+        self.btn_start_download.pack(fill="x", ipady=10, pady=(8, 0))
         self.btn_pause = ttk.Button(ctrl_card, text="⏸ 일시정지", command=self.on_pause, state="disabled")
         self.btn_pause.pack(fill="x", pady=(8, 0), ipady=6)
         self.btn_resume = ttk.Button(ctrl_card, text="▶ 재개", command=self.on_resume, state="disabled")
@@ -1994,6 +2500,18 @@ class FlowVisionApp:
         self.cfg["asset_start_selector"] = self.asset_start_selector_var.get().strip() if hasattr(self, "asset_start_selector_var") else self.cfg.get("asset_start_selector", "")
         self.cfg["asset_search_button_selector"] = self.asset_search_btn_selector_var.get().strip() if hasattr(self, "asset_search_btn_selector_var") else self.cfg.get("asset_search_button_selector", "")
         self.cfg["asset_search_input_selector"] = self.asset_search_input_selector_var.get().strip() if hasattr(self, "asset_search_input_selector_var") else self.cfg.get("asset_search_input_selector", "")
+        self.cfg["download_mode"] = self.download_mode_var.get().strip().lower() if hasattr(self, "download_mode_var") else self.cfg.get("download_mode", "video")
+        if self.cfg["download_mode"] not in ("video", "image"):
+            self.cfg["download_mode"] = "video"
+        self.cfg["download_video_quality"] = self.download_video_quality_var.get().strip().upper() if hasattr(self, "download_video_quality_var") else str(self.cfg.get("download_video_quality", "1080P"))
+        if self.cfg["download_video_quality"] not in ("720P", "1080P", "4K"):
+            self.cfg["download_video_quality"] = "1080P"
+        self.cfg["download_image_quality"] = self.download_image_quality_var.get().strip().upper() if hasattr(self, "download_image_quality_var") else str(self.cfg.get("download_image_quality", "4K"))
+        if self.cfg["download_image_quality"] not in ("1K", "2K", "4K"):
+            self.cfg["download_image_quality"] = "4K"
+        self.cfg["download_search_input_selector"] = self.download_search_input_selector_var.get().strip() if hasattr(self, "download_search_input_selector_var") else self.cfg.get("download_search_input_selector", "")
+        self.cfg["download_video_filter_selector"] = self.download_video_filter_selector_var.get().strip() if hasattr(self, "download_video_filter_selector_var") else self.cfg.get("download_video_filter_selector", "")
+        self.cfg["download_image_filter_selector"] = self.download_image_filter_selector_var.get().strip() if hasattr(self, "download_image_filter_selector_var") else self.cfg.get("download_image_filter_selector", "")
         # 실행 중에는 시작 시 확정한 입력방식을 유지(중간 변경으로 typing/paste 뒤바뀜 방지)
         if self.running and self.run_input_mode in ("typing", "paste", "mixed"):
             self.cfg["input_mode"] = self.run_input_mode
@@ -2872,6 +3390,108 @@ class FlowVisionApp:
             self.log(f"❌ 에셋 selector 테스트 실패: {e}")
             self.update_status_label("❌ 에셋 selector 테스트 실패", self.color_error)
 
+    def on_auto_detect_image_download_selectors(self):
+        if self.running:
+            messagebox.showwarning("안내", "자동화 실행 중에는 selector 탐색을 할 수 없습니다.\n먼저 중지 후 시도해주세요.")
+            return
+        self.on_option_toggle()
+        self._auto_detect_download_selectors_worker("image")
+
+    def on_auto_detect_video_download_selectors(self):
+        if self.running:
+            messagebox.showwarning("안내", "자동화 실행 중에는 selector 탐색을 할 수 없습니다.\n먼저 중지 후 시도해주세요.")
+            return
+        self.on_option_toggle()
+        self._auto_detect_download_selectors_worker("video")
+
+    def _auto_detect_download_selectors_worker(self, mode):
+        mode = "image" if mode == "image" else "video"
+        mode_txt = "이미지" if mode == "image" else "영상"
+        try:
+            self.update_status_label(f"🔍 {mode_txt} 다운로드 selector 자동 탐색 중...", self.color_info)
+            self._ensure_browser_session()
+            self.actor.set_page(self.page)
+
+            start_url = (self.cfg.get("start_url") or "").strip()
+            if start_url and start_url not in (self.page.url or ""):
+                self.page.goto(start_url, wait_until="domcontentloaded", timeout=45000)
+            time.sleep(random.uniform(0.8, 1.6))
+
+            items = self._build_download_items()
+            tag = items[0] if items else "S01"
+            quality = self._download_quality(mode)
+            result = self._run_single_download_flow(mode=mode, tag=tag, quality=quality, dry_run=True, wait_sec=25)
+            self._apply_download_used_selectors(mode, result.get("used", {}))
+            self.save_config()
+            used = result.get("used", {})
+            self.log(
+                f"🔍 {mode_txt} 다운로드 selector 자동탐색 결과 | "
+                f"검색입력: {used.get('search_input') or '미탐지'} | "
+                f"필터: {used.get('filter') or '미탐지'} | "
+                f"카드: {used.get('card') or '미탐지'} | "
+                f"더보기: {used.get('more') or '미탐지'} | "
+                f"다운로드: {used.get('menu') or '미탐지'} | "
+                f"품질: {used.get('quality') or '미탐지'}"
+            )
+            self.update_status_label(f"✅ {mode_txt} 다운로드 selector 자동탐색 완료", self.color_success)
+        except Exception as e:
+            self.log(f"❌ {mode_txt} 다운로드 selector 자동탐색 실패: {e}")
+            self.update_status_label(f"❌ {mode_txt} 다운로드 selector 자동탐색 실패", self.color_error)
+
+    def on_test_image_download_selectors(self):
+        if self.running:
+            messagebox.showwarning("안내", "자동화 실행 중에는 selector 테스트를 할 수 없습니다.\n먼저 중지 후 시도해주세요.")
+            return
+        self.on_option_toggle()
+        self._test_download_selectors_worker("image")
+
+    def on_test_video_download_selectors(self):
+        if self.running:
+            messagebox.showwarning("안내", "자동화 실행 중에는 selector 테스트를 할 수 없습니다.\n먼저 중지 후 시도해주세요.")
+            return
+        self.on_option_toggle()
+        self._test_download_selectors_worker("video")
+
+    def _test_download_selectors_worker(self, mode):
+        mode = "image" if mode == "image" else "video"
+        mode_txt = "이미지" if mode == "image" else "영상"
+        try:
+            self.update_status_label(f"🧪 {mode_txt} 다운로드 selector 테스트 중...", self.color_info)
+            self._ensure_browser_session()
+            self.actor.set_page(self.page)
+
+            start_url = (self.cfg.get("start_url") or "").strip()
+            if start_url and start_url not in (self.page.url or ""):
+                self.page.goto(start_url, wait_until="domcontentloaded", timeout=45000)
+            time.sleep(random.uniform(0.8, 1.6))
+
+            items = self._build_download_items()
+            default_tag = items[0] if items else "S01"
+            tag = simpledialog.askstring(
+                f"{mode_txt} 다운로드 테스트",
+                "테스트할 태그를 입력하세요. (예: S01)",
+                initialvalue=default_tag,
+                parent=self.root,
+            )
+            if tag is None:
+                self.update_status_label(f"ℹ️ {mode_txt} 다운로드 테스트 취소됨", self.color_info)
+                return
+            tag = (tag or "").strip()
+            if not tag:
+                messagebox.showwarning("입력 오류", "태그를 입력해주세요.")
+                self.update_status_label(f"⚠️ {mode_txt} 다운로드 테스트 취소", self.color_error)
+                return
+
+            quality = self._download_quality(mode)
+            result = self._run_single_download_flow(mode=mode, tag=tag, quality=quality, dry_run=False, wait_sec=60)
+            self._apply_download_used_selectors(mode, result.get("used", {}))
+            self.save_config()
+            self.log(f"🧪 {mode_txt} 다운로드 selector 테스트 성공 | 태그: {tag} | 품질: {quality} | 파일: {result.get('file') or '-'}")
+            self.update_status_label(f"✅ {mode_txt} 다운로드 selector 테스트 통과", self.color_success)
+        except Exception as e:
+            self.log(f"❌ {mode_txt} 다운로드 selector 테스트 실패: {e}")
+            self.update_status_label(f"❌ {mode_txt} 다운로드 selector 테스트 실패", self.color_error)
+
     def on_open_relay_selector(self):
         slots = self.cfg.get("prompt_slots", [])
         if not slots:
@@ -2995,8 +3615,12 @@ class FlowVisionApp:
         except: pass
 
     def _update_progress_ui(self):
-        total = len(self.prompts)
-        current = self.index
+        if self.current_run_mode == "download":
+            total = len(self.download_items)
+            current = self.download_index
+        else:
+            total = len(self.prompts)
+            current = self.index
         shown = 0 if total == 0 else min(current + 1, total)
         self.lbl_nav_status.config(text=f"{shown} / {total}")
         if total > 0:
@@ -3049,11 +3673,12 @@ class FlowVisionApp:
             print(f"Failed to update monitor UI: {e}")
 
     def _set_run_mode(self, mode):
-        use_asset = (mode == "asset")
         self.current_run_mode = mode
-        self.cfg["asset_loop_enabled"] = use_asset
-        if hasattr(self, "asset_loop_var"):
-            self.asset_loop_var.set(use_asset)
+        if mode in ("prompt", "asset"):
+            use_asset = (mode == "asset")
+            self.cfg["asset_loop_enabled"] = use_asset
+            if hasattr(self, "asset_loop_var"):
+                self.asset_loop_var.set(use_asset)
         self.save_config()
 
     def on_start_prompt(self):
@@ -3064,6 +3689,10 @@ class FlowVisionApp:
         self._set_run_mode("asset")
         self.on_start()
 
+    def on_start_download(self):
+        self._set_run_mode("download")
+        self.on_start()
+
     def on_start(self):
         if self.running:
             self.log("ℹ️ 이미 자동화가 실행 중입니다.")
@@ -3071,7 +3700,10 @@ class FlowVisionApp:
         if self.paused:
             self.on_resume()
             return
-        self.on_reload() # 시작 시 프롬프트 최신화
+        run_mode = self.current_run_mode or ("asset" if self.cfg.get("asset_loop_enabled") else "prompt")
+        is_download_mode = (run_mode == "download")
+        if not is_download_mode:
+            self.on_reload() # 시작 시 프롬프트 최신화
         try:
             self.cfg["interval_seconds"] = int(self.entry_interval.get())
         except: pass
@@ -3079,14 +3711,14 @@ class FlowVisionApp:
         self.cfg["scheduled_start_at"] = self.schedule_text_var.get().strip() if hasattr(self, "schedule_text_var") else self.cfg.get("scheduled_start_at", "")
         self.save_config()
 
-        if self.cfg.get("asset_loop_enabled") and self.cfg.get("relay_mode"):
+        if (not is_download_mode) and self.cfg.get("asset_loop_enabled") and self.cfg.get("relay_mode"):
             self.cfg["relay_mode"] = False
             if hasattr(self, "relay_var"):
                 self.relay_var.set(False)
             self.save_config()
             self.log("ℹ️ S반복 모드에서는 이어달리기를 자동 해제합니다.")
 
-        if self.cfg.get("relay_mode"):
+        if (not is_download_mode) and self.cfg.get("relay_mode"):
             seq = self._get_effective_relay_sequence()
             if not seq:
                 messagebox.showwarning("주의", "이어달리기 대상 문서가 없습니다.")
@@ -3104,23 +3736,42 @@ class FlowVisionApp:
             else:
                 self.log(f"🏃 이어달리기 범위: {self.cfg['prompt_slots'][start_slot]['name']} → {self.cfg['prompt_slots'][end_slot]['name']}")
 
-        if not (self.cfg.get("start_url", "").strip() and self.cfg.get("input_selector", "").strip()):
-            messagebox.showwarning("주의", "시작 URL / 입력 셀렉터를 먼저 입력해주세요.")
-            return
-        
-        if not self.prompts and not self.cfg.get("relay_mode"):
-            if self.cfg.get("asset_loop_enabled"):
-                messagebox.showwarning("주의", "S반복 목록이 비어 있습니다.\n시작/끝 번호를 확인해주세요.")
-            else:
-                messagebox.showwarning("주의", "프롬프트 파일이 비어있습니다!\n먼저 프롬프트를 입력하고 저장을 눌러주세요.")
-            return
-        
-        if self.index >= len(self.prompts):
-            self.index = 0
+        if is_download_mode:
+            if not self.cfg.get("start_url", "").strip():
+                messagebox.showwarning("주의", "시작 URL을 먼저 입력해주세요.")
+                return
+            self.download_items = self._build_download_items()
+            self.download_index = 0
+            self.download_session_log = []
+            if not self.download_items:
+                messagebox.showwarning("주의", "다운로드 대상 S번호가 비어 있습니다.\n시작/끝 번호를 확인해주세요.")
+                return
             self._update_progress_ui()
+            self.cfg["scheduled_start_enabled"] = False
+            self.cfg["scheduled_start_at"] = ""
+            if hasattr(self, "schedule_var"):
+                self.schedule_var.set(False)
+            if hasattr(self, "schedule_text_var"):
+                self.schedule_text_var.set("")
+            self.save_config()
+        else:
+            if not (self.cfg.get("start_url", "").strip() and self.cfg.get("input_selector", "").strip()):
+                messagebox.showwarning("주의", "시작 URL / 입력 셀렉터를 먼저 입력해주세요.")
+                return
+            
+            if not self.prompts and not self.cfg.get("relay_mode"):
+                if self.cfg.get("asset_loop_enabled"):
+                    messagebox.showwarning("주의", "S반복 목록이 비어 있습니다.\n시작/끝 번호를 확인해주세요.")
+                else:
+                    messagebox.showwarning("주의", "프롬프트 파일이 비어있습니다!\n먼저 프롬프트를 입력하고 저장을 눌러주세요.")
+                return
+            
+            if self.index >= len(self.prompts):
+                self.index = 0
+                self._update_progress_ui()
 
         scheduled_dt = None
-        if self.cfg.get("scheduled_start_enabled"):
+        if (not is_download_mode) and self.cfg.get("scheduled_start_enabled"):
             raw = self.cfg.get("scheduled_start_at", "")
             scheduled_dt = self._parse_schedule_datetime(raw)
             if not scheduled_dt:
@@ -3136,8 +3787,10 @@ class FlowVisionApp:
         if self.relay_progress == 0:
             self.session_start_time = datetime.now()
             self.session_log = []
-            self._open_action_log()
+            self._open_action_log("download_trace" if is_download_mode else "action_trace")
             self.session_report_path = self.logs_dir / f"session_report_{self.session_start_time.strftime('%Y%m%d_%H%M%S')}.json"
+            if is_download_mode:
+                self.download_report_path = self.logs_dir / f"download_report_{self.session_start_time.strftime('%Y%m%d_%H%M%S')}.json"
         self.running = True
         self.paused = False
         self.pause_remaining = None
@@ -3145,6 +3798,8 @@ class FlowVisionApp:
             self.btn_start_prompt.config(state="disabled")
         if hasattr(self, "btn_start_asset"):
             self.btn_start_asset.config(state="disabled")
+        if hasattr(self, "btn_start_download"):
+            self.btn_start_download.config(state="disabled")
         if hasattr(self, "btn_pause"):
             self.btn_pause.config(state="normal")
         if hasattr(self, "btn_resume"):
@@ -3153,22 +3808,28 @@ class FlowVisionApp:
         self.update_status_label("🚀 시작 중...", self.color_success)
         self.play_sound("start")
         self.on_option_toggle()
-        if self.cfg.get("asset_loop_enabled"):
+        if is_download_mode:
+            mode_label = "영상" if self._download_mode() == "video" else "이미지"
+            self.log(f"🚀 다운로드 자동화 시작 ({mode_label}, {len(self.download_items)}개)")
+        elif self.cfg.get("asset_loop_enabled"):
             self.log("🚀 S반복 자동화 시작")
         else:
             self.log("🚀 프롬프트 자동화 시작")
-        # 실행 시점 입력방식 고정: 중간에 설정이 바뀌어도 현재 런에는 영향 없게 한다.
-        self.run_input_mode = (self.cfg.get("input_mode", "paste") or "paste").strip().lower()
-        if self.run_input_mode not in ("typing", "paste", "mixed"):
-            self.run_input_mode = "paste"
-        self.cfg["input_mode"] = self.run_input_mode
-        self.input_mode_var.set(self.run_input_mode)
-        self.save_config()
-        try:
-            self.combo_input_mode.config(state="disabled")
-        except Exception:
-            pass
-        self.log(f"🔒 실행 입력방식 고정: {self.run_input_mode}")
+        if not is_download_mode:
+            # 실행 시점 입력방식 고정: 중간에 설정이 바뀌어도 현재 런에는 영향 없게 한다.
+            self.run_input_mode = (self.cfg.get("input_mode", "paste") or "paste").strip().lower()
+            if self.run_input_mode not in ("typing", "paste", "mixed"):
+                self.run_input_mode = "paste"
+            self.cfg["input_mode"] = self.run_input_mode
+            self.input_mode_var.set(self.run_input_mode)
+            self.save_config()
+            try:
+                self.combo_input_mode.config(state="disabled")
+            except Exception:
+                pass
+            self.log(f"🔒 실행 입력방식 고정: {self.run_input_mode}")
+        else:
+            self.run_input_mode = None
         # 안정성 우선: UI(Selector 테스트)와 작업 스레드 간 Playwright 세션 충돌 방지
         # 실행 시작 시 기존 세션을 정리하고, 작업 스레드에서 세션을 새로 만든다.
         try:
@@ -3228,6 +3889,8 @@ class FlowVisionApp:
             self.btn_start_prompt.config(state="disabled")
         if hasattr(self, "btn_start_asset"):
             self.btn_start_asset.config(state="disabled")
+        if hasattr(self, "btn_start_download"):
+            self.btn_start_download.config(state="disabled")
         self.btn_stop.config(state="normal")
         self._ensure_worker_thread()
         wait_sec = max(1, int(self.pause_remaining or 1))
@@ -3238,6 +3901,7 @@ class FlowVisionApp:
         self.log(f"▶ 자동화 재개 (다음 작업까지 약 {wait_sec}초)")
 
     def on_stop(self):
+        prev_mode = self.current_run_mode
         self.running = False
         self.paused = False
         self.pause_remaining = None
@@ -3245,6 +3909,8 @@ class FlowVisionApp:
             self.btn_start_prompt.config(state="normal")
         if hasattr(self, "btn_start_asset"):
             self.btn_start_asset.config(state="normal")
+        if hasattr(self, "btn_start_download"):
+            self.btn_start_download.config(state="normal")
         if hasattr(self, "btn_pause"):
             self.btn_pause.config(state="disabled")
         if hasattr(self, "btn_resume"):
@@ -3258,12 +3924,19 @@ class FlowVisionApp:
         if self.alert_window:
             self.alert_window.close()
             self.alert_window = None
-        self.save_session_report()
+        if prev_mode == "download":
+            self.save_download_report()
+        else:
+            self.save_session_report()
         self._stop_worker_thread()
         self._shutdown_browser()
         self._close_action_log()
         self.run_input_mode = None
         self.current_run_mode = None
+        self.download_items = []
+        self.download_index = 0
+        self.download_session_log = []
+        self.download_report_path = None
         try:
             self.combo_input_mode.config(state="readonly")
         except Exception:
@@ -3374,6 +4047,10 @@ class FlowVisionApp:
         self.hide_to_tray()
 
     def on_exit(self):
+        if self.current_run_mode == "download":
+            self.save_download_report()
+        else:
+            self.save_session_report()
         self.running = False
         self._stop_worker_thread()
         self._shutdown_browser()
@@ -3397,7 +4074,7 @@ class FlowVisionApp:
                         self.update_status_label(f"⏳ 대기 중... {int(remain)}초", "#FFC107")
 
                     # 예약 대기 중이 아니고, 랜덤 행동 옵션이 켜져 있으면 페이지 내부에서 가벼운 행동 수행
-                    if (not self.scheduled_waiting) and self.cfg.get("afk_mode") and random.random() < 0.3:
+                    if (self.current_run_mode != "download") and (not self.scheduled_waiting) and self.cfg.get("afk_mode") and random.random() < 0.3:
                         try:
                             self.actor.random_behavior_routine()
                         except Exception:
@@ -3405,7 +4082,10 @@ class FlowVisionApp:
             
             try: base = int(self.entry_interval.get())
             except: base = 180
-            remain_cnt = len(self.prompts) - self.index
+            if self.current_run_mode == "download":
+                remain_cnt = len(self.download_items) - self.download_index
+            else:
+                remain_cnt = len(self.prompts) - self.index
             total_sec = remain_cnt * base + max(0, int(remain))
             finish_time = datetime.fromtimestamp(time.time() + total_sec).strftime("%p %I:%M")
             self.lbl_eta.config(text=f"🏁 종료 예정: {finish_time}")
@@ -3432,15 +4112,21 @@ class FlowVisionApp:
                     self.is_processing = True
                     self._ensure_worker_thread()
                     self.task_queue.put("run")
-                try:
-                    speed = self.actor.cfg.get('speed_multiplier', 1.0)
-                except: speed = 1.0
-                interval = int(base + random.uniform(0, base * 0.3 * speed))
+                if self.current_run_mode == "download":
+                    interval = max(1, int(base))
+                else:
+                    try:
+                        speed = self.actor.cfg.get('speed_multiplier', 1.0)
+                    except: speed = 1.0
+                    interval = int(base + random.uniform(0, base * 0.3 * speed))
                 self.t_next = time.time() + interval
         self.root.after(1000, self._tick)
 
     def _run_task(self):
         print(f"[{datetime.now()}] Task started")
+        if self.current_run_mode == "download":
+            self._run_download_task()
+            return
         self.on_reload() # 각 작업 시작 전 프롬프트 최신화
         self.log("작업 스레드 시작 (프롬프트 동기화 완료)")
         if not self.prompts or self.index >= len(self.prompts):
@@ -3663,6 +4349,75 @@ class FlowVisionApp:
             self.root.after(0, self._update_progress_ui)
             self.is_processing = False
 
+    def _run_download_task(self):
+        print(f"[{datetime.now()}] Download task started")
+        self.log("다운로드 작업 스레드 시작")
+        if not self.download_items or self.download_index >= len(self.download_items):
+            self.log("다운로드 대상 없음 또는 범위 초과")
+            self.save_download_report()
+            self._show_completion_popup()
+            self.is_processing = False
+            return
+
+        start_url = (self.cfg.get("start_url") or "").strip()
+        mode = self._download_mode()
+        quality = self._download_quality(mode)
+        tag = self.download_items[self.download_index]
+        started_at = datetime.now()
+
+        try:
+            self._ensure_browser_session()
+            self.actor.set_page(self.page)
+            current_url = self.page.url or ""
+            if (not current_url) or (start_url and start_url not in current_url):
+                self.log(f"🌐 페이지 이동: {start_url}")
+                self.page.goto(start_url, wait_until="domcontentloaded", timeout=45000)
+                self.actor.random_action_delay("페이지 로딩 안정화", 1.0, 2.0)
+
+            self.update_status_label(f"⬇️ 다운로드 중... {tag}", self.color_info)
+            wait_sec = int(self.cfg.get("download_wait_seconds", 60) or 60)
+            result = self._run_single_download_flow(
+                mode=mode,
+                tag=tag,
+                quality=quality,
+                dry_run=False,
+                wait_sec=wait_sec,
+            )
+            self._apply_download_used_selectors(mode, result.get("used", {}))
+            self.save_config()
+            file_name = result.get("file") or ""
+            self.download_session_log.append({
+                "tag": tag,
+                "mode": mode,
+                "quality": quality,
+                "status": "success",
+                "file_name": file_name,
+                "started_at": started_at.isoformat(),
+                "ended_at": datetime.now().isoformat(),
+                "error": "",
+            })
+            self.log(f"✅ 다운로드 성공: {tag} ({mode}/{quality}) {file_name}")
+            self.play_sound("success")
+        except Exception as e:
+            self.download_session_log.append({
+                "tag": tag,
+                "mode": mode,
+                "quality": quality,
+                "status": "failed",
+                "file_name": "",
+                "started_at": started_at.isoformat(),
+                "ended_at": datetime.now().isoformat(),
+                "error": str(e),
+            })
+            self.log(f"⚠️ 다운로드 실패: {tag} | 이유: {e}")
+            self.update_status_label(f"⚠️ 실패 후 다음으로 이동: {tag}", self.color_error)
+        finally:
+            self.download_index += 1
+            self.root.after(0, self._update_progress_ui)
+            self.is_processing = False
+            if self.download_index >= len(self.download_items):
+                self._show_completion_popup()
+
     def on_first(self): 
         self.index = 0
         self._update_progress_ui()
@@ -3838,6 +4593,31 @@ class FlowVisionApp:
             self.log(f"🧾 세션 리포트 저장: {self.session_report_path.name}")
         except Exception as e:
             self.log(f"⚠️ 세션 리포트 저장 실패: {e}")
+
+    def save_download_report(self):
+        if not hasattr(self, "download_session_log"):
+            return
+        if self.download_report_path is None:
+            stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+            self.download_report_path = self.logs_dir / f"download_report_{stamp}.json"
+        try:
+            failed = [x for x in self.download_session_log if x.get("status") != "success"]
+            payload = {
+                "created_at": datetime.now().isoformat(),
+                "started_at": getattr(self, "session_start_time", datetime.now()).isoformat() if hasattr(getattr(self, "session_start_time", None), "isoformat") else str(getattr(self, "session_start_time", "")),
+                "mode": self._download_mode(),
+                "video_quality": self._download_quality("video"),
+                "image_quality": self._download_quality("image"),
+                "total": len(self.download_session_log),
+                "success": len(self.download_session_log) - len(failed),
+                "failed": len(failed),
+                "failed_tags": [x.get("tag", "") for x in failed],
+                "entries": self.download_session_log,
+            }
+            self.download_report_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+            self.log(f"🧾 다운로드 리포트 저장: {self.download_report_path.name}")
+        except Exception as e:
+            self.log(f"⚠️ 다운로드 리포트 저장 실패: {e}")
 
 if __name__ == "__main__":
     try: FlowVisionApp().root.mainloop()
