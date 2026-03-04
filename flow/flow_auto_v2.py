@@ -121,6 +121,7 @@ DEFAULT_CONFIG = {
     "download_image_menu_selector": "",
     "download_video_quality_selector": "",
     "download_image_quality_selector": "",
+    "download_human_slowdown": 1.35,
     "enter_submit_rate": 0.5,
     "use_ref_images": False,
     "ref_image_count": 1,
@@ -841,6 +842,26 @@ class FlowVisionApp:
         val = str(self.cfg.get("download_video_quality", "1080P") or "1080P").strip().upper()
         return val if val in ("720P", "1080P", "4K") else "1080P"
 
+    def _download_action_delay(self, label, min_s, max_s):
+        try:
+            slow = float(self.cfg.get("download_human_slowdown", 1.35))
+        except Exception:
+            slow = 1.35
+        slow = max(1.0, min(2.5, slow))
+        self.actor.random_action_delay(label, min_s * slow, max_s * slow)
+
+    def _download_expect_timeout_sec(self, mode, quality, is_test=False):
+        mode = "image" if mode == "image" else "video"
+        quality = str(quality or "").strip().upper()
+        if mode == "video":
+            if quality in ("1080P", "4K"):
+                return 300 if is_test else 240
+            return 75 if is_test else 60
+        # image
+        if quality == "4K":
+            return 180 if is_test else 120
+        return 90 if is_test else 70
+
     def _download_search_input_candidates(self):
         cands = []
         cands.extend(self._normalize_candidate_list(self.cfg.get("download_search_input_selector", "")))
@@ -1039,7 +1060,7 @@ class FlowVisionApp:
         key = "download_image_quality_selector" if mode == "image" else "download_video_quality_selector"
         quality = str(quality or "").strip().upper()
         cands = []
-        cands.extend(self._normalize_candidate_list(self.cfg.get(key, "")))
+        # 요청 품질 기반 selector를 우선 사용해 품질 오클릭을 방지
         if quality:
             cands.extend([
                 f"button:has-text('{quality}')",
@@ -1047,6 +1068,13 @@ class FlowVisionApp:
                 f"[role='option']:has-text('{quality}')",
                 f"text={quality}",
             ])
+        saved = self._normalize_candidate_list(self.cfg.get(key, ""))
+        for s in saved:
+            su = s.upper()
+            # 저장된 selector에 다른 품질이 박혀있으면 제외
+            if any(q in su for q in ("720P", "1080P", "4K", "2K", "1K")) and (quality not in su):
+                continue
+            cands.append(s)
         seen = set()
         uniq = []
         for x in cands:
@@ -1609,8 +1637,9 @@ class FlowVisionApp:
             self.log(f"ℹ️ {'이미지' if mode == 'image' else '영상'} 필터 버튼 미탐지(현재 화면 유지)")
             return False
         used["filter"] = filter_sel or ""
+        self._download_action_delay("필터 클릭 전 안정화", 0.2, 0.7)
         self._click_with_actor_fallback(filter_loc, f"{'이미지' if mode == 'image' else '영상'} 필터")
-        self.actor.random_action_delay("필터 적용 대기", 0.2, 0.9)
+        self._download_action_delay("필터 적용 대기", 0.2, 0.9)
         return True
 
     def _resolve_more_button_from_card(self, card_loc, mode):
@@ -1664,7 +1693,7 @@ class FlowVisionApp:
             return best, self.cfg.get(key, "")
         return None, None
 
-    def _run_single_download_flow(self, mode, tag, quality, dry_run=False, wait_sec=60):
+    def _run_single_download_flow(self, mode, tag, quality, dry_run=False, wait_sec=60, is_test=False):
         if not self.page:
             raise RuntimeError("브라우저 페이지가 없습니다.")
         mode = "image" if mode == "image" else "video"
@@ -1695,7 +1724,7 @@ class FlowVisionApp:
             except Exception as e:
                 raise RuntimeError(f"검색어 입력 실패: {e}")
         self.page.keyboard.press("Enter")
-        self.actor.random_action_delay("검색 결과 반영 대기", 0.4, 1.2)
+        self._download_action_delay("검색 결과 반영 대기", 0.4, 1.2)
 
         deadline = time.time() + wait_sec
         card_loc = None
@@ -1751,6 +1780,7 @@ class FlowVisionApp:
         if more_loc is None:
             raise RuntimeError(f"더보기 버튼을 찾지 못했습니다. (대기 {wait_sec}초)")
 
+        self._download_action_delay("더보기 클릭 전 안정화", 0.25, 0.9)
         if not self._click_with_actor_fallback(more_loc, "더보기 버튼"):
             raise RuntimeError("더보기 버튼 클릭 실패")
 
@@ -1786,7 +1816,7 @@ class FlowVisionApp:
                 menu_loc.hover(timeout=1200)
             except Exception:
                 pass
-        self.actor.random_action_delay("품질 목록 표시 대기", 0.15, 0.6)
+        self._download_action_delay("품질 목록 표시 대기", 0.15, 0.6)
 
         quality_loc, quality_sel = self._wait_best_locator(
             self._download_quality_candidates(mode, quality),
@@ -1798,12 +1828,26 @@ class FlowVisionApp:
         if quality_loc is None:
             raise RuntimeError(f"{quality} 품질 항목을 찾지 못했습니다.")
         used["quality"] = quality_sel or ""
+        quality_meta = self._locator_meta_text(quality_loc)
+        self.log(
+            f"🎚️ 품질 선택 시도 | 요청: {quality} | selector: {quality_sel or '-'} | 후보: {(quality_meta or '')[:80]}"
+        )
+        # 방어적으로 요청 품질이 보이지 않으면 텍스트 기반 재탐색 1회
+        if quality and (quality.lower() not in (quality_meta or "")):
+            retry_loc, retry_sel = self._resolve_text_locator_any_frame([quality], timeout_ms=1200)
+            if retry_loc is not None:
+                quality_loc, quality_sel = retry_loc, retry_sel
+                used["quality"] = quality_sel or used["quality"]
+                self.log(f"🎚️ 품질 재탐색 적용: {quality_sel or quality}")
 
         if dry_run:
             return {"used": used, "file": None}
 
+        dl_timeout_sec = self._download_expect_timeout_sec(mode, quality, is_test=is_test)
+        self.log(f"⏱️ 다운로드 시작 대기 타임아웃: {dl_timeout_sec}초 ({mode}/{quality})")
+        self._download_action_delay("품질 클릭 전 안정화", 0.2, 0.8)
         try:
-            with self.page.expect_download(timeout=15000) as dl_info:
+            with self.page.expect_download(timeout=int(dl_timeout_sec * 1000)) as dl_info:
                 if not self._click_with_actor_fallback(quality_loc, f"{quality} 품질"):
                     quality_loc.click(timeout=2500)
             dl = dl_info.value
@@ -2101,6 +2145,7 @@ class FlowVisionApp:
         self.spin_asset_start.pack(side="left", padx=(6, 14))
         self.spin_asset_start.bind("<FocusOut>", self.on_option_toggle)
         self.spin_asset_start.bind("<Return>", self.on_option_toggle)
+        self.spin_asset_start.bind("<KeyRelease>", self.on_option_toggle)
 
         tk.Label(asset_range_f, text="끝 번호", bg=self.color_bg, font=("Malgun Gothic", 9)).pack(side="left")
         self.asset_loop_end_var = tk.StringVar(value=str(self.cfg.get("asset_loop_end", 1)))
@@ -2117,6 +2162,7 @@ class FlowVisionApp:
         self.spin_asset_end.pack(side="left", padx=(6, 0))
         self.spin_asset_end.bind("<FocusOut>", self.on_option_toggle)
         self.spin_asset_end.bind("<Return>", self.on_option_toggle)
+        self.spin_asset_end.bind("<KeyRelease>", self.on_option_toggle)
 
         asset_prefix_f = tk.Frame(asset_f, bg=self.color_bg)
         asset_prefix_f.pack(fill="x", pady=(0, 6))
@@ -3753,7 +3799,7 @@ class FlowVisionApp:
                 return
 
             quality = self._download_quality(mode)
-            result = self._run_single_download_flow(mode=mode, tag=tag, quality=quality, dry_run=False, wait_sec=60)
+            result = self._run_single_download_flow(mode=mode, tag=tag, quality=quality, dry_run=False, wait_sec=60, is_test=True)
             self._apply_download_used_selectors(mode, result.get("used", {}))
             self.save_config()
             self.log(f"🧪 {mode_txt} 다운로드 selector 테스트 성공 | 태그: {tag} | 품질: {quality} | 파일: {result.get('file') or '-'}")
@@ -4316,10 +4362,18 @@ class FlowVisionApp:
             return
         self.on_exit()
 
+    def _persist_ui_options(self):
+        try:
+            self.on_option_toggle()
+        except Exception:
+            pass
+
     def on_window_close(self):
+        self._persist_ui_options()
         self.hide_to_tray()
 
     def on_exit(self):
+        self._persist_ui_options()
         if self.current_run_mode == "download":
             self.save_download_report()
         else:
